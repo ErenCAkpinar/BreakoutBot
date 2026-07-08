@@ -1,0 +1,69 @@
+  [cache miss] fetching SOLUSDT 90d (one-time)…
+  [cache miss] fetching INJUSDT 90d (one-time)…
+  [cache miss] fetching FETUSDT 90d (one-time)…
+  [cache miss] fetching BTCUSDT 90d (one-time)…
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — SOLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (full)    : 14  (TP1=5 TP2=2 SL=3 TRAIL=3 TMO=1)
+  Trades/day       : 0.16  ⚠️ 
+  Win Rate         : 78.6%  ✅
+  Profit Factor    : 3.08  ✅
+  Total Return     : +1.53%  ✅
+  Monthly estimate : +0.51%
+  Final Balance    : $1015.33
+  Max Drawdown     : -0.66%  ✅
+  Avg PnL/trade    : $+1.095
+  Confirm rate     : 16%  (9 ok / 47 fail)
+  Regime (IDLE bar): BULL 33%  NEUTRAL 52%  BEAR 14%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — INJUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (full)    : 50  (TP1=18 TP2=3 SL=14 TRAIL=15 TMO=0)
+  Trades/day       : 0.56  ✅
+  Win Rate         : 72.0%  ✅
+  Profit Factor    : 1.87  ✅
+  Total Return     : +5.25%  ✅
+  Monthly estimate : +1.75%
+  Final Balance    : $1052.48
+  Max Drawdown     : -1.64%  ✅
+  Avg PnL/trade    : $+1.050
+  Confirm rate     : 23%  (32 ok / 105 fail)
+  Regime (IDLE bar): BULL 51%  NEUTRAL 48%  BEAR 1%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — FETUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (full)    : 67  (TP1=23 TP2=6 SL=21 TRAIL=17 TMO=0)
+  Trades/day       : 0.74  ✅
+  Win Rate         : 68.7%  ✅
+  Profit Factor    : 1.31  ✅
+  Total Return     : +0.76%  ✅
+  Monthly estimate : +0.25%
+  Final Balance    : $1007.58
+  Max Drawdown     : -3.96%  ✅
+  Avg PnL/trade    : $+0.113
+  Confirm rate     : 22%  (44 ok / 155 fail)
+  Regime (IDLE bar): BULL 22%  NEUTRAL 71%  BEAR 7%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+
+========================================================
+  PHASE BENCHMARK: faz1   (pinned data, 3 symbols)
+────────────────────────────────────────────────────────
+  Profitable    : 3/3
+  Avg Win Rate  : 73.1%
+  Avg Profit Fac: 2.09
+  Worst MaxDD   : -3.96%
+  Monthly est ($): $+25.13  (on $1000)
+========================================================
+  data: backtests/data/ (deterministic — delete to refresh window)

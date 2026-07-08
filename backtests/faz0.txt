@@ -1,0 +1,65 @@
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — SOLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (full)    : 14  (TP1=5 TP2=2 SL=3 TRAIL=3 TMO=1)
+  Trades/day       : 0.16  ⚠️ 
+  Win Rate         : 78.6%  ✅
+  Profit Factor    : 1.96  ✅
+  Total Return     : +1.76%  ✅
+  Monthly estimate : +0.59%
+  Final Balance    : $1017.57
+  Max Drawdown     : -1.59%  ✅
+  Avg PnL/trade    : $+1.255
+  Confirm rate     : 16%  (9 ok / 47 fail)
+  Regime (IDLE bar): BULL 33%  NEUTRAL 52%  BEAR 14%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — INJUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (full)    : 50  (TP1=18 TP2=3 SL=14 TRAIL=15 TMO=0)
+  Trades/day       : 0.56  ✅
+  Win Rate         : 72.0%  ✅
+  Profit Factor    : 1.33  ✅
+  Total Return     : +1.70%  ✅
+  Monthly estimate : +0.57%
+  Final Balance    : $1017.02
+  Max Drawdown     : -4.13%  ✅
+  Avg PnL/trade    : $+0.340
+  Confirm rate     : 23%  (32 ok / 105 fail)
+  Regime (IDLE bar): BULL 51%  NEUTRAL 48%  BEAR 1%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — FETUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (full)    : 67  (TP1=23 TP2=6 SL=21 TRAIL=17 TMO=0)
+  Trades/day       : 0.74  ✅
+  Win Rate         : 68.7%  ✅
+  Profit Factor    : 1.21  ❌
+  Total Return     : +0.58%  ✅
+  Monthly estimate : +0.19%
+  Final Balance    : $1005.80
+  Max Drawdown     : -7.73%  ✅
+  Avg PnL/trade    : $+0.087
+  Confirm rate     : 22%  (44 ok / 155 fail)
+  Regime (IDLE bar): BULL 22%  NEUTRAL 71%  BEAR 7%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+========================================================
+  PHASE BENCHMARK: faz0   (pinned data, 3 symbols)
+────────────────────────────────────────────────────────
+  Profitable    : 3/3
+  Avg Win Rate  : 73.1%
+  Avg Profit Fac: 1.50
+  Worst MaxDD   : -7.73%
+  Monthly est ($): $+13.46  (on $1000)
+========================================================
+  data: backtests/data/ (deterministic — delete to refresh window)

@@ -1,0 +1,10 @@
+secrets_local.py
+state_paper.json
+paper_bb.log
+__pycache__/
+*.pyc
+.DS_Store
+*.old
+cache/
+.dist/
+office/

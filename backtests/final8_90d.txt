@@ -1,0 +1,171 @@
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — SOLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 14  (TP1=5 TP2=2 SL=3 TRAIL=3 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 3  (TP=2 SL=1 TMO=0)  WR 67%
+  Trades/day (all) : 0.19  ⚠️ 
+  Win Rate         : 35.3%  ❌
+  Profit Factor    : 10.19  ✅
+  Total Return     : +1.52%  ✅
+  Monthly estimate : +0.51%
+  Final Balance    : $1015.16
+  Max Drawdown     : -0.42%  ✅
+  Avg PnL/trade    : $+0.892
+  Confirm rate     : 16%  (9 ok / 47 fail)
+  Regime (IDLE bar): BULL 33%  NEUTRAL 52%  BEAR 14%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — AVAXUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 18  (TP1=7 TP2=1 SL=4 TRAIL=6 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 5  (TP=2 SL=3 TMO=0)  WR 40%
+  Trades/day (all) : 0.26  ⚠️ 
+  Win Rate         : 34.8%  ❌
+  Profit Factor    : 4.27  ✅
+  Total Return     : +1.49%  ✅
+  Monthly estimate : +0.50%
+  Final Balance    : $1014.95
+  Max Drawdown     : -0.98%  ✅
+  Avg PnL/trade    : $+0.650
+  Confirm rate     : 17%  (11 ok / 53 fail)
+  Regime (IDLE bar): BULL 38%  NEUTRAL 47%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — NEARUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 66  (TP1=23 TP2=4 SL=20 TRAIL=19 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 9  (TP=4 SL=5 TMO=0)  WR 44%
+  Trades/day (all) : 0.83  ✅
+  Win Rate         : 42.7%  ❌
+  Profit Factor    : 1.36  ✅
+  Total Return     : +1.63%  ✅
+  Monthly estimate : +0.54%
+  Final Balance    : $1016.29
+  Max Drawdown     : -3.25%  ✅
+  Avg PnL/trade    : $+0.217
+  Confirm rate     : 28%  (43 ok / 110 fail)
+  Regime (IDLE bar): BULL 53%  NEUTRAL 47%  BEAR 0%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — ADAUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 20  (TP1=6 TP2=1 SL=8 TRAIL=5 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 11  (TP=8 SL=3 TMO=0)  WR 73%
+  Trades/day (all) : 0.34  ⚠️ 
+  Win Rate         : 32.3%  ❌
+  Profit Factor    : 2.20  ✅
+  Total Return     : +0.49%  ✅
+  Monthly estimate : +0.16%
+  Final Balance    : $1004.94
+  Max Drawdown     : -1.20%  ✅
+  Avg PnL/trade    : $+0.159
+  Confirm rate     : 23%  (14 ok / 46 fail)
+  Regime (IDLE bar): BULL 25%  NEUTRAL 60%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — UNIUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 19  (TP1=6 TP2=1 SL=7 TRAIL=5 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 12  (TP=5 SL=7 TMO=0)  WR 42%
+  Trades/day (all) : 0.34  ⚠️ 
+  Win Rate         : 35.5%  ❌
+  Profit Factor    : 1.91  ✅
+  Total Return     : +1.00%  ✅
+  Monthly estimate : +0.33%
+  Final Balance    : $1010.02
+  Max Drawdown     : -2.66%  ✅
+  Avg PnL/trade    : $+0.323
+  Confirm rate     : 19%  (13 ok / 56 fail)
+  Regime (IDLE bar): BULL 25%  NEUTRAL 66%  BEAR 9%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — INJUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 50  (TP1=18 TP2=3 SL=14 TRAIL=15 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 5  (TP=4 SL=1 TMO=0)  WR 80%
+  Trades/day (all) : 0.61  ✅
+  Win Rate         : 50.9%  ❌
+  Profit Factor    : 2.89  ✅
+  Total Return     : +8.64%  ✅
+  Monthly estimate : +2.88%
+  Final Balance    : $1086.35
+  Max Drawdown     : -1.41%  ✅
+  Avg PnL/trade    : $+1.570
+  Confirm rate     : 23%  (32 ok / 105 fail)
+  Regime (IDLE bar): BULL 51%  NEUTRAL 48%  BEAR 1%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — LDOUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 28  (TP1=10 TP2=2 SL=7 TRAIL=8 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 6  (TP=4 SL=2 TMO=0)  WR 67%
+  Trades/day (all) : 0.38  ⚠️ 
+  Win Rate         : 41.2%  ❌
+  Profit Factor    : 1.67  ✅
+  Total Return     : +1.87%  ✅
+  Monthly estimate : +0.62%
+  Final Balance    : $1018.68
+  Max Drawdown     : -2.98%  ✅
+  Avg PnL/trade    : $+0.549
+  Confirm rate     : 14%  (18 ok / 113 fail)
+  Regime (IDLE bar): BULL 43%  NEUTRAL 40%  BEAR 17%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — POLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 15  (TP1=4 TP2=0 SL=6 TRAIL=4 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 7  (TP=3 SL=4 TMO=0)  WR 43%
+  Trades/day (all) : 0.24  ⚠️ 
+  Win Rate         : 22.7%  ❌
+  Profit Factor    : 1.82  ✅
+  Total Return     : +0.01%  ✅
+  Monthly estimate : +0.00%
+  Final Balance    : $1000.12
+  Max Drawdown     : -0.76%  ✅
+  Avg PnL/trade    : $+0.005
+  Confirm rate     : 31%  (11 ok / 25 fail)
+  Regime (IDLE bar): BULL 30%  NEUTRAL 59%  BEAR 11%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+========================================================
+  PHASE BENCHMARK: final8_90d   (pinned data, 8 symbols)
+────────────────────────────────────────────────────────
+  Profitable    : 8/8
+  Avg Win Rate  : 36.9%
+  Avg Profit Fac: 3.29
+  Worst MaxDD   : -3.25%
+  Monthly est ($): $+55.51  (on $1000)
+========================================================
+  data: backtests/data/ (deterministic — delete to refresh window)

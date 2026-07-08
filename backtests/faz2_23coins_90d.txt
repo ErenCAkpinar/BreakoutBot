@@ -1,0 +1,538 @@
+📡 Fetching BTC reference data for macro gate…
+  Fetching 90d of BTCUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — BTCUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 6  (TP1=1 TP2=0 SL=4 TRAIL=1 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 11  (TP=4 SL=7 TMO=0)  WR 36%
+  Trades/day (all) : 0.19  ⚠️ 
+  Win Rate         : 35.3%  ❌
+  Profit Factor    : 0.19  ❌
+  Total Return     : -2.93%  ❌
+  Monthly estimate : -0.98%
+  Final Balance    : $970.72
+  Max Drawdown     : -3.08%  ✅
+  Avg PnL/trade    : $-1.722
+  Confirm rate     : 14%  (5 ok / 30 fail)
+  Regime (IDLE bar): BULL 43%  NEUTRAL 49%  BEAR 8%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of ETHUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — ETHUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 12  (TP1=3 TP2=0 SL=5 TRAIL=3 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 5  (TP=3 SL=2 TMO=0)  WR 60%
+  Trades/day (all) : 0.19  ⚠️ 
+  Win Rate         : 58.8%  ✅
+  Profit Factor    : 0.62  ❌
+  Total Return     : -2.15%  ❌
+  Monthly estimate : -0.72%
+  Final Balance    : $978.47
+  Max Drawdown     : -2.23%  ✅
+  Avg PnL/trade    : $-1.267
+  Confirm rate     : 20%  (9 ok / 36 fail)
+  Regime (IDLE bar): BULL 43%  NEUTRAL 39%  BEAR 18%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of SOLUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — SOLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 14  (TP1=5 TP2=2 SL=3 TRAIL=3 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 3  (TP=2 SL=1 TMO=0)  WR 67%
+  Trades/day (all) : 0.19  ⚠️ 
+  Win Rate         : 76.5%  ✅
+  Profit Factor    : 3.03  ✅
+  Total Return     : +1.76%  ✅
+  Monthly estimate : +0.59%
+  Final Balance    : $1017.64
+  Max Drawdown     : -0.89%  ✅
+  Avg PnL/trade    : $+1.038
+  Confirm rate     : 17%  (9 ok / 44 fail)
+  Regime (IDLE bar): BULL 33%  NEUTRAL 52%  BEAR 15%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+  Fetching 90d of AVAXUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — AVAXUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 18  (TP1=7 TP2=1 SL=4 TRAIL=6 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 6  (TP=2 SL=4 TMO=0)  WR 33%
+  Trades/day (all) : 0.27  ⚠️ 
+  Win Rate         : 66.7%  ✅
+  Profit Factor    : 2.11  ✅
+  Total Return     : +1.39%  ✅
+  Monthly estimate : +0.46%
+  Final Balance    : $1013.91
+  Max Drawdown     : -1.66%  ✅
+  Avg PnL/trade    : $+0.580
+  Confirm rate     : 17%  (11 ok / 52 fail)
+  Regime (IDLE bar): BULL 38%  NEUTRAL 47%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+  Fetching 90d of NEARUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — NEARUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 63  (TP1=21 TP2=4 SL=21 TRAIL=17 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 9  (TP=4 SL=5 TMO=0)  WR 44%
+  Trades/day (all) : 0.80  ✅
+  Win Rate         : 63.9%  ✅
+  Profit Factor    : 1.10  ❌
+  Total Return     : -1.85%  ❌
+  Monthly estimate : -0.62%
+  Final Balance    : $981.54
+  Max Drawdown     : -4.15%  ✅
+  Avg PnL/trade    : $-0.256
+  Confirm rate     : 27%  (42 ok / 115 fail)
+  Regime (IDLE bar): BULL 53%  NEUTRAL 47%  BEAR 0%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of XRPUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — XRPUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 12  (TP1=2 TP2=0 SL=8 TRAIL=2 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 10  (TP=5 SL=5 TMO=0)  WR 40%
+  Trades/day (all) : 0.24  ⚠️ 
+  Win Rate         : 36.4%  ❌
+  Profit Factor    : 0.25  ❌
+  Total Return     : -4.85%  ❌
+  Monthly estimate : -1.62%
+  Final Balance    : $951.47
+  Max Drawdown     : -5.58%  ✅
+  Avg PnL/trade    : $-2.206
+  Confirm rate     : 37%  (10 ok / 17 fail)
+  Regime (IDLE bar): BULL 36%  NEUTRAL 48%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of ADAUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — ADAUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 22  (TP1=7 TP2=1 SL=8 TRAIL=6 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 11  (TP=8 SL=3 TMO=0)  WR 73%
+  Trades/day (all) : 0.37  ⚠️ 
+  Win Rate         : 66.7%  ✅
+  Profit Factor    : 1.50  ✅
+  Total Return     : +0.22%  ✅
+  Monthly estimate : +0.07%
+  Final Balance    : $1002.23
+  Max Drawdown     : -1.22%  ✅
+  Avg PnL/trade    : $+0.068
+  Confirm rate     : 24%  (15 ok / 48 fail)
+  Regime (IDLE bar): BULL 25%  NEUTRAL 60%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+  Fetching 90d of LINKUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — LINKUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 23  (TP1=7 TP2=2 SL=8 TRAIL=5 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 9  (TP=6 SL=3 TMO=0)  WR 67%
+  Trades/day (all) : 0.36  ⚠️ 
+  Win Rate         : 65.6%  ✅
+  Profit Factor    : 1.05  ❌
+  Total Return     : -1.34%  ❌
+  Monthly estimate : -0.45%
+  Final Balance    : $986.64
+  Max Drawdown     : -4.56%  ✅
+  Avg PnL/trade    : $-0.418
+  Confirm rate     : 31%  (16 ok / 36 fail)
+  Regime (IDLE bar): BULL 44%  NEUTRAL 48%  BEAR 9%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of UNIUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — UNIUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 18  (TP1=6 TP2=1 SL=6 TRAIL=5 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 12  (TP=5 SL=7 TMO=0)  WR 42%
+  Trades/day (all) : 0.33  ⚠️ 
+  Win Rate         : 56.7%  ✅
+  Profit Factor    : 1.39  ✅
+  Total Return     : -0.01%  ❌
+  Monthly estimate : -0.00%
+  Final Balance    : $999.91
+  Max Drawdown     : -3.64%  ✅
+  Avg PnL/trade    : $-0.003
+  Confirm rate     : 18%  (12 ok / 54 fail)
+  Regime (IDLE bar): BULL 25%  NEUTRAL 66%  BEAR 9%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of LTCUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — LTCUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 8  (TP1=2 TP2=0 SL=3 TRAIL=2 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 6  (TP=4 SL=2 TMO=0)  WR 67%
+  Trades/day (all) : 0.16  ⚠️ 
+  Win Rate         : 64.3%  ✅
+  Profit Factor    : 1.12  ❌
+  Total Return     : -0.50%  ❌
+  Monthly estimate : -0.17%
+  Final Balance    : $994.99
+  Max Drawdown     : -0.98%  ✅
+  Avg PnL/trade    : $-0.358
+  Confirm rate     : 25%  (6 ok / 18 fail)
+  Regime (IDLE bar): BULL 40%  NEUTRAL 44%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of POLUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,921/25,920 bars
+  ✅ Fetched 25,921 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — POLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 17  (TP1=5 TP2=0 SL=6 TRAIL=5 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 7  (TP=3 SL=4 TMO=0)  WR 43%
+  Trades/day (all) : 0.27  ⚠️ 
+  Win Rate         : 58.3%  ✅
+  Profit Factor    : 0.96  ❌
+  Total Return     : -1.21%  ❌
+  Monthly estimate : -0.40%
+  Final Balance    : $987.89
+  Max Drawdown     : -2.52%  ✅
+  Avg PnL/trade    : $-0.505
+  Confirm rate     : 32%  (12 ok / 25 fail)
+  Regime (IDLE bar): BULL 30%  NEUTRAL 59%  BEAR 11%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of APTUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — APTUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 28  (TP1=6 TP2=2 SL=15 TRAIL=4 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 10  (TP=4 SL=6 TMO=0)  WR 40%
+  Trades/day (all) : 0.42  ⚠️ 
+  Win Rate         : 44.7%  ❌
+  Profit Factor    : 0.66  ❌
+  Total Return     : -5.39%  ❌
+  Monthly estimate : -1.80%
+  Final Balance    : $946.08
+  Max Drawdown     : -5.86%  ✅
+  Avg PnL/trade    : $-1.419
+  Confirm rate     : 18%  (22 ok / 97 fail)
+  Regime (IDLE bar): BULL 35%  NEUTRAL 54%  BEAR 11%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of ARBUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — ARBUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 36  (TP1=12 TP2=1 SL=12 TRAIL=11 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 9  (TP=5 SL=4 TMO=0)  WR 56%
+  Trades/day (all) : 0.50  ✅
+  Win Rate         : 64.4%  ✅
+  Profit Factor    : 0.94  ❌
+  Total Return     : -2.78%  ❌
+  Monthly estimate : -0.93%
+  Final Balance    : $972.25
+  Max Drawdown     : -4.75%  ✅
+  Avg PnL/trade    : $-0.617
+  Confirm rate     : 20%  (24 ok / 95 fail)
+  Regime (IDLE bar): BULL 43%  NEUTRAL 42%  BEAR 15%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of INJUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — INJUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 50  (TP1=18 TP2=3 SL=14 TRAIL=15 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 5  (TP=4 SL=1 TMO=0)  WR 80%
+  Trades/day (all) : 0.61  ✅
+  Win Rate         : 72.7%  ✅
+  Profit Factor    : 1.89  ✅
+  Total Return     : +5.97%  ✅
+  Monthly estimate : +1.99%
+  Final Balance    : $1059.74
+  Max Drawdown     : -2.30%  ✅
+  Avg PnL/trade    : $+1.086
+  Confirm rate     : 23%  (32 ok / 109 fail)
+  Regime (IDLE bar): BULL 51%  NEUTRAL 48%  BEAR 1%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+  Fetching 90d of SUIUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — SUIUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 32  (TP1=9 TP2=1 SL=14 TRAIL=8 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 9  (TP=2 SL=7 TMO=0)  WR 22%
+  Trades/day (all) : 0.46  ⚠️ 
+  Win Rate         : 48.8%  ❌
+  Profit Factor    : 0.77  ❌
+  Total Return     : -5.05%  ❌
+  Monthly estimate : -1.68%
+  Final Balance    : $949.49
+  Max Drawdown     : -6.85%  ✅
+  Avg PnL/trade    : $-1.232
+  Confirm rate     : 24%  (23 ok / 72 fail)
+  Regime (IDLE bar): BULL 49%  NEUTRAL 43%  BEAR 9%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of WIFUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — WIFUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 30  (TP1=6 TP2=0 SL=18 TRAIL=6 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 14  (TP=5 SL=8 TMO=1)  WR 43%
+  Trades/day (all) : 0.49  ⚠️ 
+  Win Rate         : 40.9%  ❌
+  Profit Factor    : 0.39  ❌
+  Total Return     : -11.34%  ❌
+  Monthly estimate : -3.78%
+  Final Balance    : $886.65
+  Max Drawdown     : -11.34%  ✅
+  Avg PnL/trade    : $-2.576
+  Confirm rate     : 19%  (24 ok / 105 fail)
+  Regime (IDLE bar): BULL 38%  NEUTRAL 46%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of JUPUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — JUPUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 44  (TP1=13 TP2=2 SL=17 TRAIL=11 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 13  (TP=6 SL=7 TMO=0)  WR 46%
+  Trades/day (all) : 0.63  ✅
+  Win Rate         : 56.1%  ✅
+  Profit Factor    : 0.85  ❌
+  Total Return     : -5.44%  ❌
+  Monthly estimate : -1.81%
+  Final Balance    : $945.61
+  Max Drawdown     : -9.88%  ✅
+  Avg PnL/trade    : $-0.954
+  Confirm rate     : 23%  (31 ok / 102 fail)
+  Regime (IDLE bar): BULL 49%  NEUTRAL 43%  BEAR 7%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of AAVEUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,921/25,920 bars
+  ✅ Fetched 25,921 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — AAVEUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 30  (TP1=9 TP2=1 SL=12 TRAIL=8 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 14  (TP=3 SL=11 TMO=0)  WR 21%
+  Trades/day (all) : 0.49  ⚠️ 
+  Win Rate         : 47.7%  ❌
+  Profit Factor    : 0.53  ❌
+  Total Return     : -5.77%  ❌
+  Monthly estimate : -1.92%
+  Final Balance    : $942.29
+  Max Drawdown     : -6.01%  ✅
+  Avg PnL/trade    : $-1.312
+  Confirm rate     : 22%  (21 ok / 75 fail)
+  Regime (IDLE bar): BULL 15%  NEUTRAL 67%  BEAR 19%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of FETUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — FETUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 65  (TP1=22 TP2=6 SL=21 TRAIL=16 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 12  (TP=6 SL=6 TMO=0)  WR 50%
+  Trades/day (all) : 0.86  ✅
+  Win Rate         : 64.9%  ✅
+  Profit Factor    : 1.32  ✅
+  Total Return     : +0.77%  ✅
+  Monthly estimate : +0.26%
+  Final Balance    : $1007.73
+  Max Drawdown     : -3.84%  ✅
+  Avg PnL/trade    : $+0.100
+  Confirm rate     : 22%  (43 ok / 157 fail)
+  Regime (IDLE bar): BULL 22%  NEUTRAL 71%  BEAR 7%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+  Fetching 90d of LDOUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — LDOUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 27  (TP1=10 TP2=1 SL=7 TRAIL=9 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 6  (TP=4 SL=2 TMO=0)  WR 67%
+  Trades/day (all) : 0.37  ⚠️ 
+  Win Rate         : 72.7%  ✅
+  Profit Factor    : 1.65  ✅
+  Total Return     : +1.78%  ✅
+  Monthly estimate : +0.59%
+  Final Balance    : $1017.75
+  Max Drawdown     : -3.04%  ✅
+  Avg PnL/trade    : $+0.538
+  Confirm rate     : 13%  (17 ok / 113 fail)
+  Regime (IDLE bar): BULL 43%  NEUTRAL 40%  BEAR 17%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY
+
+  Fetching 90d of PENDLEUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — PENDLEUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 56  (TP1=16 TP2=2 SL=24 TRAIL=14 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 5  (TP=2 SL=3 TMO=0)  WR 40%
+  Trades/day (all) : 0.68  ✅
+  Win Rate         : 55.7%  ✅
+  Profit Factor    : 0.80  ❌
+  Total Return     : -7.09%  ❌
+  Monthly estimate : -2.36%
+  Final Balance    : $929.05
+  Max Drawdown     : -8.96%  ✅
+  Avg PnL/trade    : $-1.163
+  Confirm rate     : 25%  (40 ok / 119 fail)
+  Regime (IDLE bar): BULL 44%  NEUTRAL 49%  BEAR 7%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of STXUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — STXUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 12  (TP1=3 TP2=3 SL=5 TRAIL=0 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 13  (TP=1 SL=12 TMO=0)  WR 8%
+  Trades/day (all) : 0.28  ⚠️ 
+  Win Rate         : 32.0%  ❌
+  Profit Factor    : 0.35  ❌
+  Total Return     : -4.86%  ❌
+  Monthly estimate : -1.62%
+  Final Balance    : $951.39
+  Max Drawdown     : -5.21%  ✅
+  Avg PnL/trade    : $-1.945
+  Confirm rate     : 12%  (9 ok / 64 fail)
+  Regime (IDLE bar): BULL 33%  NEUTRAL 58%  BEAR 9%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+  Fetching 90d of ORDIUSDT 5m data (25,920 bars)…
+  … 1,000/25,920 bars  … 2,000/25,920 bars  … 3,000/25,920 bars  … 4,000/25,920 bars  … 5,000/25,920 bars  … 6,000/25,920 bars  … 7,000/25,920 bars  … 8,000/25,920 bars  … 9,000/25,920 bars  … 10,000/25,920 bars  … 11,000/25,920 bars  … 12,000/25,920 bars  … 13,000/25,920 bars  … 14,000/25,920 bars  … 15,000/25,920 bars  … 16,000/25,920 bars  … 17,000/25,920 bars  … 18,000/25,920 bars  … 19,000/25,920 bars  … 20,000/25,920 bars  … 21,000/25,920 bars  … 22,000/25,920 bars  … 23,000/25,920 bars  … 24,000/25,920 bars  … 25,000/25,920 bars  … 25,920/25,920 bars
+  ✅ Fetched 25,920 bars
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — ORDIUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 43  (TP1=11 TP2=3 SL=20 TRAIL=8 TMO=1)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 8  (TP=7 SL=1 TMO=0)  WR 88%
+  Trades/day (all) : 0.57  ✅
+  Win Rate         : 58.8%  ✅
+  Profit Factor    : 0.91  ❌
+  Total Return     : -4.34%  ❌
+  Monthly estimate : -1.45%
+  Final Balance    : $956.63
+  Max Drawdown     : -5.65%  ✅
+  Avg PnL/trade    : $-0.850
+  Confirm rate     : 17%  (32 ok / 160 fail)
+  Regime (IDLE bar): BULL 41%  NEUTRAL 44%  BEAR 15%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING
+
+
+════════════════════════════════════════════════════
+  COMBINED (23 symbols, 6 profitable)
+  Total trades/day : 9.7
+  Avg Win Rate     : 56.9%
+  Monthly est ($)  : $-183.31
+  BTC gate blocks  : 0 total across all symbols
+════════════════════════════════════════════════════
