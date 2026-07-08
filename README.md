@@ -88,6 +88,63 @@ bkz. [config.py](config.py).)
 
 ---
 
+## Canlı izleme (`watch.py`)
+
+Bot çalışırken ikinci bir terminalde açtığın, birkaç saniyede bir yenilenen bir
+monitör. `state_paper.json`'u **sadece okur** — çalışan bota dokunmaz. Drawdown'ın
+throttle/hard-stop eşiklerine ne kadar kaldığını, açık pozisyonları, rejim
+tablosunu ve son trade'leri tek ekranda gösterir.
+
+```console
+$ python watch.py --demo          # örnek veriyle dene (bot gerekmez)
+
+══════════════════════════════════════════════════════════════════
+  BREAKOUTBOT — LIVE WATCH   ◆ DEMO
+  2026-07-08 10:28:36 UTC   ·   Gün 2026-07-08   ·   Bar #6,821
+══════════════════════════════════════════════════════════════════
+  Bakiye  $978.42   Getiri -2.16%   zirve $1,000.00
+
+── DRAWDOWN ──────────────────────────────────────────────────────
+  DD -2.16%  ███████··············┊························
+  0%      throttle -7%                                hard -15%
+  Throttle'a kalan: $48.42   Hard-stop'a: $128.42
+
+── BUGÜN ─────────────────────────────────────────────────────────
+  Günlük P&L $-6.68 (-0.68%)   Giriş: açık   SL bugün: 1
+  günlük freeze eşiği -5%
+
+── AÇIK POZİSYONLAR ──────────────────────────────────────────────
+  SOLUSDT   TRAIL LONG  giriş 148.2  SL 149.4  TP1✓152.1  TP2 158  $620 · 22 bar
+  UNIUSDT   PROBE LONG  giriş 9.905  SL 9.71   (yoklama) · 1 bar
+  Full: 1/2
+
+── REJİM (BTC 200-MA) ────────────────────────────────────────────
+    SOL:BULL     UNI:BULL    AVAX:NEUT    NEAR:NEUT
+    ADA:NEUT     INJ:BEAR     POL:BEAR     LDO:NEUT
+
+── SON TRADE'LER ─────────────────────────────────────────────────
+  ▲ 07-08 06:20 NEARUSDT  MR    TP1    $+4.05
+  ▼ 07-08 08:55 POLUSDT   LONG  SL     $-10.02
+  ▲ 07-08 10:30 UNIUSDT   LONG  TP1    $+6.02
+
+── OTURUM ────────────────────────────────────────────────────────
+  Pozisyon 5  ·  WR 60% (3W/2L)  ·  Net $+0.64  ·  PF 1.03
+══════════════════════════════════════════════════════════════════
+  read-only · botu etkilemez · testnet (gerçek para değil)
+```
+
+> Yukarıdaki tablo `state_paper.sample.json` **örnek verisidir** (UI'yi bot olmadan
+> göstermek için). Gerçek testnet sonuçları için → [REPORT.md](REPORT.md).
+
+```bash
+python watch.py                 # canlı, 5 sn'de bir yenilenir (gerçek state)
+python watch.py --interval 2    # daha sık yenile
+python watch.py --demo          # örnek veriyle
+python watch.py --once          # tek kare (ekran görüntüsü / CI)
+```
+
+---
+
 ## Backtest altyapısı
 
 Her strateji fazı **aynı sabitlenmiş veride** koşar; metrik farkı = sadece kod farkı.
@@ -115,6 +172,9 @@ python paper_bb.py --testnet          # Binance Futures Testnet'te gerçek emir
 python paper_bb.py --testnet --resume # kayıtlı state'ten devam
 python paper_bb.py --status           # mevcut state özeti
 
+python watch.py                       # canlı izleme ekranı (read-only)
+python watch.py --demo                # örnek veriyle (bot gerekmez)
+
 python bench.py fazN                  # faz backtest'i (bkz. BENCHMARKS.md)
 ```
 
@@ -139,7 +199,8 @@ değişkeninden okunur).
 | [short_sleeve.py](short_sleeve.py) | Short denemesi — backtest'te edge bulunamadı, kapalı ama belgeli |
 | [config.py](config.py) | Tüm parametreler, tek dosyada, gerekçeli yorumlarla |
 | [backtest.py](backtest.py) / [bench.py](bench.py) | Backtest motoru + sabit-veri faz kıyas harness'ı |
-| [dashboard.py](dashboard.py) | Go/no-go kontrol panosu |
+| [watch.py](watch.py) | Canlı izleme ekranı — state'i okur, drawdown/pozisyon/rejim/trade'leri yeniler (read-only) |
+| [dashboard.py](dashboard.py) | Go/no-go kontrol panosu (tek seferlik checklist) |
 | [REPORT.md](REPORT.md) | **Detaylı testnet raporu + postmortem (31 May – 7 Tem 2026)** |
 | [BENCHMARKS.md](BENCHMARKS.md) | Faz-faz backtest kıyası |
 | [ROADMAP.md](ROADMAP.md) | Çok-rejim evrim tasarım dokümanı |

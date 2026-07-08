@@ -1,0 +1,38 @@
+{
+  "_comment": "ÖRNEK / DEMO veri — watch.py'yi bot olmadan denemek için. Gerçek testnet state'i değildir. `python watch.py --demo` bunu okur.",
+  "balance": 978.42,
+  "peak": 1000.0,
+  "daily_start": 985.10,
+  "daily_day": "2026-07-08",
+  "daily_freeze": false,
+  "daily_sl_count": 1,
+  "bar_count": 6821,
+  "regime": {
+    "SOLUSDT": "BULL",
+    "UNIUSDT": "BULL",
+    "AVAXUSDT": "NEUTRAL",
+    "NEARUSDT": "NEUTRAL",
+    "ADAUSDT": "NEUTRAL",
+    "INJUSDT": "BEAR",
+    "POLUSDT": "BEAR",
+    "LDOUSDT": "NEUTRAL"
+  },
+  "trade_log": [
+    {"ts": "2026-07-07T09:15:00+00:00", "symbol": "SOLUSDT", "direction": "LONG", "exit_type": "TP1",   "entry": 142.30, "exit": 145.11, "pnl": 6.42,  "balance": 984.20},
+    {"ts": "2026-07-07T11:05:00+00:00", "symbol": "SOLUSDT", "direction": "LONG", "exit_type": "TRAIL", "entry": 142.30, "exit": 144.02, "pnl": 3.88,  "balance": 988.08},
+    {"ts": "2026-07-07T18:40:00+00:00", "symbol": "AVAXUSDT","direction": "LONG", "exit_type": "SL",    "entry": 21.44,  "exit": 21.02,  "pnl": -9.71, "balance": 978.37},
+    {"ts": "2026-07-08T06:20:00+00:00", "symbol": "NEARUSDT","direction": "MR",   "exit_type": "TP1",   "entry": 2.615,  "exit": 2.671,  "pnl": 4.05,  "balance": 982.42},
+    {"ts": "2026-07-08T08:55:00+00:00", "symbol": "POLUSDT", "direction": "LONG", "exit_type": "SL",    "entry": 0.4120, "exit": 0.4048, "pnl": -10.02,"balance": 972.40},
+    {"ts": "2026-07-08T10:30:00+00:00", "symbol": "UNIUSDT", "direction": "LONG", "exit_type": "TP1",   "entry": 9.812,  "exit": 10.05,  "pnl": 6.02,  "balance": 978.42}
+  ],
+  "sym_states": {
+    "SOLUSDT":  {"state": "TRAILING",  "direction": "LONG", "cooldown": 0, "test_entry": 0.0, "test_sl": 0.0, "test_atr": 0.0, "full_entry": 148.20, "full_sl": 149.40, "full_tp1": 152.10, "full_tp2": 158.00, "full_notional": 620.0, "tp1_hit": true,  "be_price": 148.20, "trail_best": 151.80, "bars_held": 22},
+    "UNIUSDT":  {"state": "TEST_OPEN", "direction": "LONG", "cooldown": 0, "test_entry": 9.905, "test_sl": 9.71, "test_atr": 0.13, "full_entry": 0.0, "full_sl": 0.0, "full_tp1": 0.0, "full_tp2": 0.0, "full_notional": 0.0, "tp1_hit": false, "be_price": 0.0, "trail_best": 0.0, "bars_held": 1},
+    "AVAXUSDT": {"state": "IDLE", "direction": "", "cooldown": 3, "test_entry": 0.0, "test_sl": 0.0, "test_atr": 0.0, "full_entry": 0.0, "full_sl": 0.0, "full_tp1": 0.0, "full_tp2": 0.0, "full_notional": 0.0, "tp1_hit": false, "be_price": 0.0, "trail_best": 0.0, "bars_held": 0},
+    "NEARUSDT": {"state": "IDLE", "direction": "", "cooldown": 0, "test_entry": 0.0, "test_sl": 0.0, "test_atr": 0.0, "full_entry": 0.0, "full_sl": 0.0, "full_tp1": 0.0, "full_tp2": 0.0, "full_notional": 0.0, "tp1_hit": false, "be_price": 0.0, "trail_best": 0.0, "bars_held": 0},
+    "ADAUSDT":  {"state": "IDLE", "direction": "", "cooldown": 0, "test_entry": 0.0, "test_sl": 0.0, "test_atr": 0.0, "full_entry": 0.0, "full_sl": 0.0, "full_tp1": 0.0, "full_tp2": 0.0, "full_notional": 0.0, "tp1_hit": false, "be_price": 0.0, "trail_best": 0.0, "bars_held": 0},
+    "INJUSDT":  {"state": "IDLE", "direction": "", "cooldown": 0, "test_entry": 0.0, "test_sl": 0.0, "test_atr": 0.0, "full_entry": 0.0, "full_sl": 0.0, "full_tp1": 0.0, "full_tp2": 0.0, "full_notional": 0.0, "tp1_hit": false, "be_price": 0.0, "trail_best": 0.0, "bars_held": 0},
+    "POLUSDT":  {"state": "IDLE", "direction": "", "cooldown": 6, "test_entry": 0.0, "test_sl": 0.0, "test_atr": 0.0, "full_entry": 0.0, "full_sl": 0.0, "full_tp1": 0.0, "full_tp2": 0.0, "full_notional": 0.0, "tp1_hit": false, "be_price": 0.0, "trail_best": 0.0, "bars_held": 0},
+    "LDOUSDT":  {"state": "IDLE", "direction": "", "cooldown": 0, "test_entry": 0.0, "test_sl": 0.0, "test_atr": 0.0, "full_entry": 0.0, "full_sl": 0.0, "full_tp1": 0.0, "full_tp2": 0.0, "full_notional": 0.0, "tp1_hit": false, "be_price": 0.0, "trail_best": 0.0, "bars_held": 0}
+  }
+}
