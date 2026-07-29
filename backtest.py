@@ -36,10 +36,11 @@ from config import (
     TOKENS, TIMEFRAME, INITIAL_BALANCE,
     DAILY_DD_LIMIT, PEAK_DD_LIMIT, DAILY_SL_LIMIT,
     SESSION_START_UTC, SESSION_END_UTC,
-    TAKER_FEE, FULL_SIZE_USD, LEVERAGE,
+    TAKER_FEE, FULL_SIZE_USD, LEVERAGE, RISK_PER_TRADE_USD,
     BTC_GATE_ENABLED, BTC_GATE_RETURN, BTC_BETA_WINDOW,
     BTC_BETA_BOOST, BTC_BETA_BLOCK,
 )
+from metrics import aggregate_positions, position_stats, exit_distribution
 
 
 # ── Data fetch ────────────────────────────────────────────────────────────────
@@ -318,6 +319,12 @@ def run_symbol(symbol: str, days: int, balance: float = INITIAL_BALANCE,
     wr     = wins / n * 100 if n > 0 else 0.0
     tpd    = n / days
 
+    # Position-based truth: TP1 emits its own record and the post-TP1 leg cannot
+    # lose, so record-based `wr`/`pf` above double-count every winner. Judge arms
+    # on these instead — see metrics.py for the derivation.
+    positions  = aggregate_positions(closed)
+    pos_stats  = position_stats(positions, risk_per_trade=RISK_PER_TRADE_USD)
+
     total_return = (bal - balance) / balance * 100
     avg_pnl      = (bal - balance) / n if n > 0 else 0.0
 
@@ -338,6 +345,9 @@ def run_symbol(symbol: str, days: int, balance: float = INITIAL_BALANCE,
         "trades_per_day":  tpd,
         "win_rate":        wr,
         "profit_factor":   pf,
+        "pos_stats":       pos_stats,
+        "pos_exits":       exit_distribution(positions),
+        "_positions":      positions,   # for pooled cross-symbol stats (not printed)
         "total_return":    total_return,
         "final_balance":   bal,
         "max_dd":          maxdd,
@@ -386,6 +396,19 @@ def print_report(r: dict) -> None:
     rc_total   = sum(rc.values()) or 1
     regime_str = "  ".join(f"{k} {v/rc_total*100:.0f}%" for k, v in rc.items())
 
+    # Position-based block — the honest numbers. The record-based Win Rate /
+    # Profit Factor printed above double-count every winner (TP1 logs its own
+    # record and the post-TP1 leg cannot lose), so judge arms on THESE.
+    ps      = r.get("pos_stats") or {}
+    pe      = r.get("pos_exits") or {}
+    pe_str  = " ".join(f"{k}={v}" for k, v in pe.items()) or "—"
+    be      = ps.get("breakeven_wr")
+    pos_ok  = "✅" if (be is not None and ps.get("win_rate", 0) > be) else "❌"
+    exp     = ps.get("expectancy")
+    exp_r   = ps.get("expectancy_r")
+    exp_str = (f"${exp:+.2f}" + (f" ({exp_r:+.3f} R)" if exp_r is not None else "")
+               ) if exp is not None else "—"
+
     print(f"""
 ════════════════════════════════════════════════════
   BREAKOUT BOT — {r["symbol"]}  ({r["days"]}d)
@@ -394,8 +417,16 @@ def print_report(r: dict) -> None:
   Trades (SHORT)   : {r.get("n_short",0)}  (TP1={r.get("s_tp1",0)} TP2={r.get("s_tp2",0)} SL={r.get("s_sl",0)} TRAIL={r.get("s_trail",0)} TMO={r.get("s_tmo",0)})  WR {(r.get("short_wins",0)/r["n_short"]*100) if r.get("n_short") else 0:.0f}%  PnL ${r.get("short_pnl",0):+.2f}
   Trades (MR)      : {r.get("trades_mr", 0)}  (TP={r.get("mr_tp",0)} SL={r.get("mr_sl",0)} TMO={r.get("mr_tmo",0)})  WR {(r.get("mr_wins",0)/r["trades_mr"]*100) if r.get("trades_mr") else 0:.0f}%
   Trades/day (all) : {r["trades_per_day"]:.2f}  {tpd_ok}
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
   Win Rate         : {r["win_rate"]:.1f}%  {wr_ok}
   Profit Factor    : {r["profit_factor"]:.2f}  {pf_ok}
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : {ps.get("n_positions", 0)}  ({pe_str})
+  Win Rate (pos)   : {ps.get("win_rate", 0)}%   break-even {be}%  {pos_ok}
+  Avg win / loss   : ${ps.get("avg_win", 0):+.2f} / ${ps.get("avg_loss", 0):+.2f}   payoff {ps.get("payoff")}
+  Expectancy/pos   : {exp_str}
+  Profit Factor    : {ps.get("profit_factor")}  (position-based)
+  ──
   Total Return     : {r["total_return"]:+.2f}%  {ret_ok}
   Monthly estimate : {r["monthly_est"]:+.2f}%
   Final Balance    : ${r["final_balance"]:.2f}
@@ -404,7 +435,7 @@ def print_report(r: dict) -> None:
   Confirm rate     : {confirm_rate:.0f}%  ({r["confirm_ok"]} ok / {r["confirm_fail"]} fail)
   Regime (IDLE bar): {regime_str}
 ════════════════════════════════════════════════════
-  VERDICT: {"✅ DEPLOY" if r["win_rate"]>=55 and r["profit_factor"]>=1.3 and r["total_return"]>0 else "❌ NEEDS TUNING"}
+  VERDICT: {"✅ DEPLOY" if (ps.get("profit_factor") or 0) >= 1.3 and (ps.get("expectancy") or 0) > 0 and r["max_dd"] >= -20 else "❌ NEEDS TUNING"}   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
 """)
 
 

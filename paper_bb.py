@@ -40,7 +40,7 @@ from config import (
     TOKENS, TIMEFRAME, INITIAL_BALANCE,
     DAILY_DD_LIMIT, EQUITY_THROTTLE_DD, PEAK_DD_LIMIT, DAILY_SL_LIMIT,
     SESSION_START_UTC, SESSION_END_UTC,
-    TEST_SIZE_USD, FULL_SIZE_USD, LEVERAGE, MAX_OPEN,
+    TEST_SIZE_USD, FULL_SIZE_USD, LEVERAGE, MAX_OPEN, RISK_PER_TRADE_USD,
     BTC_GATE_ENABLED, BTC_GATE_RETURN, BTC_BETA_WINDOW,
 )
 from indicators import build_snapshot, hurst_exponent, precompute_indicators
@@ -48,6 +48,7 @@ from strategy import SymbolState, IDLE, SCALE_OPEN, TRAILING, TEST_OPEN
 from mean_reversion import MRState
 import regime
 from config import MR_ENABLED
+from metrics import aggregate_positions, position_stats
 
 STATE_FILE = "state_paper.json"
 LOG_FILE   = "paper_bb.log"
@@ -321,6 +322,15 @@ class PaperTrader:
         self.run_tp1 = self.run_tp2 = self.run_sl = 0
         self.run_trail = self.run_tmo = 0
         self.run_confirm_ok = self.run_confirm_fail = 0
+        # Cumulative drag from probes that never became positions (CONFIRM_FAIL +
+        # TEST SL). Tracked separately because it is invisible in the trade log
+        # yet accounted for ~54% of the live drawdown.
+        self.probe_cost = 0.0
+        # Signal-funnel totals across the run — compare against the backtest's
+        # confirm rate to detect live/backtest divergence.
+        self.funnel_totals = {"scanned": 0, "regime_pass": 0, "probe": 0,
+                              "confirm_ok": 0, "confirm_fail": 0, "full": 0,
+                              "blocked_max_open": 0}
 
         # Log file (line-buffered so tail -f works)
         self.log_f = open(LOG_FILE, "a", buffering=1)
@@ -366,6 +376,8 @@ class PaperTrader:
                                for t, m in self.mr_states.items()},
             "regime":         self._regime,
             "regime_4h_ts":   self._regime_4h_ts,
+            "funnel_totals":  self.funnel_totals,
+            "probe_cost":     round(self.probe_cost, 4),
         }
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
@@ -382,6 +394,8 @@ class PaperTrader:
             self.daily_sl_count = st["daily_sl_count"]
             self.bar_count      = st["bar_count"]
             self.trade_log      = st.get("trade_log", [])
+            self.probe_cost     = st.get("probe_cost", 0.0)
+            self.funnel_totals.update(st.get("funnel_totals", {}))
             for tok, saved in st.get("sym_states", {}).items():
                 if tok not in self.sym_states:
                     continue
@@ -442,9 +456,10 @@ class PaperTrader:
                if self.daily_start > 0 else 0.0
 
         closed = [t for t in self.trade_log if t.get("exit_type") not in ("OPEN",)]
-        n_full = len(closed)
-        wins   = sum(1 for t in closed if t.get("pnl", 0) > 0)
-        wr     = wins / n_full * 100 if n_full > 0 else 0.0
+        # Position-based: TP1 logs its own record and the post-TP1 leg cannot
+        # lose, so counting records inflates WR by ~14 points. See metrics.py.
+        pstats = position_stats(aggregate_positions(closed),
+                                risk_per_trade=RISK_PER_TRADE_USD)
 
         open_list = [
             f"  {tok} {s.state}({s.direction}) bars={s.bars_held}"
@@ -455,7 +470,16 @@ class PaperTrader:
         print("─" * 60, flush=True)
         print(f"  Bar #{self.bar_count:,} | Balance: ${self.balance:.2f} | Return: {ret:+.2f}%", flush=True)
         print(f"  PeakDD: {pk_dd:.1f}%  DayDD: {day_dd:.1f}%  DayFreeze: {self.daily_freeze}", flush=True)
-        print(f"  Full trades: {n_full}  WR: {wr:.1f}%  Open: {self._open_full_count()}/{MAX_OPEN}", flush=True)
+        print(f"  Positions: {pstats['n_positions']}  WR: {pstats['win_rate']:.1f}% "
+              f"(BE {pstats['breakeven_wr']}%)  payoff {pstats['payoff']}  "
+              f"exp ${pstats['expectancy']:+.2f}  Open: {self._open_full_count()}/{MAX_OPEN}",
+              flush=True)
+        ft = self.funnel_totals
+        _cr = (100 * ft["confirm_ok"] / (ft["confirm_ok"] + ft["confirm_fail"])
+               if (ft["confirm_ok"] + ft["confirm_fail"]) else 0.0)
+        print(f"  Funnel: probe={ft['probe']} confirm={_cr:.0f}% full={ft['full']} "
+              f"maxopen_block={ft['blocked_max_open']} | probe drag: ${self.probe_cost:+.2f}",
+              flush=True)
         if open_list:
             print("  Positions:", flush=True)
             for line in open_list:
@@ -546,6 +570,13 @@ class PaperTrader:
         n_bull = sum(1 for r in self._regime.values() if r == "BULL")
         gate_str = f"regime: BULL {n_bull}/{len(self.tokens)}"
 
+        # Signal-funnel telemetry for THIS bar. Without it a parameter sweep is a
+        # blind shot: we cannot tell whether the live bot trades less than the
+        # backtest because the regime differs or because a gate behaves
+        # differently in production. Counters are per-bar; totals accumulate.
+        funnel = {"scanned": 0, "regime_pass": 0, "probe": 0, "confirm_ok": 0,
+                  "confirm_fail": 0, "full": 0, "blocked_max_open": 0}
+
         # ── Process each symbol ───────────────────────────────────────────────
         for symbol in self.tokens:
             s = self.sym_states[symbol]
@@ -589,10 +620,16 @@ class PaperTrader:
             block_new = self.daily_freeze or not in_session
 
             # ── Momentum sleeve — runs only if not gated (BULL + open) ────────
+            funnel["scanned"] += 1
+            if size_mult > 0 and not block_new:
+                funnel["regime_pass"] += 1
+
             events = []
             if not (s.state == IDLE and (block_new or size_mult <= 0)):
                 open_full      = self._open_full_count()
                 block_new_full = (s.state == TEST_OPEN and open_full >= MAX_OPEN)
+                if block_new_full:
+                    funnel["blocked_max_open"] += 1
                 events = s.process_bar(snap, high, low, rsi_val, vol_ratio,
                                        block_new_full=block_new_full,
                                        size_mult=size_mult)
@@ -603,6 +640,7 @@ class PaperTrader:
 
                 if ev.exit_type == "OPEN":
                     if ev.kind == "TEST":
+                        funnel["probe"] += 1
                         self._log(
                             f"  🔬 TEST OPEN  {ev.symbol} {ev.direction} "
                             f"@ {ev.entry:.5g} | bal=${self.balance:.2f}"
@@ -615,6 +653,8 @@ class PaperTrader:
                                 f"     ↳ [TESTNET] TEST order filled @ {fill:.5g}",
                                 also_print=False)
                     else:
+                        funnel["full"] += 1
+                        funnel["confirm_ok"] += 1
                         # FIX #1: use the strategy's dynamic, regime+throttle-aware
                         # notional (risk-based sizing) — NOT a flat FULL_SIZE_USD×LEVERAGE.
                         notional = s.full_notional
@@ -648,6 +688,11 @@ class PaperTrader:
                                 also_print=False)
                     elif ev.exit_type == "CONFIRM_FAIL":
                         self.run_confirm_fail += 1
+                        funnel["confirm_fail"] += 1
+                        # Probes that never became positions still cost money.
+                        # On the live record this drag was ~54% of the total loss,
+                        # so it is tracked explicitly rather than inferred.
+                        self.probe_cost += ev.pnl
                         self._log(
                             f"  ❌ CONF FAIL  {ev.symbol} {ev.direction} "
                             f"pnl=${ev.pnl:+.3f} | bal=${self.balance:.2f}"
@@ -659,6 +704,9 @@ class PaperTrader:
                                 f"     ↳ [TESTNET] TEST closed @ {fill:.5g}",
                                 also_print=False)
                     elif ev.exit_type == "SL":
+                        # Probe stopped out before it could be confirmed — same
+                        # category of cost as a CONFIRM_FAIL: paid, never traded.
+                        self.probe_cost += ev.pnl
                         self._log(
                             f"  🛑 TEST SL    {ev.symbol} pnl=${ev.pnl:+.3f} "
                             f"| bal=${self.balance:.2f}"
@@ -773,6 +821,23 @@ class PaperTrader:
             f"{gate_str}"
         )
 
+        for k, v in funnel.items():
+            self.funnel_totals[k] += v
+        # Only log the funnel on bars where something actually happened, so the
+        # log stays readable but every probe/confirm decision leaves a trace.
+        if any(funnel[k] for k in ("probe", "confirm_ok", "confirm_fail", "blocked_max_open")):
+            ft = self.funnel_totals
+            cr = (100 * ft["confirm_ok"] / (ft["confirm_ok"] + ft["confirm_fail"])
+                  if (ft["confirm_ok"] + ft["confirm_fail"]) else 0.0)
+            self._log(
+                f"  📊 funnel bar[scan={funnel['scanned']} regime_ok={funnel['regime_pass']} "
+                f"probe={funnel['probe']} conf_ok={funnel['confirm_ok']} "
+                f"conf_fail={funnel['confirm_fail']} full={funnel['full']} "
+                f"maxopen_block={funnel['blocked_max_open']}] | "
+                f"total[probe={ft['probe']} conf={cr:.0f}% full={ft['full']}] | "
+                f"probe_cost=${self.probe_cost:+.2f}"
+            )
+
         # Save state every bar
         self._save_state()
 
@@ -833,18 +898,24 @@ def print_saved_status() -> None:
     trade_log  = st.get("trade_log", [])
 
     closed = [t for t in trade_log if t.get("exit_type") not in ("OPEN",)]
-    n_full = len(closed)
-    wins   = sum(1 for t in closed if t.get("pnl", 0) > 0)
-    wr     = wins / n_full * 100 if n_full > 0 else 0.0
-    gross_w= sum(t["pnl"] for t in closed if t["pnl"] > 0)
-    gross_l= abs(sum(t["pnl"] for t in closed if t["pnl"] < 0))
-    pf     = gross_w / gross_l if gross_l > 0 else float("inf")
+    ps     = position_stats(aggregate_positions(closed),
+                            risk_per_trade=RISK_PER_TRADE_USD)
 
     print("=" * 60)
     print(f"  BreakoutBot Paper Status")
     print(f"  Day: {daily_day} | Bar: #{bar_count:,} | Freeze: {daily_freeze}")
     print(f"  Balance: ${balance:.2f} ({ret_pct:+.2f}%) | PeakDD: {peak_dd:.1f}%")
-    print(f"  Trades: {n_full} | WR: {wr:.1f}% | PF: {pf:.2f}")
+    print(f"  Positions: {ps['n_positions']} ({ps['n_wins']}W/{ps['n_losses']}L) | "
+          f"WR: {ps['win_rate']}% (break-even {ps['breakeven_wr']}%) | PF: {ps['profit_factor']}")
+    print(f"  Avg win/loss: ${ps['avg_win']:+.2f}/${ps['avg_loss']:+.2f} | "
+          f"payoff {ps['payoff']} | expectancy ${ps['expectancy']:+.2f}/pos")
+    ft = st.get("funnel_totals") or {}
+    if ft:
+        ok, fail = ft.get("confirm_ok", 0), ft.get("confirm_fail", 0)
+        cr = 100 * ok / (ok + fail) if (ok + fail) else 0.0
+        print(f"  Funnel: probe={ft.get('probe',0)} confirm={cr:.0f}% "
+              f"full={ft.get('full',0)} maxopen_block={ft.get('blocked_max_open',0)} | "
+              f"probe drag: ${st.get('probe_cost', 0.0):+.2f}")
     print("=" * 60)
 
     # Open positions

@@ -22,7 +22,8 @@ import pandas as pd
 
 import config
 from backtest import fetch_history, run_symbol, print_report
-from config import INITIAL_BALANCE
+from config import INITIAL_BALANCE, RISK_PER_TRADE_USD
+from metrics import position_stats
 
 # BENCH_ALL=1 → all 23 config tokens (broad-universe validation);
 # otherwise the 3-coin core bench (fast phase A/B). Cache is per-symbol so the
@@ -74,14 +75,32 @@ def main() -> None:
     monthly = sum(r["monthly_est"] * INITIAL_BALANCE / 100 for r in results)
     worst_dd = min(r["max_dd"] for r in results)
 
+    # POOLED position-based stats — the number to compare arms on. The per-symbol
+    # averages below are unweighted (one lucky symbol with 4 trades can carry the
+    # headline) and record-based (TP1 double-counted); pooling every position
+    # across symbols fixes both.
+    all_pos = [p for r in results for p in r.get("_positions", [])]
+    pooled  = position_stats(all_pos, risk_per_trade=RISK_PER_TRADE_USD)
+    for r in results:
+        r.pop("_positions", None)
+
     print(f"\n{'='*56}")
     print(f"  PHASE BENCHMARK: {label}   (pinned data, {len(results)} symbols)")
     print(f"{'─'*56}")
     print(f"  Profitable    : {n_ok}/{len(results)}")
-    print(f"  Avg Win Rate  : {avg_wr:.1f}%")
-    print(f"  Avg Profit Fac: {avg_pf:.2f}")
     print(f"  Worst MaxDD   : {worst_dd:+.2f}%")
-    print(f"  Monthly est ($): ${monthly:+.2f}  (on ${INITIAL_BALANCE:.0f})")
+    print(f"  Monthly est ($): ${monthly:+.2f}  (on ${INITIAL_BALANCE:.0f} each — implies ${INITIAL_BALANCE*len(results):.0f} total)")
+    print(f"{'─'*56}")
+    print(f"  POOLED (position-based — compare arms on these)")
+    print(f"  Positions     : {pooled['n_positions']}  ({pooled['n_wins']}W / {pooled['n_losses']}L)")
+    print(f"  Win Rate      : {pooled['win_rate']}%   break-even {pooled['breakeven_wr']}%   "
+          f"{'✅' if (pooled['breakeven_wr'] is not None and pooled['win_rate'] > pooled['breakeven_wr']) else '❌'}")
+    print(f"  Avg win/loss  : ${pooled['avg_win']:+.2f} / ${pooled['avg_loss']:+.2f}   payoff {pooled['payoff']}")
+    print(f"  Expectancy    : ${pooled['expectancy']:+.2f}/pos"
+          + (f"  ({pooled['expectancy_r']:+.3f} R)" if pooled['expectancy_r'] is not None else ""))
+    print(f"  Profit Factor : {pooled['profit_factor']}")
+    print(f"{'─'*56}")
+    print(f"  legacy (record-based, inflated): Avg WR {avg_wr:.1f}%  Avg PF {avg_pf:.2f}")
     print(f"{'='*56}")
     print(f"  data: {CACHE}/ (deterministic — delete to refresh window)")
 
