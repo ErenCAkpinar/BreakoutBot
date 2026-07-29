@@ -1,0 +1,242 @@
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — INJUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 14  (TP1=5 TP2=0 SL=4 TRAIL=5 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 5  (TP=4 SL=1 TMO=0)  WR 80%
+  Trades/day (all) : 0.21  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 73.7%  ✅
+  Profit Factor    : 1.45  ✅
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 14  (TRAIL=5 SL=5 TP=4)
+  Win Rate (pos)   : 64.3%   break-even 55.4%  ✅
+  Avg win / loss   : $+7.35 / $-9.14   payoff 0.8
+  Expectancy/pos   : $+1.46 (+0.146 R)
+  Profit Factor    : 1.45  (position-based)
+  ──
+  Total Return     : +0.52%  ✅
+  Monthly estimate : +0.17%
+  Final Balance    : $1005.23
+  Max Drawdown     : -2.91%  ✅
+  Avg PnL/trade    : $+0.275
+  Confirm rate     : 13%  (19 ok / 126 fail)
+  Regime (IDLE bar): BULL 51%  NEUTRAL 48%  BEAR 1%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — POLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 7  (TP=3 SL=4 TMO=0)  WR 43%
+  Trades/day (all) : 0.08  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 42.9%  ❌
+  Profit Factor    : 0.91  ❌
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 7  (SL=4 TP=3)
+  Win Rate (pos)   : 42.9%   break-even 45.2%  ❌
+  Avg win / loss   : $+2.47 / $-2.05   payoff 1.21
+  Expectancy/pos   : $-0.11 (-0.011 R)
+  Profit Factor    : 0.91  (position-based)
+  ──
+  Total Return     : -0.63%  ❌
+  Monthly estimate : -0.21%
+  Final Balance    : $993.66
+  Max Drawdown     : -0.76%  ✅
+  Avg PnL/trade    : $-0.905
+  Confirm rate     : 19%  (7 ok / 30 fail)
+  Regime (IDLE bar): BULL 30%  NEUTRAL 59%  BEAR 11%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — LDOUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 10  (TP1=4 TP2=1 SL=2 TRAIL=3 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 6  (TP=4 SL=2 TMO=0)  WR 67%
+  Trades/day (all) : 0.18  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 75.0%  ✅
+  Profit Factor    : 2.10  ✅
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 12  (SL=4 TP=4 TRAIL=3 TP2=1)
+  Win Rate (pos)   : 66.7%   break-even 48.8%  ✅
+  Avg win / loss   : $+7.74 / $-7.37   payoff 1.05
+  Expectancy/pos   : $+2.70 (+0.270 R)
+  Profit Factor    : 2.1  (position-based)
+  ──
+  Total Return     : +2.06%  ✅
+  Monthly estimate : +0.69%
+  Final Balance    : $1020.62
+  Max Drawdown     : -2.98%  ✅
+  Avg PnL/trade    : $+1.289
+  Confirm rate     : 10%  (13 ok / 120 fail)
+  Regime (IDLE bar): BULL 43%  NEUTRAL 40%  BEAR 17%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — SOLUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 4  (TP1=2 TP2=1 SL=0 TRAIL=1 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 3  (TP=2 SL=1 TMO=0)  WR 67%
+  Trades/day (all) : 0.08  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 85.7%  ✅
+  Profit Factor    : 10.19  ✅
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 5  (TP=2 TP2=1 TRAIL=1 SL=1)
+  Win Rate (pos)   : 80.0%   break-even 28.2%  ✅
+  Avg win / loss   : $+5.89 / $-2.31   payoff 2.55
+  Expectancy/pos   : $+4.25 (+0.425 R)
+  Profit Factor    : 10.19  (position-based)
+  ──
+  Total Return     : +1.52%  ✅
+  Monthly estimate : +0.51%
+  Final Balance    : $1015.16
+  Max Drawdown     : -0.42%  ✅
+  Avg PnL/trade    : $+2.166
+  Confirm rate     : 14%  (8 ok / 48 fail)
+  Regime (IDLE bar): BULL 33%  NEUTRAL 52%  BEAR 15%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — AVAXUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 4  (TP1=2 TP2=0 SL=0 TRAIL=2 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 5  (TP=2 SL=3 TMO=0)  WR 40%
+  Trades/day (all) : 0.10  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 66.7%  ✅
+  Profit Factor    : 2.79  ✅
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 7  (SL=3 TRAIL=2 TP=2)
+  Win Rate (pos)   : 57.1%   break-even 32.3%  ✅
+  Avg win / loss   : $+4.96 / $-2.37   payoff 2.09
+  Expectancy/pos   : $+1.82 (+0.182 R)
+  Profit Factor    : 2.79  (position-based)
+  ──
+  Total Return     : +0.54%  ✅
+  Monthly estimate : +0.18%
+  Final Balance    : $1005.38
+  Max Drawdown     : -1.04%  ✅
+  Avg PnL/trade    : $+0.597
+  Confirm rate     : 11%  (7 ok / 57 fail)
+  Regime (IDLE bar): BULL 38%  NEUTRAL 47%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — NEARUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 29  (TP1=9 TP2=1 SL=11 TRAIL=8 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 9  (TP=4 SL=5 TMO=0)  WR 44%
+  Trades/day (all) : 0.42  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 57.9%  ✅
+  Profit Factor    : 0.92  ❌
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 29  (SL=16 TRAIL=8 TP=4 TP2=1)
+  Win Rate (pos)   : 44.8%   break-even 46.9%  ❌
+  Avg win / loss   : $+9.22 / $-8.14   payoff 1.13
+  Expectancy/pos   : $-0.36 (-0.036 R)
+  Profit Factor    : 0.92  (position-based)
+  ──
+  Total Return     : -3.71%  ❌
+  Monthly estimate : -1.24%
+  Final Balance    : $962.85
+  Max Drawdown     : -5.56%  ✅
+  Avg PnL/trade    : $-0.978
+  Confirm rate     : 20%  (32 ok / 131 fail)
+  Regime (IDLE bar): BULL 53%  NEUTRAL 47%  BEAR 0%
+════════════════════════════════════════════════════
+  VERDICT: ❌ NEEDS TUNING   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — UNIUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 2  (TP1=1 TP2=0 SL=0 TRAIL=1 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 12  (TP=5 SL=7 TMO=0)  WR 42%
+  Trades/day (all) : 0.16  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 50.0%  ❌
+  Profit Factor    : 1.48  ✅
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 13  (SL=7 TP=5 TRAIL=1)
+  Win Rate (pos)   : 46.2%   break-even 36.7%  ✅
+  Avg win / loss   : $+3.92 / $-2.27   payoff 1.73
+  Expectancy/pos   : $+0.59 (+0.059 R)
+  Profit Factor    : 1.48  (position-based)
+  ──
+  Total Return     : -0.29%  ❌
+  Monthly estimate : -0.10%
+  Final Balance    : $997.14
+  Max Drawdown     : -1.54%  ✅
+  Avg PnL/trade    : $-0.204
+  Confirm rate     : 10%  (7 ok / 62 fail)
+  Regime (IDLE bar): BULL 25%  NEUTRAL 66%  BEAR 9%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+════════════════════════════════════════════════════
+  BREAKOUT BOT — ADAUSDT  (90d)
+════════════════════════════════════════════════════
+  Trades (mom)     : 2  (TP1=1 TP2=0 SL=0 TRAIL=1 TMO=0)
+  Trades (SHORT)   : 0  (TP1=0 TP2=0 SL=0 TRAIL=0 TMO=0)  WR 0%  PnL $+0.00
+  Trades (MR)      : 11  (TP=8 SL=3 TMO=0)  WR 73%
+  Trades/day (all) : 0.14  ⚠️ 
+  ── record-based (inflated: TP1 counted twice — kept for continuity) ──
+  Win Rate         : 76.9%  ✅
+  Profit Factor    : 4.83  ✅
+  ── POSITION-BASED (the real numbers — judge on these) ──
+  Positions        : 12  (TP=8 SL=3 TRAIL=1)
+  Win Rate (pos)   : 75.0%   break-even 38.3%  ✅
+  Avg win / loss   : $+3.17 / $-1.97   payoff 1.61
+  Expectancy/pos   : $+1.89 (+0.189 R)
+  Profit Factor    : 4.83  (position-based)
+  ──
+  Total Return     : +1.31%  ✅
+  Monthly estimate : +0.44%
+  Final Balance    : $1013.11
+  Max Drawdown     : -0.58%  ✅
+  Avg PnL/trade    : $+1.008
+  Confirm rate     : 13%  (8 ok / 52 fail)
+  Regime (IDLE bar): BULL 25%  NEUTRAL 60%  BEAR 16%
+════════════════════════════════════════════════════
+  VERDICT: ✅ DEPLOY   (position-based PF≥1.3 + positive expectancy + MaxDD≥-20%)
+
+
+========================================================
+  PHASE BENCHMARK: E3_vol15   (pinned data, 8 symbols)
+────────────────────────────────────────────────────────
+  Profitable    : 5/8
+  Worst MaxDD   : -5.56%
+  Monthly est ($): $+4.38  (on $1000 each — implies $8000 total)
+────────────────────────────────────────────────────────
+  POOLED (position-based — compare arms on these)
+  Positions     : 99  (56W / 43L)
+  Win Rate      : 56.6%   break-even 47.6%   ✅
+  Avg win/loss  : $+6.26 / $-5.69   payoff 1.1
+  Expectancy    : $+1.07/pos  (+0.107 R)
+  Profit Factor : 1.43
+────────────────────────────────────────────────────────
+  legacy (record-based, inflated): Avg WR 66.1%  Avg PF 3.08
+========================================================
+  data: backtests/data/ (deterministic — delete to refresh window)

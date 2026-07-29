@@ -221,3 +221,48 @@ paralel çalışıyor. Kod diske kayıtlı (commit EDİLMEDİ).
 **Hızlı referans:** deploy sistemi = `config.TOKENS` (8 coin) + `regime.py` 4c + `SHORT_ENABLED=False`
 + Faz 5 hardening (dinamik sizing · MR exec · −%5/−%7/−%15 DD · $0-notional guard · netting guard).
 Doğrulama: `BENCH_ALL=1 python bench.py x` → 8/8. AI ofisi: `office/` (Claude+Gemini çift-model).
+
+---
+
+## Faz 5 — Çıkış yapısı deneyleri (29 Tem 2026)
+
+**Bağlam:** Canlı bot 44 günde −%6.5. Teşhis: (a) WR metriği şişikti — TP1 ayrı kayıt
+olarak loglanıyor ve TP1 sonrası bacak yapısal olarak kaybedemiyor, yani her kazanan
+pozisyon iki kazanan kayıt üretiyordu (canlıda WR %57.7 → gerçek %43.6); (b) trail
+1.5×ATR kazananı boğuyordu.
+
+**Metrik değişikliği:** Bu fazdan itibaren armlar **pozisyon-bazlı, havuzlanmış**
+metriklerle kıyaslanır (`metrics.py`). Eski kayıt-bazlı "Avg PF" hem çift sayıyor
+hem ağırlıksız ortalama alıyordu. Karar metriği: **expectancy/R**, kısıt: **MaxDD**.
+Win rate artık hedef değil, teşhis.
+
+**Armlar** (env ile, `config.py` varsayılanları değişmedi):
+
+| Arm | Değişken | 90g exp/R | 90g PF | 240g exp/R | 240g PF |
+|---|---|---|---|---|---|
+| Kontrol | — | +0.228 | 1.95 | +0.057 | 1.18 |
+| E1 | `X_TP1_CLOSE_FRAC=0.0` | +0.221 | 1.92 | — | — |
+| E2 | `X_TRAIL_ATR=2.5` | +0.264 | 2.13 | +0.100 | 1.33 |
+| E2b | `X_TRAIL_ATR=3.0` | +0.261 | 2.11 | — | — |
+| E3 | `X_CONFIRM_VOL_MULT=1.5` | +0.107 ⚠️ | 1.43 | — | — |
+| **E6** | `X_TP1_CLOSE_FRAC=0.0 X_TRAIL_ATR=2.5` | **+0.281** | **2.15** | **+0.115** | **1.37** |
+| E7 | `X_TP1_CLOSE_FRAC=0.33 X_TRAIL_ATR=2.5` | +0.270 | 2.15 | +0.105 | 1.35 |
+| E8 | `X_TRAIL_ATR=2.5 X_TP2_ATR=6.0` | +0.257 | 2.06 | — | — |
+
+**Sonuçlar:**
+1. **E6 kazandı, her iki pencerede de:** 90g +%23, 240g **+%102** (expectancy iki katı).
+   MaxDD ayı penceresinde de **iyileşti** (−9.63% → −8.69%). Trade sayısı sabit (215 vs 217)
+   → "0 trade" sendromu yok.
+2. **Kazanan armın WR'si DÜŞÜK** (%56.7 vs %60.3) ama payoff'u yüksek (1.65 vs 1.28).
+   Eski WR≥55 kriteriyle bu arm reddedilirdi. Hedef fonksiyonunu düzeltmek, doğru
+   cevabı bulmanın ön şartıydı.
+3. **Trail genişliği asıl darboğazdı**, kısmi çıkış değil: E1 tek başına −%3, E2 tek
+   başına +%16, ikisi birlikte +%23 (süperadditif — trail genişleyince kısmi çıkışı
+   kaldırmak anlam kazanıyor).
+4. **Hacim teyidini sıkılaştırmak zararlı** (E3: −%53, MaxDD −5.56%). Genel literatür
+   tavsiyesi ("kırılımda 2-3× hacim") bu sisteme UYMUYOR — sinyal motoru hacmi zaten
+   eliyor, ikinci filtre iyi trade'leri kesiyor. Körlemesine uygulanmamalı.
+
+**Not — canlı/backtest uçurumu hâlâ açık:** düzeltilmiş metrikle bile backtest +0.228R
+iken canlı −0.076R. E6 bunu tek başına kapatmaz. `paper_bb.py`'ye eklenen sinyal-hunisi
+telemetrisi (probe/confirm/full sayaçları + probe_cost) bu farkın kaynağını ölçecek.

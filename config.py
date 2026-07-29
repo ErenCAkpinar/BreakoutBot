@@ -90,18 +90,30 @@ MAX_NOTIONAL_USD   = 1500.0  # ceiling (bounds leverage on a ~$1000 account)
 MAX_OPEN        = 2       # max simultaneous FULL positions across all symbols
 
 # ── Exit parameters ───────────────────────────────────────────────────────────
-SL_TEST_ATR     = 1.0     # test SL = 1×ATR  (small loss if signal fails)
-SL_FULL_ATR     = 1.5     # full SL = 1.5×ATR from entry
-TP1_ATR         = 2.0     # TP1 = entry ± 2×ATR  → close 50%, move SL to breakeven
-TP2_ATR         = 4.0     # TP2 = entry ± 4×ATR  → close remaining 50%
-TRAIL_ATR       = 1.5     # trailing SL = peak_price ∓ 1.5×ATR (active after TP1)
-TIMEOUT_BARS    = 48      # 48 bars = 4 hours max hold on full position
+# Env-overridable for controlled A/B sweeps (same pattern as regime.LONG_SIZE_MULT).
+# Defaults are the validated Faz 4c values — an unset env changes NOTHING.
+# Never hand-tune these on the live bot; run an arm through bench.py first.
+import os as _os
+def _envf(name: str, default: float) -> float:
+    return float(_os.getenv(name, default))
+
+SL_TEST_ATR     = _envf("X_SL_TEST_ATR", 1.0)   # test SL = 1×ATR  (small loss if signal fails)
+SL_FULL_ATR     = _envf("X_SL_FULL_ATR", 1.5)   # full SL = 1.5×ATR from entry
+TP1_ATR         = _envf("X_TP1_ATR", 2.0)       # TP1 = entry ± 2×ATR  → close TP1_CLOSE_FRAC
+TP2_ATR         = _envf("X_TP2_ATR", 4.0)       # TP2 = entry ± 4×ATR  → close remaining
+TRAIL_ATR       = _envf("X_TRAIL_ATR", 1.5)     # trailing SL = peak_price ∓ 1.5×ATR (after TP1)
+TIMEOUT_BARS    = int(_envf("X_TIMEOUT_BARS", 48))  # max hold on full position
+
+# Fraction of the position closed at TP1. Was hardcoded 0.50 in strategy.py.
+# Set to 0.0 to disable scaling out entirely (single exit via TP2/trail) — the
+# scale-out is what caps winners near 0.7R while losses stay at a full 1R.
+TP1_CLOSE_FRAC  = _envf("X_TP1_CLOSE_FRAC", 0.50)
 
 # ── Confirmation check (1 bar after test entry) ───────────────────────────────
-CONFIRM_PRICE_MOVE_PCT = 0.0005  # price must move ≥ 0.05% in signal direction (tiny move, just anti-reversal)
-CONFIRM_VOL_MULT       = 1.0     # volume ≥ 1.0× avg (normalizes after signal bar — Wave 11 signal already vets vol)
-CONFIRM_RSI_LONG_MIN   = 45.0    # RSI still ≥ 45 for LONG (was 50 — 1-bar dips below 50 common after breakout)
-CONFIRM_RSI_SHORT_MAX  = 55.0    # RSI still ≤ 55 for SHORT (symmetric)
+CONFIRM_PRICE_MOVE_PCT = _envf("X_CONFIRM_PRICE_MOVE_PCT", 0.0005)  # ≥0.05% move in signal direction
+CONFIRM_VOL_MULT       = _envf("X_CONFIRM_VOL_MULT", 1.0)   # volume ≥ N× avg — 1.0 is effectively no filter
+CONFIRM_RSI_LONG_MIN   = _envf("X_CONFIRM_RSI_LONG_MIN", 45.0)   # RSI still ≥ 45 for LONG
+CONFIRM_RSI_SHORT_MAX  = _envf("X_CONFIRM_RSI_SHORT_MAX", 55.0)  # RSI still ≤ 55 for SHORT
 
 # ── Cooldown ──────────────────────────────────────────────────────────────────
 COOLDOWN_BARS = 10        # bars to wait after failed signal before re-scanning

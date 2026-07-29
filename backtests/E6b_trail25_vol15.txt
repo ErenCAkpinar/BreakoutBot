@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/erenakpinar/Downloads/BreakoutBot/bench.py", line 23, in <module>
+    import config
+  File "/Users/erenakpinar/Downloads/BreakoutBot/config.py", line 104, in <module>
+    TRAIL_ATR       = _envf("X_TRAIL_ATR", 1.5)     # trailing SL = peak_price ∓ 1.5×ATR (after TP1)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/erenakpinar/Downloads/BreakoutBot/config.py", line 98, in _envf
+    return float(_os.getenv(name, default))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: could not convert string to float: '2.5 X_CONFIRM_VOL_MULT=1.5'

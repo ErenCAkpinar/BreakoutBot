@@ -28,7 +28,7 @@ from math_engine import MathEngine
 from config import (
     TEST_SIZE_USD, FULL_SIZE_USD, LEVERAGE, EXEC_COST_PER_SIDE,
     RISK_PER_TRADE_USD, MIN_NOTIONAL_USD, MAX_NOTIONAL_USD,
-    SL_TEST_ATR, SL_FULL_ATR, TP1_ATR, TP2_ATR, TRAIL_ATR,
+    SL_TEST_ATR, SL_FULL_ATR, TP1_ATR, TP2_ATR, TRAIL_ATR, TP1_CLOSE_FRAC,
     TIMEOUT_BARS, COOLDOWN_BARS,
     CONFIRM_PRICE_MOVE_PCT, CONFIRM_VOL_MULT,
     CONFIRM_RSI_LONG_MIN, CONFIRM_RSI_SHORT_MAX,
@@ -228,17 +228,23 @@ class SymbolState:
 
             if tp1_hit:
                 exit_p  = self.full_tp1
-                half    = self.full_notional * 0.50
-                gross   = half * (exit_p - self.full_entry) / self.full_entry * mult
-                pnl     = gross - half * EXEC_COST_PER_SIDE
-                t = Trade(symbol=self.symbol, direction=self.direction, kind="FULL",
-                          entry=self.full_entry, exit=exit_p, pnl=pnl, exit_type="TP1")
-                events.append(t)
-                self.trades.append(t)
+                # Scale-out fraction is configurable (TP1_CLOSE_FRAC, default 0.50).
+                # At 0.0 nothing is banked here and the whole position rides the
+                # trail — which is the point of the E1 experiment: partial exits
+                # cap winners near 0.7R while a stop-out still costs a full 1R.
+                frac = TP1_CLOSE_FRAC
+                if frac > 0.0:
+                    part  = self.full_notional * frac
+                    gross = part * (exit_p - self.full_entry) / self.full_entry * mult
+                    pnl   = gross - part * EXEC_COST_PER_SIDE
+                    t = Trade(symbol=self.symbol, direction=self.direction, kind="FULL",
+                              entry=self.full_entry, exit=exit_p, pnl=pnl, exit_type="TP1")
+                    events.append(t)
+                    self.trades.append(t)
 
-                # Move to TRAILING with remaining 50%
+                # Move to TRAILING with whatever is left
                 self.state       = TRAILING
-                self.full_notional = self.full_notional * 0.50
+                self.full_notional = self.full_notional * (1.0 - frac)
                 self.full_sl     = self.full_entry     # SL → breakeven
                 self.tp1_hit     = True
                 self.bars_held   = 0
