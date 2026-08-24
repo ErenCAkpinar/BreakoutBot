@@ -22,7 +22,7 @@ Kanıtlanmış **long momentum edge'ini koruyarak**, bota **rejim-farkındalığ
 - Sebep: **choppy → bearish** rejim; long-only strateji tape'e karşı
 
 **Altyapı:**
-- Hetzner sunucu (Helsinki) — systemd ile 7/24, **eski/güvenli kod** çalışıyor
+- Uzak sunucu — systemd ile 7/24, **eski/güvenli kod** çalışıyor
 - `dashboard.py` — go/no-go checklist panosu
 - Gerçek market verisi (production klines) + testnet emir
 

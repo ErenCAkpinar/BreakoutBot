@@ -1,7 +1,9 @@
 # BreakoutBot
 
 > Rejim-farkındalıklı **breakout momentum + mean-reversion** kripto botu.
-> Binance Futures **Testnet** üzerinde 7/24 paper-trading — gerçek para yönetmez.
+> 7/24 **simülasyon** — gerçek Binance Futures fiyat verisi, yerel sanal cüzdan,
+> borsaya **hiç emir gitmiyor**. Emekli v1 sürümü Binance Futures Testnet'e gerçek
+> emir gönderiyordu; çalışan bot göndermiyor (API anahtarı dahi yüklü değil).
 
 Bu repo "kazanan botumu paylaşıyorum" demiyor. Hikâye daha dürüst:
 **sistemi kurdum, ölçtüm, strateji kaybedince risk katmanı botu durdurdu,
@@ -130,11 +132,11 @@ $ python watch.py --demo          # örnek veriyle dene (bot gerekmez)
 ── OTURUM ────────────────────────────────────────────────────────
   Pozisyon 5  ·  WR 60% (3W/2L)  ·  Net $+0.64  ·  PF 1.03
 ══════════════════════════════════════════════════════════════════
-  read-only · botu etkilemez · testnet (gerçek para değil)
+  read-only · botu etkilemez · simülasyon (gerçek para değil)
 ```
 
 > Yukarıdaki tablo `state_paper.sample.json` **örnek verisidir** (UI'yi bot olmadan
-> göstermek için). Gerçek testnet sonuçları için → [REPORT.md](REPORT.md).
+> göstermek için). Gerçek koşu sonuçları için → [REPORT.md](REPORT.md).
 
 ```bash
 python watch.py                 # canlı, 5 sn'de bir yenilenir (gerçek state)
@@ -219,6 +221,11 @@ değişkeninden okunur).
 
 ## Feragat
 
-Tüm rakamlar **Binance Futures Testnet** (sahte bakiye) üzerindendir. Bu proje
-bir araştırma/mühendislik çalışmasıdır; **yatırım tavsiyesi değildir** ve gerçek
-parayla kullanım için tasarlanmamıştır.
+Hiçbir rakam gerçek parayla üretilmemiştir. Çalışan bot **saf simülasyondur** —
+gerçek fiyat verisi, yerel sanal cüzdan, borsaya giden emir yok. Emekli v1 sürümü
+Binance Futures **Testnet**'e gerçek emir gönderiyordu (yine sahte bakiye); bu
+ayrım önemli, çünkü emir gönderen bir sistemin slipaj ve icra maliyeti simülasyonda
+görünmez. Hangi rakamın hangisinden geldiği `BENCHMARKS.md`'de belirtilir.
+
+Bu proje bir araştırma/mühendislik çalışmasıdır; **yatırım tavsiyesi değildir** ve
+gerçek parayla kullanım için tasarlanmamıştır.

@@ -1,8 +1,12 @@
 # BreakoutBot
 
-Rejim-farkındalıklı kripto breakout + mean-reversion botu. Binance Futures **testnet**
-(sim mode) — gerçek para yok. Faz geçmişi, deney sonuçları ve kürasyon kararları
-`BENCHMARKS.md`'de; her karar orada gerekçesiyle kayıtlı.
+Rejim-farkındalıklı kripto breakout + mean-reversion botu. **Saf simülasyon** — gerçek
+Binance Futures fiyat verisi, yerel sanal cüzdan, borsaya emir gitmiyor. Emekli v1
+sürümü testnet'e gerçek emir gönderiyordu; çalışan bot göndermiyor — API anahtarı
+yüklü bile değil. "testnet" kelimesi bu projede yalnızca o emekli sürümü anlatır.
+
+Faz geçmişi, deney sonuçları ve kürasyon kararları `BENCHMARKS.md`'de; her karar
+orada gerekçesiyle kayıtlı.
 
 Canlı sistem sunucuda `breakoutbot-test` servisi olarak koşuyor (5 coin, E6 çıkış
 parametreleri env'den: `X_TP1_CLOSE_FRAC=0.0 X_TRAIL_ATR=2.5`).

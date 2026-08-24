@@ -11,17 +11,14 @@ Full analysis: `~/.gstack/projects/ErenCAkpinar-BreakoutBot/ceo-plans/2026-08-23
 
 ## 🚨 P0 — DO FIRST
 
-### S0 — Harden the VM and back up the evidence
-Before any code work. `root` SSH by **password** on a public IPv4 (a failed auth attempt
-was observed in-session), 19 pending OS updates + 3 ESM security updates, "System restart
-required", track record served over plain HTTP, and the **only copy** of the dead bot's
-`state_paper.json` (99 legs of `--testnet` evidence) sitting unbacked-up on that box.
+### S0 — Harden the VM and back up the evidence — ✅ done 2026-08-24
+Server hardening and off-box evidence backup are complete.
 
-Everything else here is measurement work on a testnet bot with no real money. This is the
-only item with an irreversible downside.
-`ssh-copy-id` → `PermitRootLogin prohibit-password` → `PasswordAuthentication no` →
-`unattended-upgrades` → reboot → TLS. Under an hour.
-**Effort:** S (human ~1h) · **Priority:** P0
+Infrastructure posture is **deliberately not described in this repo**. A public
+to-do list enumerating a live host's weaknesses is a checklist for whoever finds
+the host, and it goes stale the moment the work is done — which is worse than
+saying nothing, because readers assume it is current. Operational notes live
+outside version control.
 
 ### M1 — Regime warm-up fabricates a NEUTRAL month in every backtest window
 `regime.py:82` sets `score = 0.0` while the 200-period **4h** MA warms (`MA_PERIOD=200`
@@ -178,30 +175,13 @@ are **−$8.56** combined. Only 2 of 5 were profitable live (UNI, POL). "Curatio
 **Revisit under:** the D8 null-arm result (curated-5 vs equal-weight, out-of-sample).
 **Effort:** S to decide · **Priority:** P2
 
-### Old bot disposition
-**What:** `breakoutbot.service` is `inactive`/`disabled` but its `~/BreakoutBot/config.py`
-still holds the 8-coin universe **and** it has real testnet order authority. If it ever
-restarts it resumes trading LDO/SOL/AVAX.
-**Fix:** `systemctl disable --now breakoutbot` explicitly, or deploy the 5-coin config to
-it too. Back up its state first — 99 legs of `--testnet` evidence exist nowhere else.
-**Effort:** S (human ~30min / CC ~5min) · **Priority:** P2
+### Old bot disposition — ✅ done 2026-08-24
+The retired 8-coin bot is stopped and disabled, and its 99 legs of execution evidence
+are archived off-box. It can no longer come back on a reboot.
 
 ---
 
-## 🟡 P2 — Infrastructure & security
-
-### VM hardening
-- `root` SSH by **password** on a public IPv4 (a failed auth attempt was observed
-  in-session — port 22 gets brute-forced continuously)
-- 19 pending OS updates + 3 ESM security updates; "System restart required"
-- track record served over **plain HTTP** on a bare IP — no TLS, no domain
-- the only copy of the dead bot's `state_paper.json` is unbacked-up on that box
-
-**Fix:** key-only auth, `PermitRootLogin prohibit-password`, `unattended-upgrades`,
-reboot, TLS. Under an hour, and it gates any public release.
-**Note:** repo hygiene is clean — `secrets_local.py` gitignored, VM IP **not** in git
-history, `deploy_test.sh` parameterises the host via `$BREAKOUTBOT_SERVER`.
-**Effort:** S (human ~1h / CC —, manual) · **Priority:** P2
+## 🟡 P2 — Build & release
 
 ### Production runs uncommitted code
 **What:** `deploy_test.sh` `scp`s 8 files directly. The server's `config.py` has the
@@ -220,8 +200,10 @@ running.** If the VM dies, the deployed system cannot be reconstructed from the 
   `if`/`elif` order. That is how the intrabar optimism hid. Comment the convention.
 - **Silent swallows:** `indicators.py:125` and `backtest.py:119` catch `Exception` with
   **no logging at all**.
-- **Site states:** the track record page has only a `Loading…` state — nothing for fetch
-  failure, stale data, or `hard_stopped=True`. The hard stop firing is the most important
-  moment in the product's life and has no design.
+- **Site states:** ✅ mostly done 2026-08-24 — the page now has a fetch-failure state and
+  a staleness check (a status strip flips to STALE when the newest bar is >15 min old, so a
+  stopped bot cannot keep looking alive). Still missing: a designed treatment for
+  `hard_stopped=True`. The hard stop firing is the most important moment in the product's
+  life and has no design.
 - **`risk_events[].balance` is `None`** on all 10 entries, so the circuit-breaker
   timeline — the page's stated moat — cannot show the equity level at each trip.
