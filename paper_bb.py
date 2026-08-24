@@ -326,6 +326,9 @@ class PaperTrader:
         # TEST SL). Tracked separately because it is invisible in the trade log
         # yet accounted for ~54% of the live drawdown.
         self.probe_cost = 0.0
+        # T0: ISO timestamp from which trade_log carries EVERY balance-moving
+        # leg (OPEN + probe legs included). None until the first save.
+        self.full_leg_logging_since: str | None = None
         # Signal-funnel totals across the run — compare against the backtest's
         # confirm rate to detect live/backtest divergence.
         self.funnel_totals = {"scanned": 0, "regime_pass": 0, "probe": 0,
@@ -341,6 +344,10 @@ class PaperTrader:
     # ── State persistence ─────────────────────────────────────────────────────
 
     def _save_state(self) -> None:
+        if self.full_leg_logging_since is None:
+            # First save under the full-leg schema — everything from here on
+            # reconciles; everything before it does not (T0).
+            self.full_leg_logging_since = datetime.now(timezone.utc).isoformat()
         sym_data = {}
         for tok, s in self.sym_states.items():
             sym_data[tok] = {
@@ -378,6 +385,13 @@ class PaperTrader:
             "regime_4h_ts":   self._regime_4h_ts,
             "funnel_totals":  self.funnel_totals,
             "probe_cost":     round(self.probe_cost, 4),
+            # T0 cutover: from this bar on, trade_log contains EVERY leg that
+            # moved the balance, so sum(pnl) reconciles exactly. Legs written
+            # before it are missing their OPEN-leg fees and cannot be repaired
+            # per-trade -- any reconciliation assert must be scoped to trades at
+            # or after this marker.
+            "full_leg_logging_since": self.full_leg_logging_since,
+            "schema_version":         2,
         }
         with open(STATE_FILE, "w") as f:
             json.dump(state, f, indent=2)
@@ -395,6 +409,7 @@ class PaperTrader:
             self.bar_count      = st["bar_count"]
             self.trade_log      = st.get("trade_log", [])
             self.probe_cost     = st.get("probe_cost", 0.0)
+            self.full_leg_logging_since = st.get("full_leg_logging_since")
             self.funnel_totals.update(st.get("funnel_totals", {}))
             for tok, saved in st.get("sym_states", {}).items():
                 if tok not in self.sym_states:
@@ -421,7 +436,14 @@ class PaperTrader:
                     s2.state, s2.entry, s2.notional = m["state"], m["entry"], m["notional"]
                     s2.sl, s2.tp = m["sl"], m["tp"]
                     s2.bars_in, s2.cooldown = m["bars_in"], m["cooldown"]
-            self._regime       = st.get("regime", self._regime)
+            # Keep only the CURRENT universe: a coin dropped from TOKENS must not
+            # linger here. Stale keys are never used for trading (regimes are read
+            # per-symbol while iterating self.tokens) but they are persisted back to
+            # state, they skew the "BULL n/N" line, and the track-record exporter
+            # derives the published universe — and the own-universe HODL benchmark —
+            # from these very keys.
+            saved_regime = st.get("regime", {})
+            self._regime = {t: saved_regime.get(t, "NEUTRAL") for t in self.tokens}
             self._regime_4h_ts = st.get("regime_4h_ts", 0)
             self._log(
                 f"✅ Resumed from {STATE_FILE} — "
@@ -429,6 +451,37 @@ class PaperTrader:
             )
         except Exception as exc:
             self._log(f"⚠️  Could not load state ({exc}) — starting fresh")
+
+    # ── Trade log ─────────────────────────────────────────────────────────────
+
+    def _log_leg(self, ev, bar_dt, sleeve: str, exit_type: str | None = None) -> None:
+        """Append ONE leg to trade_log.
+
+        T0 — why every leg goes in, including the ones that open a position:
+            Each OPEN leg carries pnl = -notional x EXEC_COST_PER_SIDE (the entry
+            fee) and is applied to self.balance. It used to `continue` before the
+            append below, so the fee left the balance without ever appearing in
+            the trade log. Same for probe legs (CONFIRM_OK / CONFIRM_FAIL /
+            test-SL). The result was that sum(trade_log.pnl) did NOT equal the
+            balance change -- measured -$53.41 on the 8-coin bot and -$33.35 on
+            the 5-coin one -- and the published expectancy had the wrong sign.
+
+            aggregate_positions() ignores exit_type "OPEN", so logging these does
+            not change the position count; it only makes the money add up. Probe
+            legs land in their own PROBE sleeve for the same reason.
+        """
+        self.trade_log.append({
+            "ts":        bar_dt.isoformat(),
+            "symbol":    ev.symbol,
+            "direction": ev.direction,
+            "sleeve":    sleeve,
+            "kind":      getattr(ev, "kind", ""),
+            "exit_type": exit_type or ev.exit_type,
+            "entry":     ev.entry,
+            "exit":      ev.exit,
+            "pnl":       round(ev.pnl, 4),
+            "balance":   round(self.balance, 4),
+        })
 
     # ── Logging ───────────────────────────────────────────────────────────────
 
@@ -670,6 +723,9 @@ class PaperTrader:
                             self._log(
                                 f"     ↳ [TESTNET] FULL order filled @ {fill:.5g}",
                                 also_print=False)
+                    # T0: the entry fee already hit self.balance above — log it.
+                    self._log_leg(ev, bar_dt,
+                                  "PROBE" if ev.kind == "TEST" else "MOMENTUM")
                     continue
 
                 # ── Test position result ───────────────────────────────────
@@ -711,6 +767,12 @@ class PaperTrader:
                             f"  🛑 TEST SL    {ev.symbol} pnl=${ev.pnl:+.3f} "
                             f"| bal=${self.balance:.2f}"
                         )
+                    # T0: probe legs are real closed round-trips with real cost.
+                    # A test-SL is logged as PROBE_SL so it is never confused with
+                    # a full-position SL by the aggregator.
+                    self._log_leg(ev, bar_dt, "PROBE",
+                                  exit_type="PROBE_SL" if ev.exit_type == "SL"
+                                  else ev.exit_type)
                     continue
 
                 # ── Full trade closed ─────────────────────────────────────
@@ -786,6 +848,7 @@ class PaperTrader:
                                                   mr.notional, ev.entry)
                             self._log(f"     ↳ [TESTNET] MR order filled @ {fill:.5g}",
                                       also_print=False)
+                        self._log_leg(ev, bar_dt, "MR")   # T0: entry fee
                         continue
                     emoji = "✅" if ev.pnl > 0 else "❌"
                     self._log(f"  {emoji} MR {ev.exit_type:<4}  {ev.symbol} "

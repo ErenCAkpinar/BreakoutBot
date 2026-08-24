@@ -1,0 +1,59 @@
+
+==============================================================================
+  CURATION: E6-fresh240   window=240d  FRESH asof 2026-08-22
+  params: TRAIL_ATR=2.5  TP1_CLOSE_FRAC=0.0  TP1=2.0 TP2=4.0 SL=1.5
+==============================================================================
+
+  [fetch] INJUSDT 240d …
+  [fetch] POLUSDT 240d …
+  [fetch] LDOUSDT 240d …
+  [fetch] SOLUSDT 240d …
+  [fetch] AVAXUSDT 240d …
+  [fetch] NEARUSDT 240d …
+  [fetch] UNIUSDT 240d …
+  [fetch] ADAUSDT 240d …
+  [fetch] XRPUSDT 240d …
+  [fetch] LINKUSDT 240d …
+  [fetch] LTCUSDT 240d …
+  [fetch] AAVEUSDT 240d …
+  [fetch] WIFUSDT 240d …
+  [fetch] FETUSDT 240d …
+  [fetch] BTCUSDT 240d …
+  INJUSDT     n= 36  WR  50.0%  payoff  2.14  expR   0.297  PF  2.14  ret   +6.78%  DD  -3.53%   (68s)
+  POLUSDT     n= 22  WR  50.0%  payoff  2.31  expR   0.181  PF  2.31  ret   +1.89%  DD  -2.40%   (68s)
+  LDOUSDT     n= 33  WR  42.4%  payoff  0.97  expR  -0.145  PF  0.72  ret   -8.30%  DD -11.02%   (68s)
+  SOLUSDT     n= 21  WR  38.1%  payoff   1.4  expR  -0.035  PF  0.86  ret   -3.08%  DD  -3.83%   (70s)
+  AVAXUSDT    n= 23  WR  26.1%  payoff  1.36  expR  -0.178  PF  0.48  ret   -6.39%  DD  -6.39%   (68s)
+  NEARUSDT    n= 48  WR  52.1%  payoff  1.39  expR    0.17  PF  1.51  ret   +3.25%  DD  -3.62%   (68s)
+  UNIUSDT     n= 36  WR  55.6%  payoff   2.1  expR   0.344  PF  2.62  ret   +8.29%  DD  -3.69%   (68s)
+  ADAUSDT     n= 26  WR  50.0%  payoff  2.06  expR   0.252  PF  2.06  ret   +3.89%  DD  -2.71%   (68s)
+  XRPUSDT     n= 26  WR  38.5%  payoff  0.81  expR  -0.144  PF  0.51  ret   -6.00%  DD  -8.64%   (68s)
+  LINKUSDT    n= 19  WR  52.6%  payoff  1.14  expR   0.091  PF  1.27  ret   -0.53%  DD  -5.96%   (68s)
+  LTCUSDT     n= 15  WR  33.3%  payoff  3.65  expR   0.086  PF  1.83  ret   -0.06%  DD  -2.07%   (69s)
+  AAVEUSDT    n= 28  WR  28.6%  payoff   2.2  expR  -0.045  PF  0.88  ret   -4.42%  DD  -7.97%   (68s)
+  WIFUSDT     n= 38  WR  36.8%  payoff  0.91  expR  -0.154  PF  0.53  ret   -9.87%  DD -12.52%   (68s)
+  FETUSDT     n= 36  WR  33.3%  payoff  1.67  expR  -0.073  PF  0.84  ret   -6.83%  DD -10.98%   (68s)
+
+──────────────────────────────────────────────────────────────────────────────
+  RANKING by expectancy/R   (E6-fresh240, 240d)
+──────────────────────────────────────────────────────────────────────────────
+   # symbol         n    WR%  payoff     expR     PF     ret%     DD%
+   1 UNIUSDT       36   55.6     2.1    0.344   2.62    +8.29   -3.69
+   2 INJUSDT       36   50.0    2.14    0.297   2.14    +6.78   -3.53
+   3 ADAUSDT       26   50.0    2.06    0.252   2.06    +3.89   -2.71
+   4 POLUSDT       22   50.0    2.31    0.181   2.31    +1.89   -2.40
+   5 NEARUSDT      48   52.1    1.39     0.17   1.51    +3.25   -3.62
+   6 LINKUSDT      19   52.6    1.14    0.091   1.27    -0.53   -5.96
+   7 LTCUSDT       15   33.3    3.65    0.086   1.83    -0.06   -2.07
+   8 SOLUSDT       21   38.1     1.4   -0.035   0.86    -3.08   -3.83
+   9 AAVEUSDT      28   28.6     2.2   -0.045   0.88    -4.42   -7.97
+  10 FETUSDT       36   33.3    1.67   -0.073   0.84    -6.83  -10.98
+  11 XRPUSDT       26   38.5    0.81   -0.144   0.51    -6.00   -8.64
+  12 LDOUSDT       33   42.4    0.97   -0.145   0.72    -8.30  -11.02
+  13 WIFUSDT       38   36.8    0.91   -0.154   0.53    -9.87  -12.52
+  14 AVAXUSDT      23   26.1    1.36   -0.178   0.48    -6.39   -6.39
+──────────────────────────────────────────────────────────────────────────────
+  positive expectancy: 7/14 symbols   total positions: 407
+==============================================================================
+
+  → /private/tmp/claude-501/-Users-erenakpinar-Downloads-BreakoutBot/4fc9ea40-84db-4c89-a419-52aa0bd474f3/scratchpad/e6_fresh240.json

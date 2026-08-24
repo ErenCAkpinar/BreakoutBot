@@ -31,6 +31,12 @@ PARTIAL_EXITS = {"TP1"}
 FINAL_EXITS = {"TP2", "TRAIL", "SL", "TIMEOUT", "TMO"}
 # Mean-reversion sleeve exits are always single-leg positions.
 MR_EXITS = {"MR_TP", "MR_SL", "MR_TIMEOUT", "MR_TMO"}
+# Probe legs: the $20 test position that either failed confirmation, stopped out
+# before it could confirm, or was rolled into a full position. Real closed
+# round-trips with real cost, but NOT momentum positions — keeping them in their
+# own sleeve stops them diluting momentum expectancy while still making the
+# filter's cost visible (T0).
+PROBE_EXITS = {"CONFIRM_FAIL", "CONFIRM_OK", "PROBE_SL"}
 
 
 def _get(rec: Any, *names: str, default=None):
@@ -85,8 +91,22 @@ def aggregate_positions(trades: Iterable[Any]) -> list[Position]:
 
         symbol = str(_get(rec, "symbol", default="?"))
         pnl = float(_get(rec, "pnl", default=0.0) or 0.0)
-        kind = str(_get(rec, "kind", "sleeve", default="") or "").upper()
-        sleeve = "MR" if (kind == "MR" or exit_type in MR_EXITS) else "MOMENTUM"
+        # paper_bb's live trade_log tags MR legs as {"direction": "MR"} and writes
+        # their exit types as plain TP/SL/TIMEOUT, so neither `kind`/`sleeve` nor
+        # MR_EXITS matches on live data — every MR leg used to read as MOMENTUM,
+        # and MR "TP" matched no exit set at all. Reading `direction` too fixes
+        # both. ("LONG"/"SHORT" never equal "MR", so momentum is unaffected.)
+        kind = str(_get(rec, "kind", "sleeve", "direction", default="") or "").upper()
+        if kind == "PROBE" or exit_type in PROBE_EXITS:
+            sleeve = "PROBE"
+        elif kind == "MR" or exit_type in MR_EXITS:
+            sleeve = "MR"
+        else:
+            sleeve = "MOMENTUM"
+
+        if sleeve == "PROBE":
+            positions.append(Position(symbol, "PROBE", pnl, exit_type, [exit_type]))
+            continue
 
         if sleeve == "MR":
             positions.append(Position(symbol, "MR", pnl, exit_type, [exit_type]))
@@ -119,11 +139,50 @@ def aggregate_positions(trades: Iterable[Any]) -> list[Position]:
     return positions
 
 
-def position_stats(positions: list[Position], risk_per_trade: float | None = None) -> dict:
+def _expectancy_r(positions: list[Position], risk_by_sleeve: dict[str, float]) -> float:
+    """Mean R across positions, each converted at its OWN sleeve's dollar risk."""
+    if not positions:
+        return 0.0
+    total = 0.0
+    for p in positions:
+        risk = risk_by_sleeve.get(p.sleeve)
+        if not risk:
+            continue                      # unknown sleeve: cannot express in R
+        total += p.pnl / risk
+    return total / len(positions)
+
+
+def _by_sleeve(positions: list[Position],
+               risk_by_sleeve: dict[str, float]) -> dict[str, dict]:
+    """Per-sleeve n / expectancy / expectancy_r, so a blended number is never
+    mistaken for a single strategy's edge (M2)."""
+    out: dict[str, dict] = {}
+    for sleeve in sorted({p.sleeve for p in positions}):
+        sub  = [p for p in positions if p.sleeve == sleeve]
+        risk = risk_by_sleeve.get(sleeve)
+        exp  = sum(p.pnl for p in sub) / len(sub)
+        out[sleeve] = {
+            "n": len(sub),
+            "risk_per_trade": risk,
+            "expectancy": round(exp, 2),
+            "expectancy_r": round(exp / risk, 3) if risk else None,
+            "win_rate": round(100.0 * sum(1 for p in sub if p.is_win) / len(sub), 1),
+            "pnl": round(sum(p.pnl for p in sub), 2),
+        }
+    return out
+
+
+def position_stats(positions: list[Position], risk_per_trade: float | None = None,
+                   risk_by_sleeve: dict[str, float] | None = None) -> dict:
     """Win rate, payoff, expectancy and profit factor — computed per POSITION.
 
     `risk_per_trade` (the fixed dollar risk, e.g. RISK_PER_TRADE_USD) turns the
     dollar figures into R-multiples, which is the scale-free way to compare arms.
+
+    `risk_by_sleeve` (M2) maps sleeve -> that sleeve's dollar risk. When supplied,
+    every position is converted at ITS OWN risk before averaging, so a pooled
+    momentum($10) + MR($5) set yields a real R-multiple instead of dollars-over-ten
+    across two systems. The per-sleeve breakdown lands in `by_sleeve`.
     """
     n = len(positions)
     if n == 0:
@@ -154,7 +213,10 @@ def position_stats(positions: list[Position], risk_per_trade: float | None = Non
         "avg_loss": round(-avg_l, 2),
         "payoff": round(payoff, 2) if payoff is not None else None,
         "expectancy": round(expectancy, 2),
-        "expectancy_r": round(expectancy / risk_per_trade, 3) if risk_per_trade else None,
+        "expectancy_r": (round(_expectancy_r(positions, risk_by_sleeve), 3)
+                         if risk_by_sleeve
+                         else (round(expectancy / risk_per_trade, 3) if risk_per_trade else None)),
+        "by_sleeve": _by_sleeve(positions, risk_by_sleeve) if risk_by_sleeve else None,
         "profit_factor": round(gross_w / gross_l, 2) if gross_l > 0 else None,
         "breakeven_wr": round(breakeven, 1) if breakeven is not None else None,
         "gross_win": round(gross_w, 2),

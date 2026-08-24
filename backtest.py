@@ -41,6 +41,7 @@ from config import (
     BTC_BETA_BOOST, BTC_BETA_BLOCK,
 )
 from metrics import aggregate_positions, position_stats, exit_distribution
+from config import REGIME_WARMUP_DAYS, REGIME_WARMUP_BARS, RISK_BY_SLEEVE
 
 
 # ── Data fetch ────────────────────────────────────────────────────────────────
@@ -139,15 +140,51 @@ def print_beta_ranking(tokens: list[str], days: int, btc_df: pd.DataFrame,
 
 def run_symbol(symbol: str, days: int, balance: float = INITIAL_BALANCE,
                btc_df: pd.DataFrame | None = None,
-               df: pd.DataFrame | None = None) -> dict:
+               df: pd.DataFrame | None = None,
+               trade_start_idx: int | None = None) -> dict:
     """Run backtest for one symbol.
 
-    df     : pre-fetched OHLCV DataFrame (skips network fetch if supplied)
-    btc_df : BTC reference data for macro gate + beta
+    df     : pre-fetched OHLCV DataFrame (skips network fetch if supplied).
+             It SHOULD carry a REGIME_WARMUP_BARS prefix before the trading
+             window — see `trade_start_idx`.
+    btc_df : BTC reference data for macro gate + beta. Must span the same range
+             as `df`, prefix included, or the regime labels go cold with it.
+    trade_start_idx :
+             Row index in `df` where the TRADING window begins. Everything
+             before it is warm-up only: indicators and the 4h regime MA are
+             computed across it, but no bar is traded and none of it reaches
+             the metrics.
+
+    M1 — why the prefix exists:
+        regime.score_series_4h needs 210 closed 4h bars (~35d). Without them
+        regime.py:82 sets score = 0.0 → NEUTRAL, and LONG_SIZE_MULT["NEUTRAL"]
+        is 0.0, so momentum trades NOTHING for the first ~33 days of a window
+        while the MR sleeve (gated to NEUTRAL) inherits the whole month.
+
+        df rows:  [─── warm-up prefix ───|───── trading window ─────]
+                  0                    trade_start_idx           len(df)
+                  └ indicators + 4h regime MA warm here
+                                       └ first bar that can open a position
+
+        `days` stays the TRADING window length — it only feeds trades_per_day
+        and monthly_est, which must not be diluted by the prefix.
     """
     if df is None:
-        df = fetch_history(symbol, days)
-    warmup  = 65    # need ≥65 bars for all indicator warm-up
+        # Self-fetch: pull the window PLUS the regime warm-up prefix.
+        df = fetch_history(symbol, days + REGIME_WARMUP_DAYS)
+        trade_start_idx = REGIME_WARMUP_BARS
+    elif trade_start_idx is None:
+        print(f"  ⚠️  {symbol}: run_symbol got a pre-fetched frame with no "
+              f"trade_start_idx — the 4h regime MA will be cold for its first "
+              f"~{REGIME_WARMUP_DAYS}d and momentum will trade nothing there (M1).",
+              flush=True)
+
+    warmup  = max(65, int(trade_start_idx or 0))   # ≥65 bars for indicator warm-up
+    if warmup >= len(df):
+        raise ValueError(
+            f"{symbol}: trade_start_idx={trade_start_idx} leaves no bars to trade "
+            f"(len(df)={len(df)}). Fetch days + REGIME_WARMUP_DAYS."
+        )
 
     # ── Vectorised bulk indicator pre-computation (major speedup) ─────────
     df = precompute_indicators(df)
@@ -323,7 +360,10 @@ def run_symbol(symbol: str, days: int, balance: float = INITIAL_BALANCE,
     # lose, so record-based `wr`/`pf` above double-count every winner. Judge arms
     # on these instead — see metrics.py for the derivation.
     positions  = aggregate_positions(closed)
-    pos_stats  = position_stats(positions, risk_per_trade=RISK_PER_TRADE_USD)
+    # M2: an R-multiple is pnl / the risk THAT position took. Momentum risks $10,
+    # MR risks $5 — pooling them under one $10 denominator makes expR meaningless.
+    pos_stats  = position_stats(positions, risk_per_trade=RISK_PER_TRADE_USD,
+                                risk_by_sleeve=RISK_BY_SLEEVE)
 
     total_return = (bal - balance) / balance * 100
     avg_pnl      = (bal - balance) / n if n > 0 else 0.0

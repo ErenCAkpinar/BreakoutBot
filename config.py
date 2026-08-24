@@ -29,20 +29,55 @@ _FULL_UNIVERSE = [
     "STXUSDT", "ORDIUSDT",
 ]
 
-# ── ACTIVE universe — curated 8 (FAZ 4c) ──────────────────────────────────────
-# Kept: positive on 90d (chop) AND controlled (DD<10%, no blow-up) on 240d bear.
-#   90d (8 coins, Faz 4c): 8/8 profitable, PF 3.29, MaxDD −3.25%, +$55.51/mo
-#   240d deep bear:        −$16.42/mo, MaxDD −9.66% (defended, no hard stop)
+# ── ACTIVE universe — curated 5 (2026-08-22 re-curation) ──────────────────────
+# The previous 8 were curated 2026-07-29 under the OLD exit structure (trail
+# 1.5×ATR + 50% partial at TP1). The bot now runs E6 (X_TRAIL_ATR=2.5,
+# X_TP1_CLOSE_FRAC=0.0), and a trend-following exit ranks coins differently than a
+# scale-out one — so the universe was re-ranked under the params actually deployed.
+#
+# Dropped — negative expectancy under E6 in every window that has a sample:
+#   LDOUSDT   live −0.553R (n=13, p=0.005) · fresh90 −0.510R (last of 23, DD −12.4%)
+#             · fresh240 −0.145R. Alone cost −$71.88 live = ~2× the sleeve's total
+#             net loss; without it the momentum sleeve was +$33.
+#   SOLUSDT   live −0.726R (n=4) · fresh90 −0.292R · fresh240 −0.035R · pinned240
+#             −0.149R — negative in 4/4 windows.
+#   AVAXUSDT  live −0.582R (n=3) · fresh90 −0.426R · fresh240 −0.178R · pinned240
+#             −0.156R — negative in 4/4 windows.
+#
+# Pooled on the 240d window: +0.131R → +0.249R per position (245 → 168 positions).
+#
+# NOT dropped despite a weak live run: ADA (live −0.141R but p=0.36 → noise; +0.252R
+# on 240d, n=26) and NEAR (live n=1; +0.170R on 240d with n=48, the largest sample
+# in the set). Cutting those would have been fitting noise.
 TOKENS = [
-    "INJUSDT", "POLUSDT", "LDOUSDT",      # robust: positive in BOTH 90d & 240d
-    "SOLUSDT", "AVAXUSDT", "NEARUSDT",    # 90d-positive, bear-controlled
-    "UNIUSDT", "ADAUSDT",
+    "UNIUSDT", "INJUSDT", "ADAUSDT",      # +0.34 / +0.30 / +0.25 R on 240d (E6)
+    "POLUSDT", "NEARUSDT",                # +0.18 / +0.17 R on 240d (E6)
 ]
-# Total: 8 curated tokens (of 23 — re-expand when market regime turns)
+# Total: 5 curated tokens (of 23).
+#
+# ⚠️ Selection rule — do NOT curate on a short window. Measured 2026-08-22, per-coin
+# expectancy rank correlation: 90d vs 240d = −0.31, 90d vs live = −0.55 (sign
+# agreement 1/8), 240d vs live = +0.74. A 90d window has ~5–20 positions per coin and
+# anti-predicts the next period; only the 240d window (25–48/coin) transfers. Every
+# candidate that screened well on 90d flipped negative on 240d — FET +0.240→−0.073,
+# XRP +0.138→−0.144, AAVE +0.119→−0.045, WIF +0.031→−0.154. LINKUSDT (+0.106/+0.091)
+# and LTCUSDT (+0.079/+0.086) are the only two positive in both, but at n=19/15 that
+# is indistinguishable from zero — held back until the account is off the −15% guard.
 
 # ── Timeframe ─────────────────────────────────────────────────────────────────
 TIMEFRAME  = "5m"
 BARS_PER_DAY = 288   # 5m bars in 24 h
+
+# ── Regime warm-up (M1) ───────────────────────────────────────────────────────
+# regime.score_series_4h needs MA_PERIOD(200) + SLOPE_LOOKBACK(10) = 210 CLOSED 4h
+# bars before it can label a bar; until then regime.py sets score = 0.0 → NEUTRAL,
+# and LONG_SIZE_MULT["NEUTRAL"] = 0.0 means momentum trades NOTHING. 210 × 4h = 35d.
+# A backtest whose 5m frame starts at the trading window therefore fabricates a
+# flat month at the head of EVERY window (and hands it to the MR sleeve, which is
+# gated to NEUTRAL). Callers must fetch this many extra days BEFORE the window and
+# pass `trade_start_idx` to backtest.run_symbol.
+REGIME_WARMUP_DAYS = 40                              # 35d required + margin
+REGIME_WARMUP_BARS = REGIME_WARMUP_DAYS * BARS_PER_DAY
 
 # ── Signal thresholds (Wave 11 + ~7% loosening) ───────────────────────────────
 #
@@ -128,6 +163,16 @@ MR_ENABLED            = True
 MR_RISK_PER_TRADE_USD = 5.0     # half the momentum $10 (smaller edge, §9)
 MR_MIN_NOTIONAL_USD   = 150.0   # half momentum floor
 MR_MAX_NOTIONAL_USD   = 750.0   # half momentum ceiling
+
+# ── Per-sleeve risk (M2) ──────────────────────────────────────────────────────
+# An R-multiple is pnl / the risk that position actually took. Momentum risks $10,
+# MR risks $5. Scoring a pooled momentum+MR set at a single $10 denominator makes
+# "expR" dollars-over-ten across a blend of two systems — not an R-multiple.
+RISK_BY_SLEEVE = {
+    "MOMENTUM": RISK_PER_TRADE_USD,      # 10.0
+    "MR":       MR_RISK_PER_TRADE_USD,   #  5.0
+    "PROBE":    TEST_SIZE_USD,           # probe legs risk the $20 test notional
+}
 MR_ADX_MAX            = 20.0    # only when ADX < 20 (no trend = range)
 MR_RSI_OVERSOLD       = 32.0    # buy when RSI < this (oversold)
 MR_BB_POS_MAX         = 0.12    # AND price in bottom 12% of Bollinger band

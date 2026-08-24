@@ -22,7 +22,8 @@ import pandas as pd
 
 import config
 from backtest import fetch_history, run_symbol, print_report
-from config import INITIAL_BALANCE, RISK_PER_TRADE_USD
+from config import (INITIAL_BALANCE, RISK_PER_TRADE_USD, RISK_BY_SLEEVE,
+                    REGIME_WARMUP_DAYS, REGIME_WARMUP_BARS)
 from metrics import position_stats
 
 # BENCH_ALL=1 → all 23 config tokens (broad-universe validation);
@@ -44,12 +45,12 @@ def load_data() -> dict[str, pd.DataFrame]:
     os.makedirs(CACHE, exist_ok=True)
     out: dict[str, pd.DataFrame] = {}
     for sym in TOKENS + ["BTCUSDT"]:
-        path = f"{CACHE}/{sym}_{DAYS}d.pkl"
+        path = f"{CACHE}/{sym}_{DAYS}d+{REGIME_WARMUP_DAYS}w.pkl"
         if os.path.exists(path):
             out[sym] = pd.read_pickle(path)
         else:
-            print(f"  [cache miss] fetching {sym} {DAYS}d (one-time)…", flush=True)
-            df = fetch_history(sym, DAYS, silent=True)
+            print(f"  [cache miss] fetching {sym} {DAYS}d +{REGIME_WARMUP_DAYS}d warm-up (one-time)…", flush=True)
+            df = fetch_history(sym, DAYS + REGIME_WARMUP_DAYS, silent=True)
             df.to_pickle(path)
             out[sym] = df
     return out
@@ -64,7 +65,8 @@ def main() -> None:
     for sym in TOKENS:
         # copies so the cached frames are never mutated by precompute/regime
         r = run_symbol(sym, DAYS, INITIAL_BALANCE,
-                       btc_df=btc.copy(), df=data[sym].copy())
+                       btc_df=btc.copy(), df=data[sym].copy(),
+                       trade_start_idx=REGIME_WARMUP_BARS)   # M1
         print_report(r)
         r.pop("_df", None)
         results.append(r)
@@ -80,7 +82,9 @@ def main() -> None:
     # headline) and record-based (TP1 double-counted); pooling every position
     # across symbols fixes both.
     all_pos = [p for r in results for p in r.get("_positions", [])]
-    pooled  = position_stats(all_pos, risk_per_trade=RISK_PER_TRADE_USD)
+    # M2: momentum($10) and MR($5) each scored at their own risk.
+    pooled  = position_stats(all_pos, risk_per_trade=RISK_PER_TRADE_USD,
+                             risk_by_sleeve=RISK_BY_SLEEVE)
     for r in results:
         r.pop("_positions", None)
 

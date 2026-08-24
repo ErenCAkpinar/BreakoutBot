@@ -266,3 +266,89 @@ Win rate artık hedef değil, teşhis.
 **Not — canlı/backtest uçurumu hâlâ açık:** düzeltilmiş metrikle bile backtest +0.228R
 iken canlı −0.076R. E6 bunu tek başına kapatmaz. `paper_bb.py`'ye eklenen sinyal-hunisi
 telemetrisi (probe/confirm/full sayaçları + probe_cost) bu farkın kaynağını ölçecek.
+
+---
+
+## 🔁 Faz 6 — Evren yeniden-kürasyonu (22 Ağu 2026)
+
+**Bağlam:** E6 (`X_TP1_CLOSE_FRAC=0.0 X_TRAIL_ATR=2.5`) ~8 Ağu'da canlıya alındı ve
+çıkış tarafı düzeldi (tek-bacak TP2'ler log'da görünüyor). Buna rağmen bakiye
+$1000→$901,99 (−%9,8), MaxDD −%13,8 (hard-stop −%15'e 1,2 puan). Aynı dönemde
+own-universe HODL +%19,2 → 29 puanlık fırsat maliyeti.
+
+**Huni telemetrisi sinyal katmanını akladı:** `scanned=55243 probe=101 confirm_ok=24
+confirm_fail=68`, probe_cost **−$2,81**. Canlı confirm oranı %26, backtest aralığı
+%14–30 (ort. ~21) → probe/confirm filtresi normal çalışıyor ve ucuz. Tüm hasar
+confirm'i geçen 24 tam pozisyonda.
+
+### Kök neden: kürasyon, dağıtılan parametrelerle uyumsuzdu
+8 coinlik evren **29 Tem'de ESKİ çıkış yapısıyla** (trail 1.5 + %50 kısmi) seçilmişti.
+Trend-takip çıkışı (E6) farklı coinleri ödüllendirir → evren, artık var olmayan bir
+sisteme fit edilmiş durumdaydı. `curate.py` ile 4 pencerede yeniden sıralandı.
+
+### ⚠️ En önemli bulgu — kısa pencerede kürasyon TERS teper
+Coin bazlı expectancy sıralama korelasyonu (Spearman, n=8):
+
+| | 240g | canlı |
+|---|:---:|:---:|
+| **90g** | −0.31 | **−0.55** (işaret uyumu 1/8) |
+| **240g** | — | **+0.74** |
+
+90 günlük pencerede coin başına 5–20 pozisyon var → gürültü; 240 günlükte 25–48 →
+transfer ediyor. Eski kural ("90g **VE** 240g pozitif") kısa pencerenin oy vermesine
+izin verdiği için SOL ve AVAX evrene böyle girmişti.
+
+Adayların hepsi bu tuzağı doğruladı — 90g'de parlayıp 240g'de negatife döndüler:
+FET +0.240→−0.073 · XRP +0.138→−0.144 · AAVE +0.119→−0.045 · WIF +0.031→−0.154.
+
+### Karar
+| Coin | canlı (n) | fresh90 | fresh240 | pin240 | karar |
+|---|---|---|---|---|---|
+| UNI | +0.501 (16) | +0.277 | **+0.344** | −0.033 | TUT |
+| INJ | −0.012 (4) | +0.377 | **+0.297** | +0.261 | TUT |
+| ADA | −0.141 (11) | +0.137 | **+0.252** | +0.248 | TUT |
+| POL | +0.665 (3) | +0.279 | **+0.181** | +0.418 | TUT |
+| NEAR | −0.477 (1) | −0.111 | **+0.170** | +0.116 | TUT (n=48, en büyük örneklem) |
+| **LDO** | −0.553 (13) | −0.510 | −0.145 | +0.069 | **ÇIKAR** |
+| **SOL** | −0.726 (4) | −0.292 | −0.035 | −0.149 | **ÇIKAR** (4/4 negatif) |
+| **AVAX** | −0.582 (3) | −0.426 | −0.178 | −0.156 | **ÇIKAR** (4/4 negatif) |
+
+> **LDO tek başına canlıda −$71,88** = sleeve'in toplam net kaybının (−$39) ~2 katı.
+> LDO olmasa momentum sleeve'i **+$33 kârdaydı**. Fix-sonrası pencerede masum görünüyor
+> (1W/1L); asıl hasarı Tem'de dört ~−$11'lik kayıpla yapmış → **kısa pencereye bakmak
+> yanlış coini suçlatıyor.**
+
+**ADA/NEAR bilerek TUTULDU:** ADA'nın canlı kötülüğü istatistiksel değil (p=0.36,
+8-coin Bonferroni'den geçmiyor), NEAR'ın canlı örneklemi n=1. İkisi de her iki uzun
+pencerede pozitif. LDO/SOL/AVAX ise Bonferroni'den bile geçiyor (p<0.006).
+
+### Sonuç
+| Evren | expR | pozisyon | 240g beklenen |
+|---|:---:|:---:|:---:|
+| mevcut 8 | +0.131 | 245 | +$322 |
+| **kürasyon sonrası 5** | **+0.249** | 168 | **+$418** |
+| 5 + LINK + LTC | +0.222 | 202 | +$448 |
+
+Doğrulama: 5/5 coin pozitif, hepsi PF≥1.51, worst DD −3,69%
+(`backtests/curation_2026-08-22_fresh240.txt`).
+
+**LINK/LTC eklenmedi:** iki pencerede de pozitif kalan tek adaylar ama +0.09R, n=19/15
+→ sıfırdan ayırt edilemiyor. Toplam doları artırırdı (MAX_OPEN=2 hiç dolmuyor,
+`blocked_max_open=0`) ama işlem başına kaliteyi seyreltir. Hesap hard-stop'a 1,2 puan
+uzaktayken yazı-tura bahis eklenmedi — hesap toparlayınca ön-tanımlı kriterle tekrar bak.
+
+### ⏭️ Açık kalan
+- **Canlı/backtest seviye farkı hâlâ kapanmadı** ama küçüldü: canlı −0.071R vs 240g
+  backtest +0.115R → fark 0.186R, n=55'te t≈1,8 (**anlamlı değil**). Fee modeli doğru
+  (0,075%/yön, her iki tarafta kesiliyor) → sistematik bir yürütme hatası kanıtı yok;
+  büyük olasılıkla küçük örneklem. 200+ pozisyonda tekrar ölç.
+- **Düzeltildi (22 Ağu):** `paper_bb.py` resume'da regime sözlüğünü state'ten olduğu
+  gibi geri yüklüyordu → TOKENS'tan çıkarılan coinler sözlükte kalıyordu. Alım-satımı
+  etkilemiyordu (regime hep `self.tokens` üzerinden okunuyor) ama `BULL n/N` satırını
+  bozuyor ("8/5"), state'e geri yazılıyor ve **track-record exporter yayımlanan evreni
+  ile own-universe HODL benchmark'ını tam da bu anahtarlardan türetiyor** → site 5 coin
+  koşarken 8 coin gösteriyordu. Artık resume'da mevcut evrene budanıyor.
+- **Intrabar çıkış sırası iyimserliği** (`strategy.py`): aynı 5m barda hem TP1 hem SL
+  değerse kod önce TP1'i sayıyor → E6'da bu, olması gereken −1R kaybı breakeven-trail'e
+  çeviriyor. SL 1.5×ATR + TP1 2.0×ATR = 3,5×ATR'lik bar gerektiği için nadir, ama
+  backtest'i yapısal olarak iyimser kılıyor. Ölçülmedi.

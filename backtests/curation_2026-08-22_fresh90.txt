@@ -1,0 +1,85 @@
+
+==============================================================================
+  CURATION: E6-fresh90   window=90d  FRESH asof 2026-08-22
+  params: TRAIL_ATR=2.5  TP1_CLOSE_FRAC=0.0  TP1=2.0 TP2=4.0 SL=1.5
+==============================================================================
+
+  [fetch] BTCUSDT 90d …
+  [fetch] ETHUSDT 90d …
+  [fetch] SOLUSDT 90d …
+  [fetch] AVAXUSDT 90d …
+  [fetch] NEARUSDT 90d …
+  [fetch] XRPUSDT 90d …
+  [fetch] ADAUSDT 90d …
+  [fetch] LINKUSDT 90d …
+  [fetch] UNIUSDT 90d …
+  [fetch] LTCUSDT 90d …
+  [fetch] POLUSDT 90d …
+  [fetch] APTUSDT 90d …
+  [fetch] ARBUSDT 90d …
+  [fetch] INJUSDT 90d …
+  [fetch] SUIUSDT 90d …
+  [fetch] WIFUSDT 90d …
+  [fetch] JUPUSDT 90d …
+  [fetch] AAVEUSDT 90d …
+  [fetch] FETUSDT 90d …
+  [fetch] LDOUSDT 90d …
+  [fetch] PENDLEUSDT 90d …
+  [fetch] STXUSDT 90d …
+  [fetch] ORDIUSDT 90d …
+  BTCUSDT     n= 15  WR  33.3%  payoff  0.42  expR   -0.14  PF  0.21  ret   -3.17%  DD  -3.18%   (15s)
+  ETHUSDT     n= 12  WR  16.7%  payoff  0.48  expR  -0.385  PF   0.1  ret   -5.77%  DD  -5.77%   (15s)
+  SOLUSDT     n= 10  WR  30.0%  payoff  0.31  expR  -0.292  PF  0.13  ret   -4.04%  DD  -4.29%   (15s)
+  AVAXUSDT    n=  7  WR  28.6%  payoff  0.29  expR  -0.426  PF  0.12  ret   -3.75%  DD  -3.76%   (16s)
+  NEARUSDT    n= 16  WR  37.5%  payoff  0.97  expR  -0.111  PF  0.58  ret   -3.13%  DD  -3.63%   (15s)
+  XRPUSDT     n= 13  WR  53.8%  payoff  1.68  expR   0.138  PF  1.96  ret   +0.83%  DD  -1.82%   (15s)
+  ADAUSDT     n= 20  WR  45.0%  payoff  1.68  expR   0.137  PF  1.37  ret   +0.94%  DD  -4.86%   (15s)
+  LINKUSDT    n= 10  WR  50.0%  payoff  1.46  expR   0.106  PF  1.46  ret   +0.05%  DD  -2.42%   (15s)
+  UNIUSDT     n= 23  WR  47.8%  payoff  1.99  expR   0.277  PF  1.83  ret   +3.94%  DD  -3.76%   (15s)
+  LTCUSDT     n= 11  WR  27.3%  payoff  4.01  expR   0.079  PF   1.5  ret   -0.01%  DD  -2.02%   (16s)
+  POLUSDT     n= 10  WR  50.0%  payoff  2.86  expR   0.279  PF  2.86  ret   +2.06%  DD  -1.32%   (15s)
+  APTUSDT     n= 16  WR  25.0%  payoff  0.58  expR  -0.242  PF  0.19  ret   -5.24%  DD  -5.24%   (15s)
+  ARBUSDT     n= 25  WR  44.0%  payoff  1.03  expR  -0.067  PF  0.81  ret   -3.56%  DD  -6.22%   (16s)
+  INJUSDT     n= 13  WR  69.2%  payoff   1.8  expR   0.377  PF  4.06  ret   +3.32%  DD  -1.89%   (15s)
+  SUIUSDT     n= 18  WR  22.2%  payoff  0.56  expR  -0.354  PF  0.16  ret   -7.88%  DD  -7.88%   (15s)
+  WIFUSDT     n= 16  WR  31.2%  payoff  2.55  expR   0.031  PF  1.16  ret   -0.94%  DD  -3.55%   (15s)
+  JUPUSDT     n= 15  WR  26.7%  payoff   1.3  expR   -0.23  PF  0.47  ret   -5.10%  DD  -6.35%   (15s)
+  AAVEUSDT    n= 14  WR  57.1%  payoff  1.11  expR   0.119  PF  1.47  ret   +0.32%  DD  -3.39%   (15s)
+  FETUSDT     n=  6  WR  33.3%  payoff  3.96  expR    0.24  PF  1.98  ret   +0.46%  DD  -2.09%   (15s)
+  LDOUSDT     n= 20  WR  25.0%  payoff  0.98  expR   -0.51  PF  0.33  ret  -12.43%  DD -12.44%   (15s)
+  PENDLEUSDT  n= 15  WR  26.7%  payoff  0.58  expR  -0.335  PF  0.21  ret   -6.51%  DD  -6.53%   (17s)
+  STXUSDT     n= 18  WR  33.3%  payoff  1.36  expR  -0.045  PF  0.68  ret   -2.20%  DD  -2.20%   (19s)
+  ORDIUSDT    n= 20  WR  35.0%  payoff  1.21  expR  -0.139  PF  0.65  ret   -4.67%  DD  -5.21%   (19s)
+
+──────────────────────────────────────────────────────────────────────────────
+  RANKING by expectancy/R   (E6-fresh90, 90d)
+──────────────────────────────────────────────────────────────────────────────
+   # symbol         n    WR%  payoff     expR     PF     ret%     DD%
+   1 INJUSDT       13   69.2     1.8    0.377   4.06    +3.32   -1.89
+   2 POLUSDT       10   50.0    2.86    0.279   2.86    +2.06   -1.32
+   3 UNIUSDT       23   47.8    1.99    0.277   1.83    +3.94   -3.76
+   4 FETUSDT        6   33.3    3.96     0.24   1.98    +0.46   -2.09
+   5 XRPUSDT       13   53.8    1.68    0.138   1.96    +0.83   -1.82
+   6 ADAUSDT       20   45.0    1.68    0.137   1.37    +0.94   -4.86
+   7 AAVEUSDT      14   57.1    1.11    0.119   1.47    +0.32   -3.39
+   8 LINKUSDT      10   50.0    1.46    0.106   1.46    +0.05   -2.42
+   9 LTCUSDT       11   27.3    4.01    0.079    1.5    -0.01   -2.02
+  10 WIFUSDT       16   31.2    2.55    0.031   1.16    -0.94   -3.55
+  11 STXUSDT       18   33.3    1.36   -0.045   0.68    -2.20   -2.20
+  12 ARBUSDT       25   44.0    1.03   -0.067   0.81    -3.56   -6.22
+  13 NEARUSDT      16   37.5    0.97   -0.111   0.58    -3.13   -3.63
+  14 ORDIUSDT      20   35.0    1.21   -0.139   0.65    -4.67   -5.21
+  15 BTCUSDT       15   33.3    0.42    -0.14   0.21    -3.17   -3.18
+  16 JUPUSDT       15   26.7     1.3    -0.23   0.47    -5.10   -6.35
+  17 APTUSDT       16   25.0    0.58   -0.242   0.19    -5.24   -5.24
+  18 SOLUSDT       10   30.0    0.31   -0.292   0.13    -4.04   -4.29
+  19 PENDLEUSDT    15   26.7    0.58   -0.335   0.21    -6.51   -6.53
+  20 SUIUSDT       18   22.2    0.56   -0.354   0.16    -7.88   -7.88
+  21 ETHUSDT       12   16.7    0.48   -0.385    0.1    -5.77   -5.77
+  22 AVAXUSDT       7   28.6    0.29   -0.426   0.12    -3.75   -3.76
+  23 LDOUSDT       20   25.0    0.98    -0.51   0.33   -12.43  -12.44
+──────────────────────────────────────────────────────────────────────────────
+  positive expectancy: 10/23 symbols   total positions: 343
+==============================================================================
+
+  → /private/tmp/claude-501/-Users-erenakpinar-Downloads-BreakoutBot/4fc9ea40-84db-4c89-a419-52aa0bd474f3/scratchpad/e6_fresh90.json
