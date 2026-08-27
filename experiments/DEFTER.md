@@ -365,6 +365,67 @@ Dört kolun dördü de **REDDEDİLDİ** (karar metriği: hesap getirisi, 240g).
 
 ---
 
+## 🚀 Canlıya alındı — 2026-08-27 15:31 UTC
+
+Deploy anı **ideal**di: her iki sleeve de flat, hiç açık pozisyon yoktu.
+State **sıfırlanmadı** — hesap devam ediyor ($945.77, bar #8377), epoch aynı.
+
+| adım | sonuç |
+|---|---|
+| Yedek | `/root/backups/20260827T153030Z/` (kod + state + unit override) |
+| Deploy | 8 dosya, import ağacından türetildi · SHA `dded71b` sunucuda `DEPLOYED_SHA` |
+| systemd env | `X_TP1_CLOSE_FRAC` + `X_TRAIL_ATR` **kaldırıldı** → `Environment=[]` |
+| Restart | state korundu, `NRestarts=0`, hata yok |
+| Doğrulama | sunucudaki kod SL=2.25 TP1=3.0 TP2=6.0 TRAIL=3.75 TMO=96 MR=False üretiyor |
+
+### Deploy'un ortaya çıkardıkları
+
+**`metrics.py` gerçekten eskiydi** — hipotez doğrulandı. Sunucudaki kopya
+29 Temmuz tarihli, 8141 byte (yerel: 11133). T-M1 düzeltmesi hiç ulaşmamıştı.
+Deploy sonrası test: canlı MR bacağı artık doğru sınıflandırılıyor.
+
+**T0 de ulaşmamıştı.** `full_leg_logging_since` state'te `None`'dı → sunucudaki
+`paper_bb.py` OPEN bacaklarını hiç kaydetmiyordu. Deploy sonrası damgalandı
+(`2026-08-27T15:35:04`, schema v2). Yani sitedeki −$0.35'lik manşetin sebebi
+sadece exporter değil, botun kendisi de eksik kaydediyormuş.
+
+### Deploy sonrası ilk gerçek işlem — yeni geometri çalışıyor
+
+```
+16:20  🔬 TEST OPEN  UNIUSDT LONG @ 4.527
+16:25  ✅ CONFIRMED  UNIUSDT pnl=$+0.095
+16:25  📈 FULL OPEN  UNIUSDT LONG @ 4.552 | notional=$381
+16:25  🔬 TEST OPEN  ADAUSDT LONG @ 0.2159
+16:30  ❌ CONF FAIL  ADAUSDT pnl=$-0.052        ← filtre çalışıyor
+```
+
+**notional $381** — eski $900–1500 yerine. Geniş stopun aritmetiği tam olarak
+bu: aynı $10 risk, daha uzak stop → daha küçük pozisyon → daha az ücret.
+(Throttle aktif olduğu için ayrıca yarılanmış.) Pozisyon TP1'i geçti ve
+`TP1_CLOSE_FRAC=0.0` olduğu için hiçbir şey bankalamadan 3.75×ATR trail'e geçti.
+
+53 bar, 0 hata, 0 yeniden başlatma.
+
+---
+
+## 🌐 Site (breakoutbot.dev) — 4 düzeltme yayınlandı
+
+| # | Ne | Öncesi → Sonrası |
+|---|---|---|
+| 1 | `expectancy_usd` all-in oldu | −$0.35 → **−$1.08** (mutabık: ×50 = −$54.00 ≈ bakiye −$54.23) |
+| 2 | TRAILING'de gösterilen stop | `full_sl` (girişe EŞİT, ölü alan) → gerçek trail seviyesi |
+| 3 | Backtest kartları | Faz 4c (PF 3.29, +$55.51/ay — M1/M2/T0 öncesi) → Faz 8 rakamları |
+| 4 | `meta.strategy` | "Faz 4c … + mean-reversion" → "Faz 8 — regime-gated breakout momentum" |
+
+(2) yan bir bug ortaya çıkardı: `_read_config_constants` yalnız çıplak sayı
+eşleştiriyordu, `_envf("X_...", 3.75)` biçimini okuyamıyordu → benimsenen çıkış
+setinin **tamamında** sessizce varsayılana düşüyordu. Düzeltildi.
+
+Yeni alanlar: `expectancy_exit_only_usd` (eski manşet, süreklilik için),
+`entry_fees_usd`, `unrecorded_cost_usd`.
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
