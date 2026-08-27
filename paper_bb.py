@@ -560,8 +560,13 @@ class PaperTrader:
                           also_print=False)
         self._regime_4h_ts = cur_b
         bull = [t for t, r in self._regime.items() if r == "BULL"]
+        # Describe the sleeves that are actually running: MR was switched off on
+        # 2026-08-27 and a log line still promising "MR active in NEUTRAL" sends
+        # the next reader hunting for trades that cannot happen.
+        others = ("MR active in NEUTRAL" if MR_ENABLED
+                  else "MR off — nothing trades outside BULL")
         self._log(f"🧭 Regime refresh — BULL: {bull or '—'} "
-                  f"(others throttle longs→0; MR active in NEUTRAL)")
+                  f"(others throttle longs→0; {others})")
 
     # ── Bar processing ────────────────────────────────────────────────────────
 
