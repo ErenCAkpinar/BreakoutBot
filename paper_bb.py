@@ -306,6 +306,9 @@ class PaperTrader:
         self.sym_states: dict[str, SymbolState] = {
             tok: SymbolState(symbol=tok) for tok in tokens
         }
+        # Symbols carrying a position from a universe they are no longer part of
+        # (E16). Managed to the exit, never re-entered. Populated by _load_state.
+        self.winddown: set[str] = set()
         # FAZ 2: range mean-reversion sleeve (parallel to momentum)
         self.mr_states: dict[str, MRState] = {
             tok: MRState(symbol=tok) for tok in tokens
@@ -411,9 +414,29 @@ class PaperTrader:
             self.probe_cost     = st.get("probe_cost", 0.0)
             self.full_leg_logging_since = st.get("full_leg_logging_since")
             self.funnel_totals.update(st.get("funnel_totals", {}))
+            # E16 — a coin dropped from TOKENS while it still held a position used
+            # to be skipped here, and the position simply ceased to exist: no
+            # closing leg in trade_log, its unrealized PnL never booked, and on a
+            # --testnet bot the exchange position left open with nothing managing
+            # it. This already happened during the 8→5 shrink on 2026-08-22, and
+            # every re-curation is another chance for it.
+            #
+            # Orphans are adopted into a WIND-DOWN set instead: they keep being
+            # processed each bar so their stops and targets still fire, but they
+            # are barred from opening anything new, and they leave the book for
+            # good once they go flat.
             for tok, saved in st.get("sym_states", {}).items():
                 if tok not in self.sym_states:
-                    continue
+                    if str(saved.get("state", IDLE)) != IDLE:
+                        self.sym_states[tok] = SymbolState(symbol=tok)
+                        self.winddown.add(tok)
+                        self._log(
+                            f"⚠️  {tok} açık pozisyonla evrenden çıkmış "
+                            f"({saved.get('state')}) — WIND-DOWN: yeni giriş yok, "
+                            f"mevcut pozisyon kapanana kadar yönetilecek."
+                        )
+                    else:
+                        continue
                 s = self.sym_states[tok]
                 s.state         = saved["state"]
                 s.direction     = saved["direction"]
@@ -493,6 +516,16 @@ class PaperTrader:
         self.log_f.write(line + "\n")
 
     # ── Helpers ───────────────────────────────────────────────────────────────
+
+    def _blocks_new_entries(self, symbol: str, in_session: bool) -> bool:
+        """Whether `symbol` is barred from opening anything on this bar.
+
+        Three independent reasons, and a wind-down symbol (E16) is the third:
+        it is kept on the book only to manage the position it already holds, so
+        it must never be able to re-enter — otherwise dropping a coin from
+        TOKENS would have no effect at all while it happened to be in a trade.
+        """
+        return self.daily_freeze or not in_session or symbol in self.winddown
 
     def _open_full_count(self) -> int:
         """Count symbols currently in SCALE_OPEN or TRAILING (a full position is open)."""
@@ -636,8 +669,16 @@ class PaperTrader:
                   "confirm_fail": 0, "full": 0, "blocked_max_open": 0}
 
         # ── Process each symbol ───────────────────────────────────────────────
-        for symbol in self.tokens:
+        # Wind-down symbols (E16) ride along until flat so their exits still fire.
+        for symbol in list(self.tokens) + sorted(self.winddown):
             s = self.sym_states[symbol]
+            if symbol in self.winddown and s.state == IDLE:
+                # Reached the exit — it can leave the book now.
+                self.winddown.discard(symbol)
+                self.sym_states.pop(symbol, None)
+                self.mr_states.pop(symbol, None)
+                self._log(f"✅ {symbol} wind-down tamamlandı — kitaptan çıkarıldı.")
+                continue
 
             # Fetch token data
             try:
@@ -675,7 +716,7 @@ class PaperTrader:
             # ── Regime (Faz 1/4c): longs ONLY in BULL (size_mult>0) ───────────
             reg       = self._regime.get(symbol, "NEUTRAL")
             size_mult = regime.LONG_SIZE_MULT.get(reg, 0.0) * self.size_factor
-            block_new = self.daily_freeze or not in_session
+            block_new = self._blocks_new_entries(symbol, in_session)
 
             # ── Momentum sleeve — runs only if not gated (BULL + open) ────────
             funnel["scanned"] += 1

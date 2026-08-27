@@ -426,6 +426,132 @@ Yeni alanlar: `expectancy_exit_only_usd` (eski manşet, süreklilik için),
 
 ---
 
+## Tur 3 — Evren kürasyonu, seçim yanlılığı düzeltmesiyle
+
+**Tarih:** 27 Ağu 2026 · **Aday:** 23 coin · **Pencere:** 665g (önbellek)
+
+### Neden bu turun yöntemi öncekilerden farklı
+
+Bu projedeki her kürasyon aynı biçimi aldı: N coini bir pencerede koştur, sırala,
+ilk birkaçını al. **Bu sayı hiçbir şeyin tahmini değil.** 23 gürültülü adayın en
+iyi 5'i *yapı gereği* iyi görünür — 23 yazı-turadan da gurur verici bir sıralama
+çıkarabilirsiniz. `config.py` semptomu zaten belgeliyor (90g sıralaması sonraki
+dönemle −0.31 korelasyon) ama hastalığı adlandırmıyor.
+
+Bu tur üç ayrı soruyu ayrı ayrı ölçüyor:
+
+| # | Soru | Yöntem |
+|---|---|---|
+| 1 | Seçim **kuralı** işe yarıyor mu? | Walk-forward: her fold'un ÖNCESİNDEKİ veriyle seç, fold'un KENDİSİNDE ölç, örneklem-dışı parçaları birleştir. İki null kola karşı: hepsi eşit ağırlık, ve aynı boyutta rastgele seçim. |
+| 2 | Bu yordam beni ne sıklıkta kandırır? | **PBO** (CSCV — Bailey, Borwein, López de Prado & Zhu): pozisyon matrisini S bloğa böl, tüm dengeli eğitim/test bölüntülerinde in-sample kazananın out-of-sample medyanın altına düşme sıklığı. |
+| 3 | Kazanan, kazanan olmayı hak ediyor mu? | **Deflated Sharpe** (Bailey & López de Prado): 23 bağımsız adayın beklenen maksimum Sharpe'ı sıfırdan büyüktür; kazanan önce o çıtayı aşmalı. Deneme sayısı + örneklem uzunluğu + çarpıklık + basıklık düzeltilir. |
+
+**Purge + embargo:** Fold sınırından önce açılıp sonra kapanan pozisyon sızdırır.
+Pozisyonlar **açılış** zamanına göre fold'a atanıyor, sınırı aşanlar purge
+ediliyor, ardından **192 barlık embargo** uygulanıyor — çünkü `bars_held` TP1'de
+sıfırlandığı için gerçek azami tutuş `2×TIMEOUT_BARS`; 665g'de ölçülen maks 187 bar.
+
+### Altyapı
+
+- `experiments/gen_candidates.py` — pahalı replay'i BİR KEZ yapar, coin başına
+  zaman damgalı pozisyon kaydı yazar. Analiz saniyeler sürer, yöntem replay
+  bedeli ödemeden iterasyona açılır.
+- `experiments/wfa.py` — walk-forward + PBO + DSR.
+- `tests/test_wfa_stats.py` — **16 test**, istatistik çekirdeği bilinen değerlere
+  sabitlendi: ters normal CDF kuantilleri, normal örneklemde çarpıklık/basıklık,
+  beklenen-maks-Sharpe'ın Monte Carlo kontrolü, PBO'nun saf gürültüde yüksek /
+  gerçek edge'de düşük çıkması, C(8,4)=70 bölüntünün tam sayılması.
+  *Sessizce yanlış bir yanlılık düzeltmesi, hiç olmamasından kötüdür: kimsenin
+  yeniden türetmediği bir sonuca otorite kazandırır.*
+
+### ⚠️ Önce: harness'ta hayatta-kalma yanlılığı bulundu ve düzeltildi
+
+İlk koşuda 23 coinin **9'u** `PEAK_DD_LIMIT`'e çarpıp pencereyi yarıda bıraktı
+(LDO 178 günde). Geç fold'larda yalnızca **hayatta kalanlar** kalıyordu — yani
+harness'ın kendi içinde ürettiği bir hayatta-kalma yanlılığı. Fold 3'ün 7
+pozisyonluk saçma sonucu bundandı.
+
+`BT_RESTARTS=1` ile yeniden koşuldu (23/23 tam pencere) ve `gen_candidates.py`
+artık env verilmezse uyarıyor, sonda kaç coinin yarıda kaldığını sayıyor.
+*Bu, aynı sınıftan bugünkü ikinci tuzak — ilki 665g portföy kollarındaydı.
+Uzun pencerede hard-stop, karşılaştırmayı sessizce bozan yapısal bir sorun.*
+
+### Sonuçlar — üçü de aynı yöne işaret ediyor
+
+**1 · Walk-forward (6 fold, purge + 192 bar embargo):**
+
+| kol | n | ort R |
+|---|---:|---:|
+| **SEÇİLEN (ilk 5)** | 209 | **−0.109** |
+| en kötü 8 elendi (kalan 15) | 885 | −0.058 |
+| hepsi (23, eşit ağırlık) | 1350 | −0.068 |
+| **rastgele 5** | 301 | **−0.021** |
+
+**Seçim kuralı her iki null kolun da ALTINDA.** Seçim primi −0.041R, t=−0.51 —
+"aktif olarak zararlı" diyemeyiz ama **"işe yarıyor" kesinlikle diyemeyiz.**
+Fold 3 (n=7) atılsa da tablo değişmiyor: seçilen −0.084, hepsi −0.073,
+rastgele −0.057.
+
+Alt-eleme kolu ayrıca test edildi çünkü *en iyiyi seçmek* ile *en kötüyü elemek*
+farklı sorular ve sıralamanın alt ucunda bilgi olabilirdi. Yok: −0.058 vs −0.068,
+fark yok.
+
+**2 · PBO = 0.486** (70 dengeli bölüntü, 8 blok). In-sample kazanan,
+out-of-sample medyanın altına **%48.6 sıklıkta** düşüyor — yazı-tura.
+Sıralama neredeyse hiç bilgi taşımıyor.
+
+**3 · Deflated Sharpe = 0.000.** Gözlenen Sharpe −0.099; 23 denemenin şans eşiği
++0.253. Kazanan, kazanan olmayı hak etmiyor.
+
+### 🔴 Asıl bulgu — mevcut evrenin sicili seçildiği pencerenin içinde
+
+665 günü, kürasyonun yapıldığı pencere (son 240g) ile öncesi olarak ayırdım:
+
+| | önceki ~425g | son 240g (kürasyon penceresi) |
+|---|---:|---:|
+| **dağıtılan 5 coin** | **−0.105R** (n=339) | **+0.265R** (n=121) |
+| tüm 23 coin | −0.092R (n=1535) | +0.017R (n=482) |
+
+Dağıtılan 5 coin, **seçildikleri pencerede** muhteşem (+0.265R); o pencerenin
+dışında **23 coinlik ortalamadan da kötü** (−0.105 vs −0.092).
+
+> Ders kitabı seçim yanlılığı, artık ölçülmüş durumda. Faz 6'nın "+0.249R,
+> 5/5 coin pozitif" sonucu bir edge tahmini değil, seçim işleminin kendi
+> izidir.
+
+### Karar — **YENİDEN KÜRASYON YAPILMADI**
+
+Yeni bir "en iyi 5" üretmek, az önce örneklem dışında bilgi taşımadığını
+kanıtladığım yordamı bir kez daha koşturmak olurdu. Ölçüm, evrenin *hangi* 5
+coin olduğunu değil, **coinleri geçmiş getiriye göre seçme fikrini** çürüttü.
+
+Pratik sonuç:
+- Mevcut 5'i değiştirmek için **kanıt yok** (yenisini seçmek için de yok).
+- Sıralama gürültüyse, 5 coinde yoğunlaşmak **ödüllendirilmeyen** idiyosinkratik
+  risktir. Evreni genişletmek — geçmiş getiri iddiasıyla DEĞİL, çeşitlendirme
+  gerekçesiyle — savunulabilir. `MAX_OPEN=2` olduğu için genişletmek maruziyeti
+  artırmaz, yalnızca aynı 2 slot için aday havuzunu büyütür. **Portföy düzeyinde
+  test edilmeli** (henüz koşulmadı).
+- Daha derin sorun: 665g'de eşit-ağırlık **−0.068R**. Hiçbir coin seçimi bunu
+  düzeltmiyor. Pozitif sonuçların tamamı son 8 ayda yoğunlaşıyor.
+
+---
+
+## Yan bulgu — E16 kapatıldı (27 Ağu, A/B değil, bug)
+
+`_load_state`, `TOKENS`'ta olmayan sembolleri atlıyordu. Açık pozisyonu olan bir
+coin evrenden çıkarılırsa pozisyon **yok oluyordu**: kapanış bacağı yok,
+gerçekleşmemiş PnL kaydedilmiyor, `--testnet` botunda borsa pozisyonu yönetilmeden
+açık kalıyor. 22 Ağustos'taki 8→5 küçültmesinde bir kez oldu — ve Tur 3 evreni
+yine değiştireceği için **tam da şimdi** kapatılması gerekiyordu.
+
+**Çözüm — WIND-DOWN:** yetim semboller kitaba alınıyor, her barda işlenmeye devam
+ediyor (stop/hedefleri ateşlenebilsin diye) ama **yeni giriş açamıyorlar**; flat
+olunca kitaptan düşüyorlar. Giriş kapısı test edilebilir olsun diye
+`_blocks_new_entries()` metoduna çıkarıldı. 5 test (`tests/test_winddown.py`).
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,

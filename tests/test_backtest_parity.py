@@ -173,7 +173,7 @@ def test_every_leg_reaches_the_log_and_reconciles():
     delta = account_events(mom, mr, legs, tally)
 
     assert len(legs) == 6
-    assert abs(sum(l["pnl"] for l in legs) - delta) < 1e-9
+    assert abs(sum(x["pnl"] for x in legs) - delta) < 1e-9
     assert tally["probe"] == 1 and tally["full"] == 1
     assert tally["confirm_ok"] == 1 and tally["TP2"] == 1 and tally["MR_TP"] == 1
 
