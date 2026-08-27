@@ -22,7 +22,11 @@ FORCE="${1:-}"
 
 # ── 1. Dosya listesini import ağacından türet ────────────────────────────────
 # Kök paper_bb.py; yerel modüller özyinelemeli izlenir. Liste elle tutulmaz.
-mapfile -t FILES < <(python3.12 - <<'PY'
+# while-read rather than `mapfile`: macOS ships bash 3.2, which has no mapfile.
+FILES=()
+while IFS= read -r _f; do
+  [ -n "$_f" ] && FILES+=("$_f")
+done < <(python3.12 - <<'PY'
 import ast, os
 
 # secrets_local.py, paper_bb'nin SADECE --testnet dalında lazy import ettiği
