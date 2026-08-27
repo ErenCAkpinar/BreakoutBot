@@ -126,23 +126,84 @@ MAX_OPEN        = 2       # max simultaneous FULL positions across all symbols
 
 # ── Exit parameters ───────────────────────────────────────────────────────────
 # Env-overridable for controlled A/B sweeps (same pattern as regime.LONG_SIZE_MULT).
-# Defaults are the validated Faz 4c values — an unset env changes NOTHING.
-# Never hand-tune these on the live bot; run an arm through bench.py first.
+# Never hand-tune these on the live bot; run an arm through experiments/run_arm.sh
+# and let experiments/ledger.py rule on it first.
+#
+# ── ADOPTED 2026-08-27: arm R1-sl225t96 (experiments/DEFTER.md, Tur 1) ────────
+# Passed the two-window rule — the ONLY rule that adopts anything here:
+#
+#            240d              665d (BT_RESTARTS=1, full window both arms)
+#   before   $1370.04          $731.93   ·  7 hard stops · MaxDD -57.3%
+#   after    $1435.46 (+$65)   $1085.22  ·  3 hard stops · MaxDD -37.6%   (+$353)
+#
+# What is ACTUALLY established, and what is not:
+#   · CERTAIN (arithmetic): entry fees fall because risk is a fixed DOLLAR amount,
+#     so a wider stop buys a SMALLER notional for the same risk. -$366 → -$223 on
+#     665d, -$147 → -$85 on 240d. This cannot regress out of sample.
+#   · CERTAIN (measured): hard stops 7 → 3, MaxDD -57.3% → -37.6%. Fewer trips
+#     into the risk limit means less throttling and fewer forced restarts.
+#   · NOT ESTABLISHED: the per-position edge. Δ+0.063R against SE 0.085 is inside
+#     the noise (t≈0.74) even at n≈400. The arm is adopted for its cost and
+#     drawdown behaviour, NOT on a claim that it picks better trades.
+#
+# The time budget is not an independent lever: the control arm (SL 1.5 + 96 bars)
+# gained $6.84 and left the exit mix untouched. TIMEOUT_BARS only matters BECAUSE
+# the stop is wider — at SL 1.5 positions resolved long before 48 bars. The two
+# move together or not at all.
+#
+# ⚠️ DEPLOY: the systemd unit still carries `X_TRAIL_ATR=2.5` from E6. That env
+#    now OVERRIDES the adopted 3.75 and would run a mix that was never tested.
+#    Remove X_TP1_CLOSE_FRAC and X_TRAIL_ATR from the unit — both are defaults now.
 import os as _os
 def _envf(name: str, default: float) -> float:
     return float(_os.getenv(name, default))
 
-SL_TEST_ATR     = _envf("X_SL_TEST_ATR", 1.0)   # test SL = 1×ATR  (small loss if signal fails)
-SL_FULL_ATR     = _envf("X_SL_FULL_ATR", 1.5)   # full SL = 1.5×ATR from entry
-TP1_ATR         = _envf("X_TP1_ATR", 2.0)       # TP1 = entry ± 2×ATR  → close TP1_CLOSE_FRAC
-TP2_ATR         = _envf("X_TP2_ATR", 4.0)       # TP2 = entry ± 4×ATR  → close remaining
-TRAIL_ATR       = _envf("X_TRAIL_ATR", 1.5)     # trailing SL = peak_price ∓ 1.5×ATR (after TP1)
-TIMEOUT_BARS    = int(_envf("X_TIMEOUT_BARS", 48))  # max hold on full position
+SL_TEST_ATR     = _envf("X_SL_TEST_ATR", 1.0)    # test SL = 1×ATR (small loss if signal fails)
+SL_FULL_ATR     = _envf("X_SL_FULL_ATR", 2.25)   # was 1.5 — adopted 2026-08-27
+TP1_ATR         = _envf("X_TP1_ATR", 3.0)        # was 2.0 — R geometry held constant
+TP2_ATR         = _envf("X_TP2_ATR", 6.0)        # was 4.0
+TRAIL_ATR       = _envf("X_TRAIL_ATR", 3.75)     # was 1.5 (E6 ran 2.5 via env)
+TIMEOUT_BARS    = int(_envf("X_TIMEOUT_BARS", 96))   # was 48 — wider targets need the time
 
-# Fraction of the position closed at TP1. Was hardcoded 0.50 in strategy.py.
-# Set to 0.0 to disable scaling out entirely (single exit via TP2/trail) — the
-# scale-out is what caps winners near 0.7R while losses stay at a full 1R.
-TP1_CLOSE_FRAC  = _envf("X_TP1_CLOSE_FRAC", 0.50)
+# Fraction of the position closed at TP1. Was hardcoded 0.50 in strategy.py, then
+# 0.0 via env (E6) from 2026-08-08. Adopted as the default 2026-08-27: the
+# scale-out caps winners near 0.7R while a stop-out still costs a full 1R.
+TP1_CLOSE_FRAC  = _envf("X_TP1_CLOSE_FRAC", 0.0)
+
+# ── Fill convention (E7) ─────────────────────────────────────────────────────
+# OHLC cannot order touches WITHIN a bar. When one 5m bar touches both an
+# adverse level (SL / trail) and a favorable one (TP1 / TP2), the sim must
+# pick which filled first. The old code always picked the favorable fill, and
+# the TRAILING branch even raised the trail from the CURRENT bar's high before
+# testing that same bar's low against it — an exit that requires the high to
+# happen before the low. Under EXIT-E6 nearly every position ends in TRAIL, so
+# that optimism priced most of the deployed system's PnL (one reason every
+# live period has underperformed its backtest).
+#   default (1) : ambiguous fills resolve AGAINST the position; the trail only
+#                 ratchets on completed bars; timeouts fill at the bar CLOSE
+#                 (the only price a close-of-bar decision can actually get).
+#                 The backtest becomes a floor, not a ceiling.
+#   X_ADVERSE_FILLS=0 : reproduces the old optimistic convention — ONLY for
+#                 comparing against numbers published before 2026-08-27.
+#                 Never make a deploy decision on it.
+ADVERSE_FILLS = _os.getenv("X_ADVERSE_FILLS", "1") != "0"
+
+# ── Minimum stop distance (Faz 7 friction floor) ──────────────────────────────
+# Round-trip cost as a fraction of the risk taken is
+#       cost/risk = (notional × 2×EXEC_COST_PER_SIDE) / (notional × sl_frac)
+#                 = 0.0015 / sl_frac
+# The notional cancels: position SIZE cannot change this ratio, only the stop's
+# distance from price can. Measured on the live August book, mean sl_frac was
+# 0.861% → every position started 0.174R behind, against a measured net edge of
+# +0.32R. The tightest setups were far worse (0.32% → 46% of risk paid in fees).
+#
+# This filter refuses a setup whose FULL stop would sit closer than this fraction
+# of price, before the $20 probe is even paid for. 0.0 = off (no filter).
+#   0.0075 → cost ≤ 20% of risk        0.0100 → cost ≤ 15%        0.0150 → ≤ 10%
+# Default off: the live evidence was ambiguous (clamp-bound trades were −$0.77/pos
+# vs −$1.07 for the rest, n=11 — the tight-stop trades were not the worse group),
+# so this must earn its place on two windows like everything else.
+MIN_SL_FRAC = _envf("X_MIN_SL_FRAC", 0.0)
 
 # ── Confirmation check (1 bar after test entry) ───────────────────────────────
 CONFIRM_PRICE_MOVE_PCT = _envf("X_CONFIRM_PRICE_MOVE_PCT", 0.0005)  # ≥0.05% move in signal direction
@@ -159,7 +220,23 @@ COOLDOWN_BARS = 10        # bars to wait after failed signal before re-scanning
 # ranging market (regime == NEUTRAL + low ADX), where breakouts fail and reversion
 # works. Long-only in Faz 2 (MR-short waits for Faz 3). Gated to NEUTRAL only
 # (closed in BULL = trending up, BEAR = falling-knife risk) per §9 matrix.
-MR_ENABLED            = True
+# ── DISABLED 2026-08-27 (arm R1-mr-off, passed the two-window rule) ──────────
+# Every measurement of this sleeve is negative once it is charged its own entry
+# fees, across five independent samples:
+#     live (n=13)              -0.228R
+#     backtest, that month     -0.256R  (n=10)
+#     240d backtest            -0.044R  (n=49)
+#     665d backtest            -0.150R  (n=418 pooled book)
+# Turning it off: 240d +$10.89 (PF 1.83→1.90, MaxDD -6.31%→-5.78%), 665d +$16.49.
+#
+# It was validated back in Faz 2 on SOL/INJ/FET under the OLD exit structure and
+# never re-validated after either the exit change (E6) or the 8→5 re-curation —
+# `paper_bb` gives both sleeves the SAME self.tokens, so Faz 6 silently re-scoped
+# MR without measuring it. TODOS E1 asked for a re-curation; the answer turned out
+# to be simpler than that.
+#
+# X_MR_ENABLED=1 turns it back on for a research run.
+MR_ENABLED            = _os.getenv("X_MR_ENABLED", "0") != "0"
 MR_RISK_PER_TRADE_USD = 5.0     # half the momentum $10 (smaller edge, §9)
 MR_MIN_NOTIONAL_USD   = 150.0   # half momentum floor
 MR_MAX_NOTIONAL_USD   = 750.0   # half momentum ceiling

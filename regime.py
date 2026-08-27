@@ -19,15 +19,37 @@ Used by both backtest (resample 5m→4h) and live (fetch 4h directly).
 
 from __future__ import annotations
 
+import os
+
 import numpy as np
 import pandas as pd
 
 # ── Parameters (≤5 — keep it that way) ────────────────────────────────────────
 MA_PERIOD      = 200     # 200-period MA on 4h  (~33 days)
 SLOPE_LOOKBACK = 10      # bars back to measure 200-MA slope (~40h)
-BTC_WEIGHT     = 0.575   # BTC macro weight in the blend (Eren: 55-60%)
+BTC_WEIGHT     = float(os.getenv("X_BTC_WEIGHT", "0.575"))  # BTC macro weight
 BULL_THRESHOLD = 0.40    # blended ≥ this → BULL
 BEAR_THRESHOLD = -0.40   # blended ≤ this → BEAR
+
+# ── Coin-confirmation gate (Faz 7) ────────────────────────────────────────────
+# At BTC_WEIGHT=0.575 a BULL BTC alone clears BULL_THRESHOLD (0.575 ≥ 0.40), so a
+# coin sitting flat against its own 200-MA is labelled BULL purely on BTC's
+# strength — the bot then buys ITS breakout. That is the 25-27 Aug pattern
+# exactly: BTC squeezed to $80.9K, all five coins flipped BULL, all five entries
+# stopped out, and the alt-season index was nowhere near its threshold.
+#
+# This gate adds no weight and no threshold — it is a conjunction: BULL requires
+# the blend AND the coin not being bearish/flat on its own 4h trend. It removes
+# exactly one cell of the truth table, the (btc=+1, coin=0) one:
+#
+#   btc  coin   blended   plain    with gate
+#   +1    +1     1.000    BULL     BULL
+#   +1     0     0.575    BULL     NEUTRAL   ← the only change
+#   +1    -1     0.150    NEUTRAL  NEUTRAL
+#    0    +1     0.425    BULL     BULL
+#
+# Default OFF so an unset env changes nothing; validate on two windows first.
+REQUIRE_COIN_BULL = os.getenv("X_REQUIRE_COIN_BULL", "0") == "1"
 
 
 def resample_4h(df_5m: pd.DataFrame) -> pd.DataFrame:
@@ -86,7 +108,7 @@ def score_series_4h(df_4h: pd.DataFrame) -> pd.Series:
 def classify(btc_score: float, coin_score: float) -> str:
     """Blend BTC + coin scores → 'BULL' | 'NEUTRAL' | 'BEAR'."""
     blended = BTC_WEIGHT * btc_score + (1.0 - BTC_WEIGHT) * coin_score
-    if blended >= BULL_THRESHOLD:
+    if blended >= BULL_THRESHOLD and (coin_score > 0 or not REQUIRE_COIN_BULL):
         return "BULL"
     if blended <= BEAR_THRESHOLD:
         return "BEAR"
@@ -147,7 +169,10 @@ def backtest_regimes(df_coin_5m: pd.DataFrame,
     coin_s  = base["coin_s"].fillna(0.0).to_numpy()
     btc_s   = base["btc_s"].fillna(0.0).to_numpy()
     blended = BTC_WEIGHT * btc_s + (1.0 - BTC_WEIGHT) * coin_s
-    labels  = np.where(blended >= BULL_THRESHOLD, "BULL",
+    is_bull = blended >= BULL_THRESHOLD
+    if REQUIRE_COIN_BULL:
+        is_bull = is_bull & (coin_s > 0)      # must mirror classify() exactly
+    labels  = np.where(is_bull, "BULL",
               np.where(blended <= BEAR_THRESHOLD, "BEAR", "NEUTRAL"))
 
     out = np.empty(n, dtype=object)

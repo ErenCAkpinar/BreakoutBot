@@ -1,5 +1,27 @@
 # 📊 BENCHMARKS — Faz-Faz Backtest Kıyası
 
+> ## ⚠️ ÖLÇÜM DİKİŞİ — 2026-08-27
+>
+> **Bu tarihten ÖNCEKİ tüm rakamlar bugünkü harness'la yeniden üretilemez.** Araya
+> dört düzeltme girdi ve her biri ölçülen büyüklüğü değiştirdi:
+>
+> | Düzeltme | Ne değişti | Yön |
+> |---|---|---|
+> | **M1** rejim ısınması | pencerenin ilk ~35 günü NEUTRAL uyduruluyor, momentum hiç işlem yapmıyordu; MR o ayı tek başına devralıyordu | eski sayılar MR lehine kaymış |
+> | **M2** sleeve başına risk | momentum($10) + MR($5) tek $10 paydasında havuzlanıyordu → "expR" bir R-katsayısı değildi | eski expR anlamsız |
+> | **T0** eksik bacaklar | OPEN bacakları ve probe bacakları bakiyeyi hareket ettiriyor ama trade_log'a girmiyordu | eski beklenti iyimser |
+> | **E7** fill konvansiyonu | trail o barın KENDİ zirvesinden çekilip aynı barın dibiyle test ediliyordu (kurulamayan emir); belirsiz intrabar dolumları lehe çözülüyordu | aşağıya bak |
+>
+> **Somut fark:** Faz 6'da yayınlanan **+0.249R** (kürasyon sonrası 5 coin, 240g)
+> bugünkü harness'la aynı pencerede **+0.072R havuzlanmış / +0.323R momentum**
+> çıkıyor. Aşağıdaki `+0.249`, `+0.115`, `PF 3.29`, `+$55.51/ay` gibi manşetler
+> **tarihsel kayıt** olarak duruyor — güncel sistemin ölçüsü değiller.
+>
+> E7 sürprizi: düzeltme backtest'i **iyileştirdi** (240g $1330.33 → $1370.04).
+> Düzeltilen şey bir iyimserlik değil, borsada kurulamayan bir emirdi — trail
+> yalnızca kapanmış barlarla yukarı çekilince pozisyonlar erken boğulmuyor.
+> Ayrıntı: Faz 7.
+
 Her faz **AYNI sabit veride** koşar → metrik değişimi = SADECE kod değişimi
 (veri penceresi sabit, run-to-run drift yok).
 
@@ -351,4 +373,214 @@ uzaktayken yazı-tura bahis eklenmedi — hesap toparlayınca ön-tanımlı krit
 - **Intrabar çıkış sırası iyimserliği** (`strategy.py`): aynı 5m barda hem TP1 hem SL
   değerse kod önce TP1'i sayıyor → E6'da bu, olması gereken −1R kaybı breakeven-trail'e
   çeviriyor. SL 1.5×ATR + TP1 2.0×ATR = 3,5×ATR'lik bar gerektiği için nadir, ama
-  backtest'i yapısal olarak iyimser kılıyor. Ölçülmedi.
+  backtest'i yapısal olarak iyimser kılıyor. ✅ **Faz 7'de düzeltildi ve ölçüldü.**
+
+---
+
+## 🔬 Faz 7 — Canlı ayın adli incelemesi (27 Ağu 2026)
+
+**Bağlam:** Hesap 29 Tem'de $1000'den başladı, 5 Ağu'da $1062,11 gördü, 27 Ağu'da
+$946,22'ye indi (−%10,9, throttle açık, hard-stop'a $43,43). Soru: kanama nereden?
+
+### Önce iki şüpheli elendi
+
+**1. Simülatör sapmıyor.** Canlı botun ve backtest'in *aynı takvim ayında aynı
+coinlerde* açtığı pozisyonlar eşleştirildi (n=26, giriş ±5 dk):
+
+| Ölçüt | Sonuç |
+|---|---|
+| Aynı çıkış tipine varan | **26/26 (%100)** |
+| PnL'i kuruşuna kadar aynı | 19/26 |
+| Farkı tam 2× (equity throttle) | 7/26 |
+| Fill konvansiyonu düzeltmesi | 1/26 |
+
+Canlı hesap düşüşteydi → throttle boyutu yarıladı; backtest hesabı aynı aya +$300
+tamponla girdiği için hiç frenlenmedi. **Fark bir hata değil, throttle'ın tasarımı.**
+Yan sonuç: throttle bu ayda −$21'e mal oldu — kaybı yarıladığı kadar toparlanmayı da.
+
+**2. Sinyal hunisi sapmıyor.** Backtest'in 28 girişinin **26'sı canlıda birebir var
+(%93)**. Canlıdaki 10 fazla girişin tamamı açıklanıyor: 5'i LDO/AVAX (backtest
+evreninde yok), 5'i 25–26 Ağu (backtest verisi 24 Ağu'da bitiyor).
+
+> **Aylardır açık olan "canlı/backtest uçurumu" sorusu kapandı: ölçüm katmanında
+> böyle bir uçurum yok.**
+
+### Kaybın ayrıştırması (hesabın −$53,78'ini kuruşuna kadar kapatır)
+
+| Kaynak | Poz. | WR | All-in | /poz |
+|---|:---:|:---:|---:|---:|
+| Kürasyonun elediği coinler (LDO, AVAX) | 5 | %20,0 | **−$30,24** | −$6,05 |
+| MR sleeve | 13 | %38,5 | **−$14,81** | −$1,14 |
+| Son üç gün (25–27 Ağu) | 5 | %0,0 | **−$28,94** | −$5,79 |
+| Probe hunisi | — | — | −$3,74 | — |
+| **Çekirdek sistem (kürasyonlu 5 coin)** | **26** | **%46,2** | **+$23,96** | **+$0,92** |
+| **Hesap** | **49** | **%36,7** | **−$53,78** | **−$1,10** |
+
+> **Çekirdek sistem canlıda KÂR ETTİ.** Kayıp, projenin kendi analizinin zaten
+> "negatif" dediği pozisyonlardan geldi. Bu bir strateji arızası değil, **tasfiye
+> gecikmesi**: LDO/AVAX kanıtı 22 Ağu'da netleşti, zarar 4–22 Ağu boyunca birikti.
+>
+> **Karşı-olgusal:** MR kapalı + LDO/AVAX bir ay önce çıkarılmış olsaydı hesap
+> **$991,27** olurdu — throttle hiç devreye girmezdi.
+
+**Son üç gün ayrı bir hikâye:** 25 Ağu'da BTC short-squeeze ile $80.894'e fırladı;
+rejim BTC'ye %57,5 ağırlık verdiği için beş coinin de rejimi BULL'a döndü, bot beş
+alt breakout'u aldı, beşi de stop oldu. Aynı hafta altcoin-season endeksi eşiğin çok
+altındaydı → **BTC yükseliyordu, alt'lar yükselmiyordu.** Rejim kapısı işlem yaptığı
+varlığın değil, BTC'nin rejimini ölçüyor. (Test edilmemiş hipotez — ablasyon gerek.)
+
+### Sürtünme tabanı — yapısal kısıt
+
+Canlı SL trade'lerinden stop mesafesi geri çözüldü. Kimlik:
+
+```
+maliyet/risk = (notional × 0.15%) / (notional × sl_frac) = 0.0015 / sl_frac
+```
+
+Notional sadeleşiyor → **pozisyon boyutu bu oranı değiştirmez.** Tek belirleyici,
+stop mesafesinin fiyata oranı. Ölçülen ortalama `sl_frac = %0.861` (1.5×ATR, 5m):
+
+| Stop | sl_frac | Sürtünme |
+|---|:---:|:---:|
+| **1.5×ATR (şu an)** | %0.86 | **0.174 R** |
+| 2.25×ATR | %1.29 | 0.116 R |
+| 3.0×ATR | %1.72 | 0.087 R |
+| 4.5×ATR | %2.58 | 0.058 R |
+
+240g'de ölçülen net momentum edge +0.323R; sürtünme 0.17–0.20R. **Brüt edge'in
+üçte birinden fazlası kapıda ödeniyor** → sinyal kalitesindeki küçük bir bozulma
+toplamı negatife çeviriyor. Risk sabit dolar olduğu için stop'u genişletmek
+pozisyonu küçültür, riski değiştirmez = saf sürtünme indirimi.
+
+**Stop genişliği taraması (240g, MR kapalı, TP+trail aynı oranda, `TIMEOUT_BARS=48` SABİT):**
+
+| Stop | Giriş ücreti | TP2 | TMO | Momentum | PF | MaxDD |
+|---|---:|:---:|:---:|:---:|:---:|:---:|
+| **1.5×ATR** (mevcut) | −$111.47 | 37 | **1** | **+0.323R** | 1.90 | −5.78% |
+| 2.25×ATR | −$77.59 | 30 | 14 | +0.307R | 1.81 | **−5.35%** |
+| 3.0×ATR | **−$58.85** | 21 | **27** | +0.192R | 1.53 | −6.65% |
+
+Ücret aritmetiği **doğrulandı** (111→78→59, monoton). Ama net edge de monoton
+bozuldu: **zaman aşımı 1→14→27 patlıyor**, TP2 37→21 eriyor. Geometri ölçeklenirken
+zaman bütçesi sabit kalınca hedefler 4 saatlik pencerede ulaşılamaz hale geliyor.
+
+> **Sürtünme kolu gerçek ama naif çekilemez.** Orta kol dikkat çekici: edge'in
+> neredeyse tamamını koruyor (+0.307 vs +0.323R, fark gürültü altında), $34 az
+> ücret ödüyor ve **DD'si üç kolun en iyisi** (−5.35%). Sıradaki deney oradan:
+> `X_SL_FULL_ATR=2.25 X_TP1_ATR=3.0 X_TP2_ATR=6.0 X_TRAIL_ATR=3.75 X_TIMEOUT_BARS=72`
+
+**Çürütülen hipotez:** en kötü maliyet oranları `MAX_NOTIONAL` kelepçesinin
+sıkıştığı trade'lerde (%32–47). "Kaybı bunlar taşıyor" denendi → **taşımıyorlar**
+(kelepçeli −$0,77/poz vs kelepçesiz −$1,07/poz, WR %36,4 vs %36,0). Kayıp yaygın.
+
+### Örneklem duvarı
+
+Canlı momentum (−0.098R, n=36) vs backtest (+0.337R, n=28) → fark 0.435R,
+**t = 1.02, p = 0.31 — anlamlı DEĞİL.** Pozisyon başına R'nin SD'si ≈1.7R; bu farkı
+%80 güçle saptamak **kol başına ~240 pozisyon** ister = mevcut hızda ~200 gün.
+
+> **Kural:** n < 100 pozisyonda parametre değiştirme. Bu ay alınan hiçbir karar tek
+> aya dayanmamalı. E17 (TODOS) doğrulandı.
+
+MR sleeve bu testi geçen tek bulgu: üç bağımsız ölçüm, üçü negatif, havuzlanmış n=72.
+
+### Kod değişiklikleri
+
+| Ne | Nerede | Etki (240g) |
+|---|---|---|
+| **E7 fill konvansiyonu** — belirsiz intrabar dolumu aleyhe çözülür; trail yalnız kapanmış barlarla çekilir; timeout bar ortası yerine kapanıştan dolar; gap-through bar aralığına kırpılır | `strategy.py` | $1330,33 → **$1370,04** |
+| `X_ADVERSE_FILLS=0` — eski iyimser konvansiyon (yalnız tarihsel kıyas için) | `config.py` | — |
+| `X_MR_ENABLED=0` — MR sleeve A/B anahtarı | `config.py` | bakiye **+$10,89**, PF 1.83→**1.90**, MaxDD −6.31%→**−5.78%** |
+
+**E7 sürprizi:** düzeltme backtest'i **iyileştirdi**. Düzeltilen şey bir iyimserlik
+değil, *borsada kurulamayan bir emirdi* — trail o barın kendi zirvesinden çekilip
+aynı barın dibiyle test ediliyordu (zirvenin dipten önce geldiğini varsayar). Trail
+yalnızca kapanmış barlarla çekilince pozisyonlar erken boğulmuyor. 21 test geçiyor.
+
+⚠️ `paper_bb.py` aynı `strategy.py`'yi kullanıyor → bu düzeltme canlı davranışı da
+değiştirir. Dağıtımda E6 env'leriyle birlikte gitmeli.
+
+---
+
+## 🧪 Faz 8 — Deney disiplini ve benimsenen çıkış seti (27 Ağu 2026)
+
+Faz 7'nin teşhisleri **hipotez** olarak kayda geçirildi ve tek tek ölçüldü.
+Altyapı: `experiments/run_arm.sh` (bir kol, bir pencere, parametreler sonuca
+damgalanır) · `experiments/ledger.py` (karşılaştırma + karar) ·
+`experiments/DEFTER.md` (her fikrin hipotez→ölçüm→sonuç kaydı).
+
+**Karar kuralı:** bir kol ancak **240g VE 665g'de birden** baseline'ı geçerse alınır.
+Tek pencere kanıt değil — n≈120'de pencere ortalamasının SE'si ≈0.16R.
+
+### Benimsenen: yeni çıkış geometrisi + MR kapalı
+
+| parametre | eski | **yeni** |
+|---|---:|---:|
+| `SL_FULL_ATR` | 1.5 | **2.25** |
+| `TP1_ATR` / `TP2_ATR` | 2.0 / 4.0 | **3.0 / 6.0** |
+| `TRAIL_ATR` | 1.5 (env'de 2.5) | **3.75** |
+| `TIMEOUT_BARS` | 48 | **96** |
+| `TP1_CLOSE_FRAC` | 0.50 (env'de 0.0) | **0.0** |
+| `MR_ENABLED` | True | **False** |
+
+| pencere | baseline | benimsenen | hard-stop | MaxDD |
+|---|---:|---:|:---:|---|
+| 240g | $1370.04 | **$1435.46** | 0 → 0 | −6.31% → −6.14% |
+| 665g (`BT_RESTARTS=1`) | $731.93 | **$1085.22** | **7 → 3** | −57.3% → **−37.6%** |
+
+**Neyin kanıtlandığı konusunda dürüst olmak gerekirse:** pozisyon başına edge
+farkı (Δ+0.063R vs SE 0.085) **kanıtlanmadı** — n≈400'de bile gürültü içinde.
+Kanıtlanan iki şey var: (1) ücret düşüşü saf aritmetik — risk sabit dolar olduğu
+için geniş stop daha küçük notional alır (665g −$366→−$223), (2) hard-stop 7→3 ve
+MaxDD −57%→−38%. **Arm, daha iyi trade seçtiği için değil, maliyet ve drawdown
+davranışı için alındı.**
+
+**Zaman bütçesi bağımsız bir kaldıraç değil.** Kontrol kolu (SL 1.5 + `TMO=96`)
+yalnız +$6.84 getirdi ve çıkış dağılımını hiç değiştirmedi — dar stopta pozisyonlar
+zaten 48 bardan önce çözülüyordu. `TIMEOUT_BARS` sadece stop genişleyince anlam
+kazanıyor; ikisi birlikte gider.
+
+### Reddedilenler (hepsi 240g'de kaybetti)
+
+| kol | sonuç | ders |
+|---|---|---|
+| `R2-coinbull` | $1370→$1296 | Kapı tasarlandığı gibi 23 pozisyonu eledi ama **elenenler net kârlıydı**. Ağustos'taki 5 kaybı doğru teşhis etmek, ondan türeyen kuralın genel olarak iyi olduğunu göstermiyor. |
+| `R2-minsl75` | $1370→$1279 | Pozisyon başına **en iyi edge** (+0.405R) ve **en iyi DD** (−5.76%) ama n 123→74. Sürtünmeyi işlem eleyerek düşürmek toplam edge'i yiyor. H0.3 ile aynı yöne işaret ediyor: dar stoplu trade'ler ücretini ödeyecek kadar edge taşıyor. |
+| `R2-minsl100` | $1370→$1071 | Aynısının aşırısı (n=41). |
+| `R2-btcw40` | değişiklik **YOK** | ↓ |
+
+### 🔍 `BTC_WEIGHT` atıl bir parametre
+
+`X_BTC_WEIGHT=0.40` koşusu baseline ile **birebir aynı** çıktı. Sebep yapısal:
+skorlar üçlü {−1,0,+1} olduğu için harman yalnız `{±1, ±w, ±(1−w), 0}` olabilir;
+BULL eşiği 0.40 iken `w ∈ [0.40, 0.60]` aralığının tamamında **hem `w` hem `(1−w)`
+eşiği geçer** → doğruluk tablosu hiç değişmez.
+
+> **ROADMAP §9'da "BTC ağırlığı 55-60 ortası → 0.575" diye tartışılıp kilitlenen
+> karar, parametrenin ifade edemediği bir karardı.** Rejim davranışını değiştirmek
+> başka bir mekanizma ister. Teste bağlandı:
+> `test_btc_weight_is_inert_between_040_and_060`.
+
+### ⚠️ Harness kusuru — kesik pencereler karşılaştırılıyordu
+
+İlk 665g turunda üç kol da `PEAK_DD_LIMIT`'e çarpıp erken durdu (baseline ~2 ayda,
+sl225t96 ~6 ayda) ve defter final bakiyeleri **karşılaştırılabilirmiş gibi** okuyup
+yanlış bir ✅ verdi. Kök neden: `dump_run` `halted`/`days_run`/`n_halts` alanlarını
+kaydetmiyordu; `print_portfolio_report` ekranda uyarıyor ama dump taşımıyordu.
+Düzeltildi: dump artık halt alanlarını yazıyor, `ledger.py` kesik koşuda
+karşılaştırmayı reddediyor (`KESİK`), uzun pencereler `BT_RESTARTS=1` ile koşuluyor.
+
+> **Bağımsız bulgu:** Eki 2024–Ağu 2026 penceresinde **eski** sistem 665 günde
+> **7 kez** hard-stop'a çarpıyordu. Yakın dönem (240g) bu tarihçeye göre çok
+> müsamahakâr — bir kolu yalnız 240g'de doğrulamak, sistemin hayatta kalamadığı
+> rejimi hiç görmemek demek.
+
+### 🚨 Deploy uyarısı
+
+systemd unit'i E6'dan kalma `X_TRAIL_ATR=2.5` taşıyor. Bu env artık benimsenen
+**3.75'i EZER** ve hiç test edilmemiş bir karışım çalıştırır.
+**Unit'ten `X_TP1_CLOSE_FRAC` ve `X_TRAIL_ATR` kaldırılmalı** — ikisi de varsayılan.
+
+Ayrıca `deploy_test.sh` `metrics.py`'yi hiç göndermiyordu (elle tutulan liste);
+`paper_bb.py` onu import ediyor → sunucudaki kopya eski. Liste artık import
+ağacından türetiliyor, kirli ağaçtan deploy reddediliyor, SHA sunucuya yazılıyor.

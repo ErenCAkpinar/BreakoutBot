@@ -9,3 +9,8 @@ cache/
 .dist/
 office/
 backtests/data_curation/
+# Cached OHLCV windows + run dumps: ~440 MB of regenerable Binance data. Any run
+# re-fetches what it needs. The *reports* under backtests/*.txt stay tracked.
+backtests/data/
+experiments/logs/
+experiments/results/

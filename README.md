@@ -53,7 +53,13 @@ Full pozisyona doğrudan girilmez; breakout önce küçük parayla yoklanır:
 1. **TEST OPEN** — $20'lık probe pozisyonu (sinyal gerçek mi?)
 2. **CONFIRMED / CONF FAIL** — 1 bar sonra fiyat/hacim/RSI onayı; geçemezse iptal
 3. **FULL OPEN** — risk-bazlı boyutlandırılmış asıl pozisyon
-4. **Çıkış** — ATR tabanlı SL / TP1 (%50 kapat + breakeven) / TP2 / trailing / timeout
+4. **Çıkış** — ATR tabanlı SL (2.25×) / TP2 (6×) / trailing (3.75×) / timeout (96 bar)
+
+> Çıkış geometrisi 2026-08-27'de genişletildi (bkz. [BENCHMARKS.md](BENCHMARKS.md)
+> Faz 8). Kısmi çıkış kapatıldı: TP1'de %50 kapatmak kazananı ~0.7R'de sınırlarken
+> kayıp tam 1R kalıyordu. Geniş stop, risk sabit dolar olduğu için **daha küçük**
+> pozisyon demek — aynı riske daha az ücret. 665 günlük pencerede hard-stop sayısı
+> 7'den 3'e indi.
 
 Gerçek testnet log'undan bir yaşam döngüsü:
 

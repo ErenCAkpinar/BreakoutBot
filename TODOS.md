@@ -11,6 +11,39 @@ Full analysis: `~/.gstack/projects/ErenCAkpinar-BreakoutBot/ceo-plans/2026-08-23
 
 ## 🚨 P0 — DO FIRST
 
+### X1 — The published track record understates cost by 3.1× — *found 2026-08-27*
+`track_record_app/track_record/exporter.py` parses the log for `CLOSE FULL` and
+`MR TP/SL` lines only. `FULL OPEN` / `MR OPEN` entry fees and every probe leg are
+never summed, so `expectancy_usd` is computed over exit legs alone.
+
+**Measured on the live export (2026-08-27):** balance moved **−$53.78**; the 49
+published trades sum to **−$17.23**. The **−$36.55** gap is $32.81 of entry fees
+(reconstructed exactly from the `notional` column × `EXEC_COST_PER_SIDE`) plus
+$3.74 of probe legs. Published expectancy **−$0.35/position**, reconciled reality
+**−$1.10/position**.
+
+This is T0 all over again, on the export side: `paper_bb.py` now logs every leg,
+the exporter still does not read them. It matters more here than in the repo,
+because the page's own claim is measurement honesty ("counted per position, not
+per fill").
+**Fix:** add `_RE_FULL_OPEN`/`_RE_MR_OPEN` fee capture + probe legs to the leg
+stream, and reconcile against `balance_after` with an assert scoped to
+`full_leg_logging_since`.
+**⚠️ Outward-facing:** this makes the published numbers worse. Eren's call.
+**Effort:** S (human ~2h / CC ~30min) · **Priority:** P0
+
+### X2 — Kill the MR sleeve — *evidence closed 2026-08-27*
+Three independent measurements, all negative, pooled n=72:
+240d backtest **−0.044R** (n=49) · same-month backtest **−0.256R** (n=10) ·
+live **−0.228R** (n=13). All-in (own entry fees charged) in every case.
+Turning it off on the 240d window: balance **+$10.89**, PF **1.83 → 1.90**,
+MaxDD **−6.31% → −5.78%**.
+
+This supersedes **E1** below ("re-curate the MR sleeve"): the sleeve does not need
+re-curating, it needs switching off. `X_MR_ENABLED=0` now exists in `config.py`.
+**Remaining work:** add it to the systemd unit's env alongside the E6 exit params.
+**Effort:** S · **Priority:** P0
+
 ### S0 — Harden the VM and back up the evidence — ✅ done 2026-08-24
 Server hardening and off-box evidence backup are complete.
 

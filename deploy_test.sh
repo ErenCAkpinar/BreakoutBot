@@ -1,21 +1,98 @@
 #!/bin/bash
-# Deploy the NEW regime-aware bot as a SECOND test service — ayrı klasör,
-# eski bota DOKUNMAZ. Mac'ten çalıştır: bash deploy_test.sh
-set -e
+# Deploy the regime-aware bot to the TEST service — ayrı klasör, eski bota DOKUNMAZ.
+# Mac'ten çalıştır: bash deploy_test.sh [--force]
+#
+# Bu betik üç şeyi garanti eder:
+#   1. Gönderilen dosya listesi paper_bb.py'nin GERÇEK import ağacından türetilir.
+#      Elle tutulan liste `metrics.py`'yi atlıyordu; paper_bb onu import ediyor,
+#      yani metrics.py'ye yapılan her düzeltme (T-M1 dahil) sunucuya HİÇ gitmedi
+#      ve oradaki kopya eski bir elle-kopyalamadan kalmaydı.
+#   2. Kirli ağaçtan deploy edilmez. Aksi halde çalışan sisteme karşılık gelen
+#      bir commit olmaz ve VM ölürse dağıtılan sistem repodan kurulamaz.
+#   3. Dağıtılan SHA sunucuya yazılır (DEPLOYED_SHA), böylece "sunucuda ne koşuyor"
+#      sorusunun cevabı tahmin değil, dosya olur.
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 : "${BREAKOUTBOT_SERVER:?BREAKOUTBOT_SERVER tanımlı değil — örn: export BREAKOUTBOT_SERVER=root@<vm-ip>}"
 SERVER="$BREAKOUTBOT_SERVER"
 DIR='~/BreakoutBot-test'
-FILES="paper_bb.py config.py indicators.py strategy.py math_engine.py mean_reversion.py regime.py short_sleeve.py"
+FORCE="${1:-}"
 
-echo "📁 Sunucuda test klasörü oluşturuluyor: $DIR"
+# ── 1. Dosya listesini import ağacından türet ────────────────────────────────
+# Kök paper_bb.py; yerel modüller özyinelemeli izlenir. Liste elle tutulmaz.
+mapfile -t FILES < <(python3.12 - <<'PY'
+import ast, os
+
+# secrets_local.py, paper_bb'nin SADECE --testnet dalında lazy import ettiği
+# API anahtarı dosyasıdır ve .gitignore'dadır. Çalışan bot saf simülasyon —
+# anahtar yüklü değil ve olmamalı. İzleyici onu bulur; buradan çıkarılır.
+EXCLUDE = {"secrets_local.py"}
+
+seen, queue = set(), ["paper_bb.py"]
+while queue:
+    f = queue.pop()
+    if f in seen or f in EXCLUDE or not os.path.exists(f):
+        continue
+    seen.add(f)
+    tree = ast.parse(open(f, encoding="utf-8").read())
+    for node in ast.walk(tree):
+        names = []
+        if isinstance(node, ast.Import):
+            names = [a.name for a in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            names = [node.module]
+        for n in names:
+            cand = n.split(".")[0] + ".py"
+            if os.path.exists(cand) and cand not in seen and cand not in EXCLUDE:
+                queue.append(cand)
+print("\n".join(sorted(seen)))
+PY
+)
+
+echo "📦 Import ağacından türetilen ${#FILES[@]} dosya:"
+printf '   %s\n' "${FILES[@]}"
+
+# ── 2. Kirli ağaç kontrolü ───────────────────────────────────────────────────
+DIRTY="$(git status --porcelain -- "${FILES[@]}" 2>/dev/null || true)"
+if [ -n "$DIRTY" ]; then
+  echo ""
+  echo "⛔ Çalışma ağacı kirli — bu dosyalar commit edilmemiş:"
+  echo "$DIRTY" | sed 's/^/     /'
+  if [ "$FORCE" != "--force" ]; then
+    echo ""
+    echo "   Deploy edilirse sunucuda koşan koda karşılık gelen bir commit OLMAZ."
+    echo "   Önce commit'le, ya da bilerek geçmek için:  bash deploy_test.sh --force"
+    exit 1
+  fi
+  echo "   ⚠️  --force verildi, kirli ağaçtan devam ediliyor."
+fi
+
+SHA="$(git rev-parse --short HEAD 2>/dev/null || echo 'no-git')"
+[ -n "$DIRTY" ] && SHA="${SHA}-dirty"
+
+# ── 3. Gönder ────────────────────────────────────────────────────────────────
+echo ""
+echo "📁 Sunucuda klasör: $DIR"
 ssh "$SERVER" "mkdir -p $DIR"
+echo "📤 Kopyalanıyor…"
+scp "${FILES[@]}" "$SERVER:$DIR/"
 
-echo "📤 Dosyalar kopyalanıyor (8 dosya)…"
-scp $FILES "$SERVER:$DIR/"
+# Ne koştuğunu tahmin etmek zorunda kalmamak için sürümü diske yaz.
+ssh "$SERVER" "printf '%s\n' '$SHA  $(date -u +%Y-%m-%dT%H:%M:%SZ)' > $DIR/DEPLOYED_SHA"
 
 echo ""
-echo "✅ Kopyalandı → $DIR"
-echo "Şimdi sunucuya gir ve eski servisin ayarını göster (ben servisi ona göre yazacağım):"
-echo "    ssh $SERVER"
-echo "    systemctl cat breakoutbot"
+echo "✅ Kopyalandı → $DIR   (sürüm: $SHA)"
+echo ""
+echo "⚠️  ENV SÖZLEŞMESİ — bu parametreler config.py'de DEĞİL, systemd unit'inde."
+echo "    Unit'te eksikse bot varsayılanlarla koşar ve doğrulanan sistemden başka"
+echo "    bir şey olur. Kontrol et:  ssh $SERVER 'systemctl cat breakoutbot-test'"
+echo ""
+echo "    Environment=X_TP1_CLOSE_FRAC=0.0     # E6 — kısmi çıkış yok"
+echo "    Environment=X_TRAIL_ATR=2.5          # E6 — geniş trail"
+echo ""
+echo "    Doğrulanmayı bekleyen bayraklar (experiments/DEFTER.md):"
+echo "      X_MR_ENABLED · X_REQUIRE_COIN_BULL · X_MIN_SL_FRAC · X_BTC_WEIGHT"
+echo ""
+echo "    Yeniden başlat:  ssh $SERVER 'systemctl restart breakoutbot-test'"

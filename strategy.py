@@ -32,8 +32,21 @@ from config import (
     TIMEOUT_BARS, COOLDOWN_BARS,
     CONFIRM_PRICE_MOVE_PCT, CONFIRM_VOL_MULT,
     CONFIRM_RSI_LONG_MIN, CONFIRM_RSI_SHORT_MAX,
-    HURST_LONG_MIN,
+    HURST_LONG_MIN, ADVERSE_FILLS, MIN_SL_FRAC,
 )
+
+# FILL CONVENTION (E7) — this file encodes intrabar fill assumptions in the
+# ORDER of its if/elif exit checks. OHLC cannot say whether the high or the low
+# of a bar came first, so any bar touching two exit levels is ambiguous. With
+# ADVERSE_FILLS (default) every ambiguity resolves AGAINST the position:
+#   · SCALE_OPEN: a bar touching both SL and TP1 fills the SL
+#   · TRAILING  : exits are tested against the trail level as of the bar's
+#                 OPEN (the ratchet moves only on completed bars), and a bar
+#                 touching both the trail and TP2 fills the trail
+#   · TIMEOUT   : fills at the bar close — the only price a decision made at
+#                 the close can actually get (was: bar midpoint, a fantasy)
+#   · adverse fills are clamped into the bar's range (gap-through protection)
+# X_ADVERSE_FILLS=0 restores the old optimistic ordering for comparison runs.
 
 # State constants
 IDLE       = "IDLE"
@@ -118,6 +131,14 @@ class SymbolState:
             # Gate: Hurst filter (block LONG in mean-reverting regime)
             if signal == "STRONG_LONG" and hurst_val < HURST_LONG_MIN:
                 return events  # mean-reverting regime — no long
+
+            # Gate: friction floor. The FULL stop would sit sl_frac from price and
+            # the round trip costs 0.0015/sl_frac of the risk taken. Too tight a
+            # stop is structurally expensive no matter how good the signal, so the
+            # setup is refused here — before the probe's fee is paid.
+            if MIN_SL_FRAC > 0 and price > 0 and \
+               (atr_val * SL_FULL_ATR / price) < MIN_SL_FRAC:
+                return events
 
             if signal in ("STRONG_LONG", "STRONG_SHORT"):
                 direction = "LONG" if signal == "STRONG_LONG" else "SHORT"
@@ -226,6 +247,11 @@ class SymbolState:
             # Timeout
             timed_out = self.bars_held >= TIMEOUT_BARS
 
+            # E7: a bar touching BOTH levels is ambiguous — adverse fill wins.
+            # (Needs a ~3.5×ATR bar: SL 1.5×ATR below entry + TP1 2×ATR above.)
+            if ADVERSE_FILLS and sl_hit:
+                tp1_hit = False
+
             if tp1_hit:
                 exit_p  = self.full_tp1
                 # Scale-out fraction is configurable (TP1_CLOSE_FRAC, default 0.50).
@@ -251,6 +277,10 @@ class SymbolState:
 
             elif sl_hit:
                 exit_p = self.full_sl
+                if ADVERSE_FILLS:
+                    # Gap-through: a bar entirely beyond the stop cannot fill AT
+                    # the stop — clamp the fill into the bar's traded range.
+                    exit_p = min(exit_p, high) if self.direction == "LONG" else max(exit_p, low)
                 gross  = self.full_notional * (exit_p - self.full_entry) / self.full_entry * mult
                 pnl    = gross - self.full_notional * EXEC_COST_PER_SIDE
                 t = Trade(symbol=self.symbol, direction=self.direction, kind="FULL",
@@ -260,7 +290,8 @@ class SymbolState:
                 self._reset(cooldown=COOLDOWN_BARS)
 
             elif timed_out:
-                exit_p = (high + low) / 2
+                # E7: the timeout decision exists only at bar close — fill there.
+                exit_p = price if ADVERSE_FILLS else (high + low) / 2
                 gross  = self.full_notional * (exit_p - self.full_entry) / self.full_entry * mult
                 pnl    = gross - self.full_notional * EXEC_COST_PER_SIDE
                 t = Trade(symbol=self.symbol, direction=self.direction, kind="FULL",
@@ -274,13 +305,19 @@ class SymbolState:
             self.bars_held += 1
             mult = 1 if self.direction == "LONG" else -1
 
-            # Update best price
-            best_now = high if self.direction == "LONG" else low
-            if (self.direction == "LONG"  and best_now > self.trail_best) or \
-               (self.direction == "SHORT" and best_now < self.trail_best):
-                self.trail_best = best_now
+            if not ADVERSE_FILLS:
+                # Old optimistic convention: raise the trail from THIS bar's
+                # high, then test the SAME bar's low against the raised level —
+                # an exit that assumes the high always precedes the low.
+                best_now = high if self.direction == "LONG" else low
+                if (self.direction == "LONG"  and best_now > self.trail_best) or \
+                   (self.direction == "SHORT" and best_now < self.trail_best):
+                    self.trail_best = best_now
 
             # Trailing SL = best_price ∓ TRAIL_ATR × atr
+            # E7 (adverse): trail_best here contains only COMPLETED bars — this
+            # bar's exits are tested against the level as of its OPEN, and the
+            # ratchet is raised at the bottom of this branch only if we survive.
             trail_sl = self.trail_best - mult * self.test_atr * TRAIL_ATR
 
             # Check exits
@@ -290,16 +327,31 @@ class SymbolState:
                         (self.direction == "SHORT" and high >= trail_sl)
             timed_out = self.bars_held >= TIMEOUT_BARS
 
+            # E7: a bar touching BOTH the trail and TP2 is ambiguous — the
+            # adverse fill (trail) wins.
+            if ADVERSE_FILLS and trail_hit:
+                tp2_hit = False
+
             if tp2_hit:
                 exit_p = self.full_tp2
                 exit_type = "TP2"
             elif trail_hit:
                 exit_p = trail_sl
+                if ADVERSE_FILLS:
+                    # Gap-through: clamp the fill into the bar's traded range.
+                    exit_p = min(exit_p, high) if self.direction == "LONG" else max(exit_p, low)
                 exit_type = "TRAIL"
             elif timed_out:
-                exit_p = (high + low) / 2
+                # E7: the timeout decision exists only at bar close — fill there.
+                exit_p = price if ADVERSE_FILLS else (high + low) / 2
                 exit_type = "TIMEOUT"
             else:
+                if ADVERSE_FILLS:
+                    # Survived the bar — NOW the completed bar raises the ratchet.
+                    best_now = high if self.direction == "LONG" else low
+                    if (self.direction == "LONG"  and best_now > self.trail_best) or \
+                       (self.direction == "SHORT" and best_now < self.trail_best):
+                        self.trail_best = best_now
                 return events  # still holding
 
             gross = self.full_notional * (exit_p - self.full_entry) / self.full_entry * mult
