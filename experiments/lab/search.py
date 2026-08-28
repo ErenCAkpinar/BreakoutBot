@@ -157,7 +157,15 @@ def main() -> None:
           f"   yıllık {win['test']['ann_ret']*100:+.1f}%   DD {win['test']['max_dd']*100:.1f}%")
 
     # DSR with the honest N.
-    sr_list = [t["train"]["sharpe"] for t in trials]
+    # SCALE: deflated_sharpe works on the raw per-bar return series, so its `sr`
+    # is per-bar. The trial variance it is compared against must be per-bar too.
+    # stats()["sharpe"] is ANNUALISED, and feeding those in directly inflated the
+    # chance bar by sqrt(bars_per_year) — it printed a threshold of +16.5 per bar
+    # (+771 annualised), which is not a Sharpe, it is a unit error. Convert each
+    # config's Sharpe back to bar scale using ITS OWN timeframe, since the grid
+    # mixes 15m with 4h.
+    sr_list = [t["train"]["sharpe"] / math.sqrt(engine.BARS_PER_YEAR[t["tf"]])
+               for t in trials]
     wfa._TRIAL_VAR[0] = statistics.pvariance(sr_list) if len(sr_list) > 1 else 0.0
     te = np.array(win["_r"])[int(len(win["_r"]) * args.split):]
     ds = wfa.deflated_sharpe([float(x) for x in te], n_trials=N)
