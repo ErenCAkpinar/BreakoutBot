@@ -751,6 +751,95 @@ Uzun/kısa hattı kapandı. Dün "yarın buradan devam edelim" dediğim yol, öl
 
 ---
 
+## Tur 6 — Funding: fiyattan türemeyen ilk bilgi · 28 Ağu 2026
+
+Dört tur boyunca sadece OHLCV vardı ve dördü de aynı cevabı verdi. Funding
+**türev değil** — fiyatın söyleyemediği bir şey söylüyor ve araştırmanın (bölüm
+09) sürekli işaret ettiği yer orası.
+
+### Altyapı
+
+| dosya | ne |
+|---|---|
+| `lab/fetch_funding.py` | 23 sembol × 2020-09'dan itibaren funding geçmişi (ccxt, sayfalı, tekrar-kaydı ayıklar) |
+| `lab/panel.py` `load_funding` | ödemeleri bar aralığına **TOPLAR** (Binance kimi çiftte 8h kimide 4h öder; reindex sessizce üçte ikisini düşürürdü) |
+| `lab/engine.py` | `evaluate(..., funding=)` → `−w·rate`. Pozitif oranda **long öder, short alır** |
+| `lab/strategies.py` | `xs_funding` (nötr), `carry_short` (kontrol: piyasaya kısa) |
+| `tests/test_lab_funding.py` | **12 test** — işaret konvansiyonu, gecikme, bar toplama |
+
+> İşaret hatası çökmez; maliyeti gelire çevirir ve tam da umduğumuz sonucu
+> **imal eder**. O yüzden dört ayrı testle sabitlendi.
+
+### 🟢 İlk kez: transfer eden bir sıralama
+
+| seçim türü | eğitim–test korelasyonu |
+|---|---|
+| coin seçimi (Tur 3) | −0.31 / −0.55 |
+| xs_mom parametreleri (Tur 5) | −0.128 |
+| **xs_funding parametreleri** | **+0.771** |
+
+### Ayrıştırma — gelir gerçek, ama fiyat riski onu boğuyor
+
+`xs_funding` net maruziyeti **0.00**. 18 konfigin **18'inde de funding bileşeni
+pozitif** (+%5.6 … +%8.5/yıl). Fiyat bileşeni −%24.4 … +%3.2 arası, çoğu negatif.
+
+**5.8 yıl, altı alt-dönem (lb=90 k=2 reb=6):**
+
+| dönem | fiyat | funding | maliyet | net |
+|---|---:|---:|---:|---:|
+| 2020-10→2021-10 | +16.7 | +6.2 | −2.5 | +20.4 |
+| 2021-10→2022-10 | −42.1 | +4.4 | −1.7 | −39.4 |
+| 2022-10→2023-09 | +49.5 | +6.8 | −3.8 | +52.5 |
+| 2023-09→2024-09 | −8.9 | +2.3 | −4.0 | −10.5 |
+| 2024-09→2025-09 | −8.6 | +2.3 | −4.3 | −10.7 |
+| 2025-09→2026-08 | +17.9 | +6.3 | −3.5 | +20.7 |
+| **ortalama** | **+4.1** | **+4.7** | **−3.3** | **+5.5** |
+
+**funding 6/6 dönemde pozitif · fiyat 3/6** — biri mekanizma, diğeri yazı-tura.
+
+Tüm 5.8 yıl: yıllık **−%0.4**, SR +0.16, DD **−%56.7**, vol %34.5.
+Güvenilir bileşen (+4.7 − 3.3 = **+%1.4/yıl**) üstüne ±%40 fiyat gürültüsü.
+
+Kontrol kolu işini gördü: `carry_short` +%26.7 getirdi ama +%27.3'ü **fiyattan**
+(düşen piyasada kısa olmak), funding katkısı yalnız +%2.7, DD −%41. Yani
+"carry kazandı" diyemezdik.
+
+### 🔑 Asıl ders — fiyat riski kabul edilecek değil, YOK EDİLECEK şey
+
+Kurduğum şey **farklı iki varlık** arasında nötr (yüksek-funding short, düşük
+long), o yüzden göreli fiyat riski taşıyor. Gerçek carry **aynı varlıkta**
+long spot + short perp: varlık başına delta-nötr, fiyat riski **yapısal olarak
+sıfır**, getiri = funding − maliyet.
+
+**Basis ticareti ne kazandırırdı (brüt funding):**
+
+| | medyan | pozitif coin |
+|---|---:|---|
+| tüm tarih (≈6 yıl) | **+%8.8/yıl** | 19/23 |
+| son 2 yıl | **+%4.0/yıl** | 18/23 |
+
+Prim sıkışmış (kalabalıklaşan bir ticarette beklenen) ama hâlâ geniş ve pozitif.
+
+### Maliyet burada gerçekten bağlayıcı — xs_mom'un aksine
+
+| maliyet/yön | xs_funding en iyi | (kıyas) xs_mom ort |
+|---|---:|---:|
+| %0.075 | +%4.7 | −%25.8 |
+| %0.020 maker | +%9.8 | −%22.8 |
+| %0.010 | +%10.7 | −%21.7 (sıfırda bile) |
+
+xs_mom'da sıfır maliyette bile ölüydü; burada maliyeti düşürmek doğrudan neti
+büyütüyor. **Yürütme bu ailede gerçek bir kaldıraç.**
+
+### Yarın için
+
+Gerçek basis ticareti **spot fiyat verisi** ister (elde yok, çekilebilir).
+O kurulunca ölçülecekler: teminat maliyeti, funding'in negatife dönme riski,
+likidasyon yönetimi, ve tek seferlik giriş/çıkış komisyonunun amortismanı.
+Bu bir ızgara değil — mekanizması olan tek aday.
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,

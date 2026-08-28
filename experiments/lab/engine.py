@@ -30,14 +30,25 @@ BARS_PER_YEAR = {"5m": 105_120, "15m": 35_040, "30m": 17_520,
 
 
 def evaluate(w: np.ndarray, ret: np.ndarray, mask: np.ndarray,
-             cost: float = COST_PER_SIDE) -> np.ndarray:
-    """Net per-bar portfolio return. `w` is the weight DECIDED on each bar."""
+             cost: float = COST_PER_SIDE,
+             funding: np.ndarray | None = None) -> np.ndarray:
+    """Net per-bar portfolio return. `w` is the weight DECIDED on each bar.
+
+    `funding` is the per-bar funding RATE, not a P&L. The sign convention is the
+    exchange's: when the rate is positive, longs pay shorts. So a position earns
+    `-weight * rate` — a short perp on a positive rate is paid to hold it. This
+    is the first return component in this lab that does not come from price, and
+    it is the reason the funding families exist at all.
+    """
     w = np.nan_to_num(w, nan=0.0, posinf=0.0, neginf=0.0)
     w = np.where(mask, w, 0.0)              # never hold a coin that is not listed
     held = np.vstack([np.zeros((1, w.shape[1])), w[:-1]])   # the lag
     gross = np.nansum(held * np.nan_to_num(ret), axis=1)
     turn = np.abs(w - held).sum(axis=1)
-    return gross - cost * turn
+    out = gross - cost * turn
+    if funding is not None:
+        out = out - np.nansum(held * np.nan_to_num(funding), axis=1)
+    return out
 
 
 def equity(r: np.ndarray) -> np.ndarray:

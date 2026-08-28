@@ -20,6 +20,7 @@ Nothing here imports the trading engine. It shares only the cached OHLCV.
 from __future__ import annotations
 
 import glob
+import json
 import os
 
 import numpy as np
@@ -78,6 +79,9 @@ class Panel:
         self.close, self.high, self.low, self.volume = close, high, low, volume
         self.index = index
         self.mask = ~np.isnan(close)
+        # Funding is a return component the price matrix cannot express: a short
+        # perp RECEIVES it while it is positive. None until load(with_funding=1).
+        self.funding: np.ndarray | None = None
         with np.errstate(invalid="ignore", divide="ignore"):
             prev = np.vstack([np.full((1, close.shape[1]), np.nan), close[:-1]])
             self.ret = close / prev - 1.0
@@ -93,7 +97,38 @@ class Panel:
                 f"{a:%Y-%m-%d}→{b:%Y-%m-%d})")
 
 
-def load(symbols: list[str], days: int, tf: str) -> Panel:
+def load_funding(symbols: list[str], index: pd.DatetimeIndex,
+                 tf: str) -> np.ndarray | None:
+    """Funding rates summed into each bar of `index`.
+
+    Binance settles funding every 8h on most pairs and every 4h on some, so the
+    rate is NOT a per-bar quantity and cannot simply be reindexed — it has to be
+    SUMMED over the interval each bar covers. Doing that also makes the result
+    independent of which settlement schedule a pair happens to use.
+
+    Bars are left-labelled, so bar T owns every settlement in [T, T+tf). A
+    position held during bar T pays (or receives) exactly those.
+    """
+    mins = TF_MINUTES[tf]
+    step = pd.Timedelta(minutes=mins)
+    cols = []
+    any_found = False
+    for s in symbols:
+        p = f"experiments/lab/funding/{s}.json"
+        if not os.path.exists(p):
+            cols.append(np.zeros(len(index)))
+            continue
+        any_found = True
+        recs = json.load(open(p))["records"]
+        ts = pd.to_datetime([r["ts"] for r in recs], unit="ms", utc=True)
+        ser = pd.Series([r["rate"] for r in recs], index=ts).sort_index()
+        # Left-closed bins aligned to the panel's own grid.
+        binned = ser.groupby(ser.index.floor(step)).sum()
+        cols.append(binned.reindex(index).fillna(0.0).to_numpy(float))
+    return np.column_stack(cols) if any_found else None
+
+
+def load(symbols: list[str], days: int, tf: str, with_funding: bool = False) -> Panel:
     frames = {}
     for s in symbols:
         p = _cache_path(s, days)
@@ -113,4 +148,7 @@ def load(symbols: list[str], days: int, tf: str) -> Panel:
         return np.column_stack([frames[s][col].reindex(idx).to_numpy(float)
                                 for s in syms])
 
-    return Panel(syms, mat("close"), mat("high"), mat("low"), mat("volume"), idx)
+    pan = Panel(syms, mat("close"), mat("high"), mat("low"), mat("volume"), idx)
+    if with_funding:
+        pan.funding = load_funding(syms, idx, tf)
+    return pan

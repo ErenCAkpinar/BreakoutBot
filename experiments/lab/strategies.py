@@ -226,6 +226,78 @@ def donchian(p, lookback: int = 100, rebal: int = 1, **_) -> np.ndarray:
     return _normalise(_throttle(w, rebal))
 
 
+def _roll_mean(a: np.ndarray, lb: int) -> np.ndarray:
+    """Trailing mean over `lb` bars ending at t (t included, no future data)."""
+    n, m = a.shape
+    out = np.full((n, m), np.nan)
+    c = np.cumsum(np.nan_to_num(a), axis=0)
+    out[lb:] = (c[lb:] - c[:-lb]) / lb
+    return out
+
+
+def xs_funding(p, lookback: int = 42, k: int = 5, rebal: int = 6,
+               buffer: int = 0, **_) -> np.ndarray:
+    """SHORT the highest-funding perps, LONG the lowest. Market neutral.
+
+    The trade is a cash flow, not a directional call. A positive funding rate
+    means longs are crowded and paying shorts to stay in; shorting that perp
+    collects the payment. Doing it against an equal long in the lowest-funding
+    names removes the market exposure, so what is left is the funding SPREAD
+    plus whatever price drift comes with crowded positioning.
+
+    This is the first family here whose signal is not derived from price, which
+    is the entire reason for adding it: four rounds of price-only search found
+    nothing that survived out-of-sample.
+    """
+    if p.funding is None:
+        raise ValueError("panel funding olmadan yüklendi (with_funding=True)")
+    f = _roll_mean(p.funding, lookback)
+    n, s = f.shape
+    w = np.zeros((n, s))
+    held_l: set[int] = set()
+    held_s: set[int] = set()
+    for t in range(n):
+        row = f[t]
+        ok = np.where(np.isfinite(row) & p.mask[t])[0]
+        if len(ok) < 2 * k:
+            continue
+        order = ok[np.argsort(row[ok])]      # lowest funding → highest
+
+        def pick(ranked, held):
+            band = set(int(i) for i in ranked[:k + buffer])
+            out = {i for i in held if i in band}
+            for i in ranked:
+                if len(out) >= k:
+                    break
+                out.add(int(i))
+            return out
+
+        longs = pick(list(order), held_l)                  # cheapest to be long
+        shorts = pick(list(reversed(order)), held_s) - longs   # paid to be short
+        held_l, held_s = longs, shorts
+        for i in longs:
+            w[t, i] = 1.0
+        for i in shorts:
+            w[t, i] = -1.0
+    return _normalise(_throttle(w, rebal))
+
+
+def carry_short(p, lookback: int = 42, thresh: float = 0.0, rebal: int = 6,
+                **_) -> np.ndarray:
+    """Short every perp whose trailing funding exceeds `thresh`.
+
+    NOT market neutral — it is short the market whenever funding is broadly
+    positive, which it usually is. Included precisely so the neutral version has
+    something to be compared against: if xs_funding only works because it is
+    short in a bear, this arm will show it.
+    """
+    if p.funding is None:
+        raise ValueError("panel funding olmadan yüklendi (with_funding=True)")
+    f = _roll_mean(p.funding, lookback)
+    w = np.where(p.mask & np.isfinite(f) & (f > thresh), -1.0, 0.0)
+    return _normalise(_throttle(w, rebal))
+
+
 FAMILIES = {
     "buy_hold": buy_hold,
     "inv_vol": inv_vol,
@@ -233,4 +305,6 @@ FAMILIES = {
     "xs_mom": xs_mom,
     "xs_rev": xs_rev,
     "donchian": donchian,
+    "xs_funding": xs_funding,
+    "carry_short": carry_short,
 }
