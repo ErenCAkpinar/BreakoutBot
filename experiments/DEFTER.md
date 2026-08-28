@@ -840,6 +840,54 @@ Bu bir ızgara değil — mekanizması olan tek aday.
 
 ---
 
+## Tur 7 — Gerçek basis ticareti ve kaldıracın sınırı · 28 Ağu 2026
+
+Spot veri çekildi (23 sembol, 4h, 2020-09'dan). `lab/basis.py`:
+`r = spot_getiri − perp_getiri + funding`, maliyet **iki bacak** üzerinden.
+
+### Ölçüm
+
+| | yıllık | vol | DD | Sharpe |
+|---|---:|---:|---:|---:|
+| tüm 5.8 yıl | +%11.7 | %2.7 | −%2.0 | +4.24 |
+| **son 2 yıl** | **+%4.55** | %1.1 | **−%0.42** | +4.17 |
+
+Tüm-dönem rakamı plan yapılacak sayı değil: 2021 tek başına +%37 ödemiş.
+Sermaye haircut'ı sonrası gerçekçi aralık **+%3.0 … +%4.5**.
+
+İnanmadan önce üç kontrol: (a) en yüksek Sharpe'lı konfig son dönemde **hiçbir
+şey tutmuyordu** — sabit `min_funding` eşiği oranlar sıkışınca her coini eliyor,
+yani Sharpe'ının bir kısmı "flat olmanın" Sharpe'ı; (b) 2021 katkısı ayrıldı;
+(c) "ağırlık 1.0"ın sermaye karşılığı açıkça yazıldı.
+
+### 🔴 Kaldıraç — asıl gerekçe çürüdü
+
+Kaldıraçsız getiri stablecoin borç vermeyle aynı aralıkta, dolayısıyla bu
+stratejiyi inşa etmenin **tek gerekçesi kaldıraçtı**. Ölçüldü:
+
+Pozisyonlar ~3 ay tutuluyor. Son 2 yılda tutulan coinler **XRP +%366,
+ADA +%236, UNI +%174** hareket etmiş. Perp bacağı AYRI teminat hesabındaysa
+1× likidasyon eşiği ≈ +%99.5 → **kaldıraçsız bile 5 kez likide olurdu.**
+
+| kaldıraç | likidasyon eşiği | gerçekleşen | manşet getiri |
+|---|---:|---:|---:|
+| 1x | +%99.5 | 5 kez | +%4.6 |
+| 3x | +%32.8 | 22 kez | +%13.9 |
+| 10x | +%9.5 | 35 kez | +%46.5 |
+
+> Önceki turun "3x ile +%14/yıl" rakamı bir getiri değil, **pozisyonun hayatta
+> kaldığını varsayan bir sayı** — ve kalmıyor.
+
+**Bu bir strateji sonucu değil, operasyonel ön koşul:** ticaret cross/portfolio
+margin ister — spot'un short'a teminat sayıldığı, hedge'in tanındığı yapı.
+O varsa fiyat riski gerçekten sıfıra yakın ve kaldıracı likidasyon değil borsa
+kuralları sınırlar. Yoksa düşük riskli falan değil.
+
+Ve bu, tüm pozisyonu tek borsada toplar — delta-nötr çerçevesinin gizlemeye
+meyilli olduğu bir risk.
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
