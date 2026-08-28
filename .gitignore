@@ -14,3 +14,6 @@ backtests/data_curation/
 backtests/data/
 experiments/logs/
 experiments/results/
+experiments/candidates/
+experiments/candidates_halted/
+experiments/lab/results/

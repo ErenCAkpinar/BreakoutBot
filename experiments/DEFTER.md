@@ -552,6 +552,121 @@ olunca kitaptan düşüyorlar. Giriş kapısı test edilebilir olsun diye
 
 ---
 
+## Tur 4 — Sıfırdan strateji arama laboratuvarı (`experiments/lab/`)
+
+**Tarih:** 27–28 Ağu 2026 · **Talimat:** "sıfırdan düşün, sanki projeye ilk defa
+başlıyormuşuz gibi, hiçbir zemin olmadan"
+
+### Mimari kopuş: durum makinesi yerine panel
+
+`paper_bb`/`backtest` tek sembolü bir durum makinesinden geçirir. Bu biçim, üç
+seçimi **sorulamaz kılarak görünmez yapıyor**: 5 dakikalık zaman dilimi,
+tek-varlık tezi, ve evren. Üçü de miras alındı; ikisi bugün ölçüldü ve tutmadı
+(sürtünme kimliği 5m stop mesafelerini eziyor; coin seçimi bilgi taşımıyor).
+
+Lab piyasayı **matris** olarak temsil ediyor: strateji `w[t,s]` ağırlık matrisi
+döndürüyor, motor bir bar geciktirip maliyeti kesiyor.
+
+| dosya | ne |
+|---|---|
+| `lab/panel.py` | 23 coin × istenen zaman dilimi (5m'den yeniden örnekleme), hizalı matrisler + listeleme maskesi |
+| `lab/engine.py` | `r[t] = Σ w[t−1,s]·ret[t,s] − maliyet·Σ|Δw|` — gecikme ve maliyet **motorda dayatılıyor** |
+| `lab/strategies.py` | 6 aile: `buy_hold`, `inv_vol`, `ts_mom`, `xs_mom`, `xs_rev`, `donchian` |
+| `lab/search.py` | ızgara + eğitim/test + DSR (gerçek deneme sayısıyla) + PBO (CSCV) |
+| `tests/test_lab_engine.py` | **16 test** |
+
+**Neden gecikme motorda:** kâhin testi — `w[t] = sign(ret[t])` veren bir
+"strateji" hiçbir şey kazanamamalı; `w[t] = sign(ret[t+1])` ise tam
+`Σ|ret|` kazanmalı. İkisi de test edilmiş durumda. Bu projedeki her olası
+lookahead hatası, her yazarın hatırlamasına bırakılmak yerine burada yapısal
+olarak imkânsız.
+
+**Neden bu altı aile:** incumbent uzayda tek bir nokta (tek-varlık, 5m,
+uzun-yanlı, breakout). Aileler onun hiç değiştirmediği eksenleri değiştiriyor:
+kesitsel vs zaman-serisi, momentum vs dönüş, ve **sinyalsiz null'lar**
+(`buy_hold`, `inv_vol`) — bu repodaki hiçbir sonuç bugüne dek "sadece piyasada
+ol"a karşı kontrol edilmemişti.
+
+### İlk duman testi (4h, 23 coin, 119 konfig) — düzenek dürüst davranıyor
+
+| | |
+|---|---|
+| eğitimde en iyi SR | **+0.90** |
+| aynı konfigin TEST SR'si | **−0.08** |
+| PBO | **0.700** (yazı-turadan kötü) |
+| DSR | **0.000** (119 deneme hesaba katılınca) |
+| null: `buy_hold` test | SR −0.51, yıllık **−41.4%** |
+
+Kazanan uydurmadı, başarısızlığı raporladı — kurulma amacı buydu.
+
+**Tasarım kusuru fark edildi:** 665g penceresi neredeyse tümüyle düşüş
+(buy_hold −%41). Uzun-yanlı her strateji burada mahkûm ve test, stratejinin
+genel değeri hakkında bilgi vermiyor. Bu yüzden ikinci panel eklendi:
+**2095g × 6 coin (2020-10 → 2026-08)** — 2021 boğası ve 2022 ayısı dahil.
+
+> Erken ama dikkat çekici: düşüş penceresinde ayakta kalan tek şey
+> **uzun/kısa kesitsel momentum** (`longshort=True`) — test DD −%10.5 vs
+> buy_hold −%52.3. Yönlü değil, göreli. Doğrulanması gerek.
+
+### Sonuçlar — 2095g × 6 coin × {1h, 4h, 1d} · **357 konfigürasyon**
+
+Eğitim: 2020-10 → ~2024-05 (2021 boğası dahil) · Test: ~2024-05 → 2026-08
+
+| | eğitim SR | TEST SR | test yıllık | test DD |
+|---|---:|---:|---:|---:|
+| en iyi (ts_mom 4h, lb=200, rebal=24) | **+1.81** | **−0.37** | −38.3% | −83.2% |
+| 2. (ts_mom 4h, lb=200, rebal=6) | +1.63 | −0.41 | −40.0% | −88.4% |
+| 3. (donchian 4h, lb=288) | +1.60 | −0.41 | −42.3% | −83.2% |
+| testte en iyi olabilen (xs_mom 4h k=3 lb=12) | +1.39 | +0.04 | −24.3% | −84.0% |
+| **null: buy_hold** | — | −0.01 | **−25.8%** | **−80.3%** |
+| **null: inv_vol** | — | +0.01 | −20.2% | — |
+
+**DSR = 0.000** (357 deneme; test SR −0.008 vs şans eşiği +1.70)
+**PBO = 0.171**
+
+### Bunun okunuşu — ve neden iki metrik çelişmiyor
+
+PBO **düşük** (0.171) ama sıralı eğitim/test **felaket**. Çelişki değil, teşhis:
+
+- **PBO blokları karıştırır**, yani boğa ve ayı dönemlerini birbirine katar. Düşük
+  PBO, sıralamanın *gürültüye uydurma* olmadığını söylüyor — bu aileler gerçekten
+  bir şey yakalıyor.
+- **Sıralı bölme karıştırmaz.** 2020-2024'te işe yarayan ne varsa 2024-2026'da
+  çalışmayı bıraktı.
+
+> Yani sorun aşırı-uydurma değil, **rejim**. Ve rejim şu: test döneminde
+> `buy_hold` yıllık **−%25.8**, drawdown **−%80**. Alt piyasası düştü; hiçbir
+> uzun-yanlı strateji bunu yenemez, çünkü yenecek bir şey yok.
+
+Hiçbir konfigürasyon null'ları anlamlı biçimde geçmedi. **357 denemeden çıkan
+şey: bu uzayda, bu dönemde, "piyasada olmak"tan iyi bir yön yok.**
+
+### Bugünün üç ölçümü aynı yere bakıyor
+
+| ölçüm | sonuç |
+|---|---|
+| Faz 8 · dağıtılan sistem, 665g | 3 hard-stop, +%8.5 (yalnız yeniden başlatma varsayımıyla) |
+| Tur 3 · coin seçimi | örneklem dışında bilgi yok (PBO 0.486, DSR 0) |
+| Tur 4 · 357 strateji konfigi | hiçbiri buy_hold'u geçmiyor; pozitif sonuçlar hep eğitim tarafında |
+
+Üçü de aynı şeyi farklı yerden söylüyor: **pozitif sonuçların tamamı, seçimin
+yapıldığı pencerenin içinde.** Bu bir parametre sorunu değil.
+
+### Yarın için açık uçlar
+
+- 665g × 23 coin × {15m, 1h, 4h} koşusu (`experiments/logs/lab_665.log`) —
+  15m'in sürtünme altında ne yaptığını görmek için; erken duman testinde
+  uzun/kısa kesitsel momentum ayı penceresinde DD'yi −%52'den −%10'a indirmişti.
+- Uzun/kısa (piyasa-nötr) kolları ayrı incele: mutlak Sharpe'ta kaybediyorlar ama
+  **düşüşte ayakta kalan tek aile** onlar. Bu, ROADMAP'in 2026-06'da not ettiği
+  "delta-nötr kazanıyor, yönlü kahramanlar patlıyor" gözlemiyle örtüşüyor.
+- Aileler hâlâ eksik: funding/carry (veri yok), likidite/spread filtresi,
+  volatilite rejimi koşullaması.
+- `search.py` artık vektörleştirildi (CSCV'de 50 bin `bar_sharpe` çağrısı
+  numpy'a taşındı) — daha büyük ızgaralar mümkün.
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
