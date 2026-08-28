@@ -114,26 +114,84 @@ def ts_mom(p, lookback: int = 100, rebal: int = 1, **_) -> np.ndarray:
     return _normalise(_throttle(w, rebal))
 
 
+def _score(p, lookback: int, skip: int = 0, vol_adj: bool = False) -> np.ndarray:
+    """The ranking signal, with two documented refinements available.
+
+    skip     rank on the return from t-lookback to t-skip, ignoring the most
+             recent `skip` bars. Standard in the equities momentum literature
+             because the newest move is contaminated by short-horizon reversal —
+             and this repo's own xs_rev family exists precisely because that
+             reversal is real here too.
+    vol_adj  divide by trailing volatility, so the ranking compares risk-adjusted
+             moves rather than rewarding whichever coin is simply the wildest.
+    """
+    if skip <= 0:
+        m = _roll_ret(p.close, lookback)
+    else:
+        past = np.vstack([np.full((lookback, p.close.shape[1]), np.nan),
+                          p.close[:-lookback]])
+        recent = np.vstack([np.full((skip, p.close.shape[1]), np.nan),
+                            p.close[:-skip]])
+        with np.errstate(invalid="ignore", divide="ignore"):
+            m = recent / past - 1.0
+        m = np.where(np.isfinite(m), m, np.nan)
+    if vol_adj:
+        v = _roll_std(p.ret, max(lookback, 20))
+        m = np.divide(m, v, out=np.full_like(m, np.nan), where=v > 1e-9)
+    return m
+
+
 def xs_mom(p, lookback: int = 100, k: int = 5, longshort: bool = False,
-           rebal: int = 1, **_) -> np.ndarray:
+           rebal: int = 1, skip: int = 0, vol_adj: bool = False,
+           buffer: int = 0, **_) -> np.ndarray:
     """Long the top-k by trailing return; optionally short the bottom-k.
 
     Cross-sectional: it does not care whether the market is up, only which coins
     lead it. That is the axis the incumbent's per-symbol state machine cannot
     express at all.
+
+    `buffer` adds hysteresis: a name entering the book must rank in the top k,
+    but only leaves once it falls out of the top k+buffer. Measured on the 665d
+    test period, the gross cross-sectional spread was +1.6% while turnover cost
+    -2.5% — the edge is real and smaller than the friction, so what the book
+    does at the RANKING BOUNDARY is the whole game. Without hysteresis a coin
+    oscillating around rank k is bought and sold repeatedly for nothing.
     """
-    m = _roll_ret(p.close, lookback)
+    m = _score(p, lookback, skip, vol_adj)
     n, s = m.shape
     w = np.zeros((n, s))
+    held_l: set[int] = set()
+    held_s: set[int] = set()
     for t in range(n):
         row = m[t]
         ok = np.where(np.isfinite(row) & p.mask[t])[0]
-        if len(ok) < 2 * k if longshort else len(ok) < k:
+        need = 2 * k if longshort else k
+        if len(ok) < need:
             continue
-        order = ok[np.argsort(row[ok])]
-        w[t, order[-k:]] = 1.0
-        if longshort:
-            w[t, order[:k]] = -1.0
+        order = ok[np.argsort(row[ok])]          # worst → best
+        best_first = list(reversed(order))       # best → worst
+
+        def pick(ranked: list, held: set[int]) -> set[int]:
+            """Keep what is still inside the wider band, refill from the top.
+
+            With buffer=0 the band equals the target set and this reduces to a
+            plain top-k, so the two paths cannot drift apart.
+            """
+            band = set(int(i) for i in ranked[:k + buffer])
+            out = {i for i in held if i in band}
+            for i in ranked:
+                if len(out) >= k:
+                    break
+                out.add(int(i))
+            return out
+
+        longs = pick(best_first, held_l)
+        shorts = pick(list(order), held_s) - longs if longshort else set()
+        held_l, held_s = longs, shorts
+        for i in longs:
+            w[t, i] = 1.0
+        for i in shorts:
+            w[t, i] = -1.0
     return _normalise(_throttle(w, rebal))
 
 

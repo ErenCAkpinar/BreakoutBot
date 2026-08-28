@@ -667,6 +667,90 @@ yapıldığı pencerenin içinde.** Bu bir parametre sorunu değil.
 
 ---
 
+## Tur 5 — Uzun/kısa (piyasa-nötr) kolun anatomisi · 28 Ağu 2026
+
+Tur 4'ün tek umut verici bulgusu: uzun/kısa kesitsel momentum, piyasa −%40
+düşerken −%2,3 kaybetmiş, DD −%10,5 vs −%54. Bunu kovalamadan önce çerçeveyi
+sorgulamak gerekti.
+
+### 1. "Ayıda ayakta kaldı" bir başarı DEĞİL
+
+`_normalise` gross'u 1.0'a çekiyor → uzun/kısa kitap ≈ +0.5 uzun / −0.5 kısa.
+Ölçüldü: **net maruziyet 0.000, piyasaya beta −0.021.** Piyasaya maruz olmayan
+bir kitap düşen piyasaya kaybedemez; bu aritmetik, edge değil.
+
+### 2. Bacak ayrıştırması — edge var, sürtünmeden küçük
+
+Test dönemi (`decompose.py`):
+
+| | |
+|---|---|
+| uzun bacak | −%15,7 |
+| kısa bacak | +%17,3 |
+| **brüt kesitsel yayılım** | **+%1,6** |
+| devir maliyeti | **−%2,5** |
+| net | −%0,9 |
+
+Volatilite eşitlenmiş kıyas: uzun/kısa −%2,3/yıl @ %14,9 vol · aynı vole
+ölçeklenmiş `buy_hold` −%8,3/yıl. Yani piyasadan iyi, ama **yıllık alfa −%1,9**.
+
+> Dünkü `0.0015/sl_frac` bulgusunun başka kılıkta tekrarı: **edge gerçek ama
+> sürtünmeden küçük.**
+
+### 3. Parametre seçimi de transfer etmiyor (432 konfig)
+
+| | |
+|---|---|
+| eğitimde ilk 10'un testte pozitif olanı | **0/10** |
+| eğitim–test Sharpe korelasyonu | **−0.128** |
+| eğitim kazananı | SR +2.47 → test **−1.82** |
+| DSR (432 deneme) | **0.001** |
+
+Coin seçimi için ölçülen imza (90g↔240g = −0.31), şimdi **parametre seçimi**
+için de aynı: hafif NEGATİF korelasyon.
+
+### 4. Mekanizma mı, seçim mi? — tüm ızgarada ortalama
+
+Bir etki ancak **eğitim ve testte aynı yönde** ise mekanizmadır:
+
+| parametre | eğitim yönü | test yönü | hüküm |
+|---|---|---|---|
+| **k (isim sayısı)** | çok → iyi | çok → iyi | ✅ **tutarlı** |
+| rebalance | yavaş → iyi | hızlı → iyi | ❌ ters |
+| buffer | 3 → iyi | 0 → iyi | ❌ ters |
+| lookback | 400 → iyi | 200 → iyi | ❌ ters |
+| vol_adj | True → iyi | False → iyi | ❌ ters |
+| skip | ~eşit | 0 → iyi | ❌ zayıf |
+
+**Tek tutarlı etki: daha çok isim tut.** Bu alfa değil **çeşitlendirme** — Tur
+3'ün "5 coinde yoğunlaşmak ödüllendirilmeyen risk" sonucuyla aynı yere çıkıyor.
+
+Hysteresis (`buffer`) maliyeti tasarlandığı gibi düşürdü (−%7,9→−%3,7→−%2,5)
+ama neti bozdu (−%3,3→−%15,3→−%34,1): bayat pozisyon tutmak, kazandırdığı devir
+maliyetinden fazlasını yiyor.
+
+### 5. 🔴 Suçlu maliyet modeli DEĞİL
+
+108 konfig, maliyet parametresi süpürüldü (test dönemi):
+
+| maliyet/yön | ort net %/yıl | pozitif | en iyi |
+|---|---:|---:|---:|
+| %0.075 (şu anki) | −25.8% | 8/108 | +31.2% |
+| %0.040 (slipajsız) | −23.9% | 12/108 | +36.7% |
+| %0.020 (maker/limit) | −22.8% | 18/108 | +39.8% |
+| **%0.000 (sürtünmesiz)** | **−21.7%** | 19/108 | +42.9% |
+
+> **Sıfır maliyette bile çalışmıyor.** Maliyet ~4 puan/yıl ediyor ama bağlayıcı
+> kısıt o değil. "Belki sorun yürütmedir / maker emirlere geçelim" hipotezi
+> **kapandı** — sinyal test döneminde ölü.
+
+### Karar
+
+Uzun/kısa hattı kapandı. Dün "yarın buradan devam edelim" dediğim yol, ölçünce
+çıkmaz çıktı — çerçevenin kendisi (net maruziyet ~0) beni yanıltmıştı.
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
