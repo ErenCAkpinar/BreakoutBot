@@ -888,6 +888,63 @@ meyilli olduğu bir risk.
 
 ---
 
+## Tur 8 — Ölçek ve sermaye: basis ticaretinin gerçek tavanı · 29 Ağu 2026
+
+Kaldıraç gerekçesi Tur 7'de çöktü. Geriye iki soru kaldı: **gerçekte ne kadar
+büyüklük kaldırır** ve **$1 notional kaç $ sermaye ister**.
+
+### Emir defteri derinliği stratejiyi yeniden tanımladı
+
+Canlı defterlerden ölçülen, **iki bacak birden** giriş kayması:
+
+| sembol | $10k | $50k | $250k | $1M |
+|---|---:|---:|---:|---:|
+| BTCUSDT | +0.000% | +0.000% | +0.000% | **+0.008%** |
+| ETHUSDT | +0.000% | +0.000% | +0.003% | +0.023% |
+| LINKUSDT | +0.027% | +0.077% | +0.389% | +3.659% |
+| UNIUSDT | +0.043% | +0.122% | +0.724% | +6.864% |
+| INJUSDT | +0.130% | +0.288% | +2.090% | derinlik yok |
+| POLUSDT | +0.178% | +0.720% | +3.209% | +22.290% |
+
+> Strateji yılda ~%4-5 kazanıyor. POL'de $250k girişin **tek seferlik** kayması
+> %3.2 — **dokuz aylık gelir, tek işlemde.** "En yüksek funding'i seç" mantığı
+> ölçekte çöküyor: en yüksek funding'li coinler en ince defterliler.
+
+### Dağıtılabilir evren (son 2 yıl)
+
+| evren | funding | maliyet | NET | vol | DD |
+|---|---:|---:|---:|---:|---:|
+| BTC + ETH | +4.85% | −0.23% | **+4.65%** | 0.56% | −0.58% |
+| BTC+ETH+XRP+ADA+LINK+LTC | +5.37% | −0.39% | **+5.00%** | 0.98% | −0.37% |
+| tüm 23 (önceki kurgu) | +4.98% | −0.54% | +4.55% | 1.09% | −0.42% |
+
+Likit 6 coin, 23 coinden **daha iyi** — ince altların funding primi kaymayı
+karşılamıyor.
+
+### Sermaye verimliliği (futures bakım %2.5, başlangıç %5 → maks 20x)
+
+| yapı | yıllık |
+|---|---:|
+| Portfolio Margin (spot teminat sayılır + %5 futures marjı) | **+4.43%** |
+| Cross margin, muhafazakâr tampon | +3.72% |
+| Ayrı hesaplar ($1 spot + $1 futures marjı, likidasyonsuz) | +2.33% |
+
+### 🔴 KARAR — dağıtmaya değmez
+
+**En iyi durumda (+%4.43/yıl) stablecoin borç vermeyle (~%4-8, DD ~0) aynı
+aralıkta, üstelik:**
+
+- borsa/karşı taraf riski tek noktada toplanıyor
+- iki bacaklı operasyonel yük ve margin yönetimi var
+- 2021'in +%37 primi gitmiş, kalabalıklaşmayla sıkışmış
+- kaldıraç ancak Portfolio Margin'le mümkün, o da riski yoğunlaştırıyor
+
+Mekanizma gerçek ve 5.8 yılın her alt-döneminde pozitif. Ama **perakende
+erişimle risksiz alternatifi yenmiyor.** Bu bir başarısızlık değil, bir ölçüm:
+inşa etmeden önce öğrenildi.
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
