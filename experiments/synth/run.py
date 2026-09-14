@@ -87,10 +87,14 @@ def _allin(r: dict) -> dict:
 
 def run_one(scenario: str, days: int, seed: int, restarts: bool,
             block_days: int, drift: float, source_days: int = 240,
-            before: str | None = None, after: str | None = None) -> dict:
+            before: str | None = None, after: str | None = None,
+            random_entry: float = 0.0) -> dict:
     from config import INITIAL_BALANCE, REGIME_WARMUP_BARS, TOKENS
     import backtest
     backtest._RESTARTS = restarts
+    if random_entry > 0:
+        from experiments.synth.random_entry import install
+        install(random_entry, seed)
 
     os.makedirs(LOGS, exist_ok=True)
     log = os.path.join(LOGS, f"{scenario}_{days}d_s{seed}.log")
@@ -112,6 +116,7 @@ def run_one(scenario: str, days: int, seed: int, restarts: bool,
         **meta,
         "days":          days,
         "restarts":      restarts,
+        "random_entry":  random_entry or None,
         "final_balance": round(r["final_balance"], 2),
         "total_return":  round(r["total_return"], 2),
         "max_dd":        round(r["max_dd"], 2),
@@ -180,6 +185,10 @@ def main() -> None:
     ap.add_argument("--before", default=None, help="bootstrap: only source days before this UTC date")
     ap.add_argument("--after",  default=None, help="bootstrap: only source days on/after this UTC date")
     ap.add_argument("--tag", default="", help="suffix for the results file")
+    ap.add_argument("--random-entry", type=float, default=0.0, metavar="P",
+                    help="research: replace the signal engine with a coin flip (STRONG_LONG "
+                         "with prob P per idle bar), always confirm, lift the regime gate — "
+                         "a pure test of the exit geometry (see random_entry.py)")
     a = ap.parse_args()
 
     os.makedirs(RES, exist_ok=True)
@@ -190,12 +199,13 @@ def main() -> None:
     #   X_SL_FULL_ATR=8 X_TIMEOUT_BARS=288 python3.12 experiments/synth/run.py --scenario trend --tag wide
     env = {k: v for k, v in os.environ.items() if k.startswith("X_") or k.startswith("BT_")}
     print(f"▶ {a.scenario}: {len(seeds)} seeds × {a.days}d, {a.jobs} jobs → {out}"
-          + (f"   env {env}" if env else ""), flush=True)
+          + (f"   env {env}" if env else "")
+          + (f"   RANDOM ENTRY p={a.random_entry:g} (no regime gate)" if a.random_entry else ""), flush=True)
     rows: list[dict] = []
     t0 = time.time()
     with ProcessPoolExecutor(max_workers=a.jobs) as ex:
         futs = {ex.submit(run_one, a.scenario, a.days, s, a.restarts, a.block_days, a.drift,
-                          a.source_days, a.before, a.after): s
+                          a.source_days, a.before, a.after, a.random_entry): s
                 for s in seeds}
         for f in as_completed(futs):
             s = futs[f]

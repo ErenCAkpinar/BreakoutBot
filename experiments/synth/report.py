@@ -75,8 +75,9 @@ def synth_rows() -> list[dict]:
         stem = os.path.basename(p)[:-5]
         base = f"{d['scenario']}_{d['days']}d"
         tag = stem[len(base) + 1:] if stem.startswith(base + "_") else ""
+        rnd = rows[0].get("random_entry")
         out.append({"label": f"{d['scenario']} {d['days']}g" + (" (restart)" if d.get("restarts") else "")
-                    + (f" [{tag}]" if tag else ""),
+                    + (f" [{tag}]" if tag else "") + (" RASTGELE-GİRİŞ" if rnd else ""),
                     "scenario": d["scenario"], "seeds": len(rows), "days": d["days"],
                     "fb_mean": fb.mean(), "fb_sd": fb.std(ddof=1) if len(fb) > 1 else float("nan"),
                     "fb_min": fb.min(), "fb_max": fb.max(),

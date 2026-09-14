@@ -1597,7 +1597,9 @@ iyileşme. Çıkış dağılımı ilk kez piyasaya tepki veriyor: SL %54 → %40
 %5 → %29 — 24 saat sınırı bağlıyor; pozisyonlar artık stopla değil zamanla
 çözülüyor, ve zaman sürüklenmenin lehine. **Giriş sinyali latent sürüklenmeyle
 ilişkili**: aynı 5m breakout puanı, çıkış ufka ölçeklenince +0.2R hasat ediyor.
-H10.1'in "YANLIŞ ise" dalı ("giriş bilgisiz") dışlandı.
+H10.1'in "YANLIŞ ise" dalı ("giriş bilgisiz") dışlandı. **[DÜZELTME, Sonuç 10c:
+bu çıkarım yanlıştı — rastgele giriş aynı geometriyle aynı hasadı yapıyor;
+sinyal yazı-turadan ayrışmıyor (t 0.33). Bkz. H10c.4.]**
 
 Not: bu, sentetik `trend` üzerinde bir **mekanizma** kanıtıdır — geometri ufka
 ölçeklenirse makine var olan edge'i alabiliyor. Gerçek veride o edge'in
@@ -1712,6 +1714,96 @@ edilen sayı trend − null_mart farkıdır**, ham havuz değil.
 
 **Durum: Tur 10 tamamlandı — 14 Eyl 2026 10:07 UTC.** 84 tohum-koşu toplam
 (Tur 9 + 10). Çalışan bota değişiklik veya deploy yok.
+
+### Tur 10c — açık maddeler: 12 tohum ve rastgele-giriş kontrolü (14 Eyl, ölçümden önce)
+
+**Kullanıcı isteği:** `null_mart` × wide3'e 12 tohum; rastgele-giriş testi.
+
+Araç: `experiments/synth/random_entry.py` — sinyal motoru yazı-tura ile
+değiştirilir (boş barda p=0.003 ile STRONG_LONG ≈ makinenin kendi probe oranı),
+probe her zaman onaylanır, rejim kapısı kalkar (`BT_NO_REGIME`); probe ücreti,
+tam boy fill, SL/TP/trail/timeout, adverse fill, portföy kapları, DD frenleri
+**dokunulmamış kod yolu**. `--random-entry P` ile yalnız replay sürecine kurulur.
+
+| kol | ne | öngörü |
+|---|---|---|
+| H10c.1 rastgele × baseline × null_mart | baseline geometrisi tek başına | ≈ ücret tabanı −0.11R |
+| H10c.2 null_mart × wide3, tohum 7–12 | 12 tohum havuzu | +0.056'nın gürültü olup olmadığı: 12 tohumla SE ≈ 0.03 |
+| H10c.3 rastgele × wide3 × null_mart | wide3 geometrisi tek başına | ≈ ücret tabanı −0.06R ise +0.056 gürültü/sinyal-etkileşimi; ≈ +0.05 ise **çıkış konvansiyonlarında iyimserlik** |
+| H10c.4 rastgele × wide3 × trend | wide3 geometrisi sinyalsiz, trend piyasasında | Belirleyici: trailing-stop sistemleri otokorelasyonlu piyasada rastgele girişle bile kazanabilir. Eğer ≈ sinyalli wide3 (+0.21R) ise **giriş sinyali hiçbir şey eklemiyor**, hasat tamamen çıkış geometrisinin; eğer ≈ 0 ise giriş bilgi taşıyor |
+
+Karar okuması: raporlanan sayı her zaman **(sinyalli − rastgele)** ve
+**(trend − null_mart)** farklarıdır; ham havuz değil.
+
+### Sonuç 10c — 12 tohum ve rastgele-giriş kontrolleri (14 Eyl, 14:55 UTC)
+
+**H10c.1 / H10c.3 — geometri ve muhasebe martingale'de dürüst.**
+
+| kol | k | momR (tohum ort ± SE) | ücret tabanı | halt | çıkış |
+|---|--:|--:|--:|--:|--:|
+| rastgele × baseline × null_mart | 6 | **−0.107 ± 0.023** | −0.124 | 6 | 18/56/23/2 |
+| rastgele × wide3 × null_mart | 6 | **−0.079 ± 0.044** | −0.043 | 6 | 15/49/18/18 |
+| sinyalli × wide3 × null_mart, tohum 1–6 | 6 | +0.055 ± 0.041 | −0.060 | 1 | |
+| sinyalli × wide3 × null_mart, tohum 7–12 | 6 | −0.081 ± 0.032 | −0.059 | 4 | |
+| **sinyalli × wide3 × null_mart, 12 tohum** | 12 | **−0.013 ± 0.032** | −0.060 | 5 | 9/38/13/40 |
+
+**H10c.2:** +0.056 gürültüydü — tohum 7–12 −0.081, 12 tohum havuzu −0.013
+(sıfırdan 0.4 SE, tabandan 1.5 SE). Rastgele girişle her iki geometri de tam
+ücret tabanında: çıkış konvansiyonlarında (fill sırası, ratchet, timeout,
+gap-through) ve muhasebede **iyimserlik yok**. Sonuç 10.1d'deki açık madde
+kapandı: 6 tohum yol varyansını küçümsemişti, geometri masum.
+
+**H10c.4 — belirleyici kontrol: wide3 geometrisi, `trend` piyasasında, sinyalli vs rastgele giriş.**
+
+| tohum | sinyalli bakiye | n | momR | çıkış | rastgele bakiye | DD | halt | n | momR | çıkış |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $1843 | 171 | +0.513 | 41/56/23/51 | $1422 | -12.4% | 0 | 350 | **+0.126** | 68/157/64/61 |
+| 2 | $1276 | 192 | +0.168 | 37/74/23/58 | $1801 | -11.2% | 0 | 366 | **+0.223** | 83/178/53/52 |
+| 3 | $915 | 67 | -0.102 | 6/33/9/19 | $1141 | -15.2% | 1 | 251 | **+0.062** | 46/125/43/37 |
+| 4 | $971 | 121 | -0.001 | 21/52/18/30 | $1872 | -10.8% | 0 | 347 | **+0.256** | 80/155/64/48 |
+| 5 | $1384 | 115 | +0.361 | 22/45/13/35 | $893 | -15.0% | 1 | 284 | **-0.033** | 54/141/51/38 |
+| 6 | $1158 | 176 | +0.110 | 30/75/20/51 | $1630 | -10.9% | 0 | 350 | **+0.184** | 71/155/60/64 |
+
+| wide3 × trend | havuz | tohum ort ± SE | P(kâr) | bakiye | halt | WR | payoff |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| sinyalli giriş | +0.207 | +0.175 ± 0.093 | 4/6 | $1258 ± 337 | 1 | 40.4% | 2.02 |
+| **rastgele giriş** | +0.146 | **+0.136 ± 0.044** | **5/6** | **$1460 ± 385** | 2 | 38.3% | 2.14 |
+
+- sinyalli − rastgele (eşleştirilmiş, aynı yollar): **+0.039 ± 0.115, t = 0.33**,
+  2/6 tohumda sinyalli önde.
+- rastgele giriş, trend − null_mart: **+0.215R, t = 3.44**. Sinyalli: +0.119, t 1.18.
+- etkileşim [(sinyalli−rastgele)_trend − (sinyalli−rastgele)_null]: −0.095 ± 0.157.
+
+**Okuma — Sonuç 10.1a'nın yorumu DÜZELTİLDİ.** Orada "giriş sinyali latent
+sürüklenmeyle ilişkili; makinenin kurtarılacak parçası var" yazılmıştı. Yanlış.
+Geniş geometri (SL ≈ 8h gürültüsü, 11.25×ATR trail, 24h timeout) ekilen trendi
+**tek başına** hasat ediyor — yazı-tura girişle, sinyalliden daha tutarlı ve
+2.3× daha çok pozisyonla. Bu, trend-takip literatürünün bilinen sonucu:
+pozitif otokorelasyonlu bir seride geniş stop + trailing çıkış, rastgele
+girişle bile pozitif beklenti üretir; hasadı çıkış yapar. Makinenin tüm sinyal
+yığını — MathEngine puanı (RSI/EMA/MACD/ADX/BB), probe + 3 onay şartı, rejim
+harmanı, Hurst, beta kapısı — yazı-turanın üstüne **ölçülebilir hiçbir şey
+eklemiyor** (t 0.33). Tur 9'daki "sürtünme aritmetiği" ve H10.2'deki "naif kural
+gerçek veride sıfır" ile birlikte okununca: bu projenin 13 ayda inşa ettiği
+karmaşıklığın tamamı, edge'in bulunmadığı bir ufukta, bilgi taşımayan bir
+girişin etrafında.
+
+**Karar (Tur 10 nihai):**
+1. Kod ve muhasebe doğru (H9.1, H10c.1, H10c.3).
+2. Faz 8 geometrisi ufka göre 3.7× dar; edge'li piyasada bile kaybeder (H9.2).
+3. Geometri ufka ölçeklenince edge'li piyasada kazanır — ama **giriş sinyali
+   sayesinde değil, çıkışın kendisiyle** (H10c.4). Sinyal yığını ≈ yazı-tura.
+4. Gerçek veride bu ufukta hasat edilecek edge yok (H10.2, Tur 4, Tur 9 OOS).
+5. Deploy yok; parametre araması yok. Bir sonraki hipotez varsa şu şekilde
+   olmalı: **giriş = rastgele/basit, çıkış = ufka ölçekli**, ve önce
+   "gerçek veride hangi ufukta VR > 1?" — o ufuk bulunamazsa yönlü bot yok.
+
+Harness kuralı (kalıcı): her geometri kolu `null_mart` ve **rastgele-giriş**
+kontrolleriyle koşar; raporlanan sayılar (trend − null_mart) ve
+(sinyalli − rastgele) farklarıdır.
+
+**Durum: Tur 10 tamamlandı — 14 Eyl 2026 14:55 UTC.** Tur 9+10 toplam 108
+tohum-koşu. Çalışan bota değişiklik veya deploy yok.
 
 ---
 

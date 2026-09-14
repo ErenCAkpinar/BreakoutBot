@@ -166,3 +166,17 @@ def test_martingale_null_has_zero_arithmetic_drift():
     # same shocks (same seed): the difference in mean return is the removed drift
     assert abs((rp.mean() - rm.mean()) - sigma2_half) < 0.2 * sigma2_half
     assert abs(rm.mean()) < 3 * se
+
+
+def test_random_entry_state_is_a_coin_flip_that_always_confirms():
+    from experiments.synth.random_entry import RandomEntryState
+    st = RandomEntryState(symbol="ADAUSDT", p_entry=0.01, seed=3)
+    sig = [st.engine.analyze({})["signal"] for _ in range(20_000)]
+    rate = sig.count("STRONG_LONG") / len(sig)
+    assert 0.007 < rate < 0.013 and set(sig) <= {"STRONG_LONG", "NEUTRAL"}
+    assert st._confirm(1.0, 0.0, 0.0, 1) is True
+    # deterministic across processes: same seed+symbol → same stream
+    st2 = RandomEntryState(symbol="ADAUSDT", p_entry=0.01, seed=3)
+    assert [st2.engine.analyze({})["signal"] for _ in range(200)] == sig[:200]
+    st3 = RandomEntryState(symbol="ADAUSDT", p_entry=0.01, seed=4)
+    assert [st3.engine.analyze({})["signal"] for _ in range(200)] != sig[:200]
