@@ -107,6 +107,10 @@ class Scenario:
     mr_hl_d:    float = 0.0
     vol_mult:   float = 1.0
     garch:      tuple = (0.08, 0.90)
+    martingale: bool = False   # True: zero ARITHMETIC drift (log drift −σ²/2 per
+                               # bar). The plain null is a log-martingale, which
+                               # hands a long-only system +σ²/2 per bar held —
+                               # ≈ +0.03–0.05R per position at 8–24h holds.
 
 
 # Variance ratios measured on 3×400d samples (ADAUSDT, GARCH off):
@@ -119,6 +123,7 @@ class Scenario:
 # For reference the REAL 240d window reads VR 4h 0.93 · 1d 0.97 · 5d 0.98.
 SCENARIOS: dict[str, Scenario] = {
     "null":       Scenario("null"),
+    "null_mart":  Scenario("null_mart", martingale=True),
     "trend":      Scenario("trend",      trend_k=1.0, trend_hl_d=0.25),
     "trend_slow": Scenario("trend_slow", trend_k=0.3, trend_hl_d=2.0),
     "chop":       Scenario("chop",       mr_hl_d=1.0),
@@ -217,6 +222,7 @@ def simulate(scn: Scenario | list[Scenario], days: int, seed: int,
     # Per-day law → per-bar arrays
     drift  = np.array([laws[d].drift_ann for d in day_ix]) / (365 * BARS_PER_DAY)
     volm   = np.array([laws[d].vol_mult  for d in day_ix])
+    mart   = np.array([laws[d].martingale for d in day_ix])
     k_arr  = np.array([laws[d].trend_k   for d in day_ix])
     hl_arr = np.array([laws[d].trend_hl_d for d in day_ix])
     mr_arr = np.array([laws[d].mr_hl_d   for d in day_ix])
@@ -243,6 +249,9 @@ def simulate(scn: Scenario | list[Scenario], days: int, seed: int,
         mI = mI * (k_arr / max(k_arr.max(), 1e-12))
 
         mu_bar = drift + c.beta * mF + mI                # per-bar expected log return
+        # Price-martingale null: cancel the +σ²/2 arithmetic drift of a
+        # log-martingale (unconditional per-bar variance ≈ σ_i² · vol_mult²).
+        mu_bar = mu_bar - np.where(mart, 0.5 * (c.sigma * volm) ** 2, 0.0)
         shock  = c.beta * zF + zI                        # per sub-step
         r_sub  = shock + np.repeat(mu_bar / SUBSTEPS, SUBSTEPS)
 

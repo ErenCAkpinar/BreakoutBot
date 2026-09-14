@@ -23,7 +23,7 @@ REAL = {  # arm file → label
     "N1-control-20260910_240d.json": "GERÇEK 240g (mevcut geometri)",
     "R1-sl225t96_665d.json":         "GERÇEK 665g (mevcut geometri, restart)",
 }
-ORDER = ["null", "trend", "trend_slow", "chop", "bull", "bear", "bootstrap",
+ORDER = ["null", "null_mart", "trend", "trend_slow", "chop", "bull", "bear", "bootstrap",
          "2027", "2028", "2029", "2030"]
 
 

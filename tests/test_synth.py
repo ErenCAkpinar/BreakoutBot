@@ -151,3 +151,18 @@ def test_chop_anchor_follows_the_price_after_a_trend():
     assert p_switch > 1.3 * p_start                       # the trend happened
     assert abs(np.log(p_chop_mean / p_switch)) < abs(np.log(p_chop_mean / p_start))
     assert abs(np.log(p_chop_mean / p_switch)) < 0.15     # stays near the switch level
+
+
+def test_martingale_null_has_zero_arithmetic_drift():
+    """The plain null is a log-martingale (+σ²/2 arithmetic drift per bar); the
+    martingale null must have ~zero arithmetic drift so a long-only system
+    cannot earn from holding alone."""
+    plain = gen.simulate(gen.Scenario("p", garch=(0, 0)), 300, seed=7)["ADAUSDT"]
+    mart  = gen.simulate(gen.Scenario("m", garch=(0, 0), martingale=True), 300, seed=7)["ADAUSDT"]
+    rp = plain["close"].pct_change().dropna()
+    rm = mart["close"].pct_change().dropna()
+    se = float(rp.std() / np.sqrt(len(rp)))
+    sigma2_half = 0.5 * gen.DEFAULT_COINS[3].sigma ** 2        # ADA is index 3
+    # same shocks (same seed): the difference in mean return is the removed drift
+    assert abs((rp.mean() - rm.mean()) - sigma2_half) < 0.2 * sigma2_half
+    assert abs(rm.mean()) < 3 * se

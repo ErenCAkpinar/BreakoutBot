@@ -1649,8 +1649,69 @@ ise, doğru sonuç "daha iyi bot" değil "bu piyasada yönlü bot yok"tur.
 `wide4` × `trend` (×4 geometri, 48h) arka planda koşuyor; sonucu ek olarak
 işlenecek, kararı değiştirmez.
 
-**Durum: H10.1 ve H10.2 tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik
-veya deploy yok.
+### Sonuç H10.1c — `wide4` × `trend` (6 tohum): hasat ×3'te doyuyor
+
+| tohum | bakiye | DD | halt | n | momR | payoff | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $1479.64 | -9.9% | 0 | 131 | **+0.390** | 2.3 | 31/48/24/28 |
+| 2 | $1429.52 | -11.2% | 0 | 148 | **+0.316** | 2.16 | 24/52/29/43 |
+| 3 | $995.06 | -15.8% | 1 | 51 | **+0.021** | 1.79 | 7/27/3/14 |
+| 4 | $1222.02 | -13.7% | 0 | 96 | **+0.259** | 2.09 | 25/40/13/18 |
+| 5 | $988.94 | -13.5% | 0 | 93 | **+0.018** | 1.65 | 13/46/19/15 |
+| 6 | $1200.52 | -11.2% | 0 | 143 | **+0.163** | 1.71 | 26/64/20/33 |
+
+Havuz **+0.225R** (tohum +0.195 ± 0.063), P(kâr) 4/6, halt 1. Eşleştirilmiş
+wide4 − baseline **+0.249R ± 0.054, t = 4.62, 6/6**; wide4 − wide3 +0.020 ±
+0.089 (t 0.22). Stop bir kez ufkun gürültüsünün dışına çıkınca daha da
+genişletmek bir şey eklemiyor.
+
+### Sonuç H10.1d — fiyat-martingale null (`null_mart`, harness düzeltmesi) — **Jensen açıklaması TUTMADI**
+
+`gen.Scenario(martingale=True)`: log drift −σ²/2, aritmetik getiri 0. Test
+`test_martingale_null_has_zero_arithmetic_drift`. Aynı tohumlar, aynı şoklar.
+
+| tohum | baseline bakiye | halt | momR | TP2/SL/TRL/TMO | wide3 bakiye | halt | momR | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $869.64 | 1 | -0.168 | 8/38/15/9 | $1177.56 | 0 | **+0.150** | 17/45/21/58 |
+| 2 | $978.92 | 1 | -0.001 | 27/71/30/11 | $951.29 | 1 | **-0.021** | 10/49/23/42 |
+| 3 | $1139.54 | 0 | +0.139 | 28/59/26/8 | $924.64 | 0 | **-0.056** | 8/37/11/38 |
+| 4 | $936.58 | 0 | -0.040 | 22/53/20/10 | $1115.29 | 0 | **+0.170** | 10/30/11/28 |
+| 5 | $855.78 | 1 | -0.193 | 10/42/15/1 | $934.85 | 0 | **-0.022** | 13/55/18/58 |
+| 6 | $884.29 | 1 | -0.073 | 23/70/29/7 | $1146.37 | 0 | **+0.111** | 16/51/28/71 |
+
+| null türü | baseline momR | wide3 momR | wide3 ücret tabanı |
+|---|--:|--:|--:|
+| log-martingale (`null`) | −0.016 (±0.042) | +0.049 (±0.032) | −0.059 |
+| **fiyat-martingale (`null_mart`)** | −0.035 (±0.049) | **+0.056 (±0.041)** | −0.060 |
+| eşleştirilmiş fark log − fiyat, wide3 | | −0.004 ± 0.022 | (öngörü +0.03) |
+
+Baseline'da düzeltme beklenen yönde ve boyutta (−0.019R). **wide3'te değil:**
+fiyat-martingale'de de +0.056R — edge'siz piyasada ücret tabanının **~0.11R
+üstünde**, 6 tohum yayılımıyla ≈ 2.8 SE. Jensen bunu açıklamıyor. Adaylar,
+hiçbiri doğrulanmadı: (i) 6 tohumun yol varyansını küçümsemesi (iki null
+neredeyse aynı yollar — bağımsız kanıt değil); (ii) geniş geometride küçük,
+açıklanmamış bir iyimserlik (fill/ratchet/timeout sırası — baseline'da
+görünmüyor, ama baseline'ın TIMEOUT payı %7, wide3'ün %40). Açık madde:
+`null_mart` × wide3'e 12+ tohum ve **rastgele-giriş** stratejisiyle saf
+geometri testi (giriş sinyalsiz aynı çıkış; martingale'de ≈ −ücret vermeli).
+
+**Bunun karara etkisi:** hasat iddiasının iki bacağı ayrışıyor.
+- *Mekanizma* — aynı yollarda geometri değişince sonuç değişiyor: wide3/wide4 −
+  baseline eşleştirilmiş t = 2.95 / 4.62, çıkış dağılımı ilk kez piyasaya bağlı.
+  **Ayakta.**
+- *Büyüklük* — trend − null_mart, wide3'te +0.120R, SE 0.102, **t = 1.18**.
+  Ekilen trendden hasat edilen net miktar 6 tohumla gürültüden ayrılmıyor;
+  +0.21R'nin ~0.06'sı geometrinin martingale'de de verdiği şey olabilir.
+  **Belirsiz.** H10.1'in "≥ +0.10R" eşiği ham havuzda geçiyor, null'a göre
+  düzeltilmiş hâliyle geçmiyor.
+
+Deploy kararı zaten "hayır"dı (H10.2); bu onu değiştirmiyor, yalnızca
+mekanizma bulgusunun boyutuna ihtiyat ekliyor. Harness'ın gelecek kullanımı
+için kural: **her geometri kolu `null_mart` üzerinde de koşar ve rapor
+edilen sayı trend − null_mart farkıdır**, ham havuz değil.
+
+**Durum: Tur 10 tamamlandı — 14 Eyl 2026 10:07 UTC.** 84 tohum-koşu toplam
+(Tur 9 + 10). Çalışan bota değişiklik veya deploy yok.
 
 ---
 
