@@ -1846,6 +1846,151 @@ rejim" bulgusunun (Tur 4) VR karşılığı.
 Araç: `experiments/synth/vr_scan.py`. Parametre taraması yok; ufuk ızgarası
 ölçümden önce sabit.
 
+### Sonuçlar (14 Eyl 2026, ~100 s CPU)
+
+### A. VR profili — 23 coin, 2024-09 → 2026-08, havuz ortalama (satır = ufuk, sütun = taban)
+
+| ufuk | 1h | 4h | 5m |
+|--:|--:|--:|--:|
+| 15m |  |  | 0.921 |
+| 30m |  |  | 0.870 |
+| 1h |  |  | 0.803 |
+| 2h | 0.953 |  | 0.767 |
+| 4h | 0.916 |  | 0.739 |
+| 8h | 0.909 | 0.955 | 0.735 |
+| 12h | 0.898 | 0.935 | 0.727 |
+| 1d | 0.892 | 0.923 | 0.722 |
+| 2d | 0.886 | 0.916 | 0.718 |
+| 5d | 0.820 | 0.843 | 0.667 |
+| 10d | 0.785 | 0.806 | 0.638 |
+| 15d | 0.787 | 0.809 | 0.639 |
+
+Uzun form (SE, min/max, z* sayıları) `python3.12 experiments/synth/vr_scan.py` çıktısında. **Hiçbir tabanda, hiçbir ufukta, 23 coinin hiçbirinde z* > 1.96 yok.** 5m tabanda 15m'den itibaren < 1 (bid-ask sekmesi), 1h/4h tabanda da 0.79–0.96 ve ufuk uzadıkça düşüyor.
+
+### B. Doğrudan hasat — sign(r_L)·r_H uzun-kısa, 23 coin, 2024-09 → 2026-08 (örtüşmeyen H)
+
+| L | H | ort_% | t_havuz | coin+ | n_coin | n |
+|--:|--:|--:|--:|--:|--:|--:|
+| 1h | 1h | -0.003 | -1.503 | 8 | 23 | 389123 |
+| 1h | 4h | -0.006 | -0.873 | 9 | 23 | 97267 |
+| 1h | 8h | -0.013 | -0.956 | 9 | 23 | 48622 |
+| 1h | 1d | 0.036 | 0.876 | 14 | 23 | 16192 |
+| 1h | 5d | -0.238 | -1.211 | 7 | 23 | 3220 |
+| 4h | 1h | 0.006 | 3.281 | 21 | 23 | 389054 |
+| 4h | 4h | 0.008 | 1.072 | 13 | 23 | 97253 |
+| 4h | 8h | 0.030 | 2.257 | 16 | 23 | 48622 |
+| 4h | 1d | 0.109 | 2.735 | 17 | 23 | 16192 |
+| 4h | 5d | 0.367 | 1.862 | 16 | 23 | 3220 |
+| 1d | 1h | -0.004 | -2.080 | 6 | 23 | 388594 |
+| 1d | 4h | -0.005 | -0.630 | 8 | 23 | 97138 |
+| 1d | 8h | 0.015 | 1.001 | 14 | 23 | 48562 |
+| 1d | 1d | 0.086 | 1.977 | 16 | 23 | 16178 |
+| 1d | 5d | -0.230 | -1.230 | 11 | 23 | 3220 |
+| 5d | 1h | 0.003 | 1.523 | 15 | 23 | 386386 |
+| 5d | 4h | 0.006 | 0.796 | 12 | 23 | 96586 |
+| 5d | 8h | 0.002 | 0.131 | 12 | 23 | 48286 |
+| 5d | 1d | -0.035 | -0.811 | 8 | 23 | 16086 |
+| 5d | 5d | 0.188 | 0.953 | 13 | 23 | 3206 |
+
+### C. Çeyrek bazında — 23 coin, 665g
+
+| dönem | n_coin | getiri_ort_% | VR(1d;1h) | z>2 1d;1h | VR(5d;1h) | z>2 5d;1h | VR(5d;4h) | z>2 5d;4h | VR(4h;5m) | z>2 4h;5m |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2024Q4 | 23 | 25.501 | 0.822 | 0 | 0.789 | 0 | 0.894 | 0 | 0.837 | 0 |
+| 2025Q1 | 23 | -64.886 | 0.991 | 0 | 0.710 | 0 | 0.729 | 0 | 1.011 | 0 |
+| 2025Q2 | 23 | 12.042 | 1.037 | 0 | 0.971 | 0 | 0.945 | 0 | 0.952 | 0 |
+| 2025Q3 | 23 | 15.498 | 0.955 | 0 | 0.867 | 0 | 0.930 | 0 | 0.862 | 0 |
+| 2025Q4 | 23 | -69.764 | 0.902 | 0 | 0.656 | 0 | 0.666 | 0 | 0.463 | 0 |
+| 2026Q1 | 23 | -35.764 | 1.012 | 0 | 0.802 | 0 | 0.859 | 0 | 0.867 | 0 |
+| 2026Q2 | 23 | -12.626 | 0.830 | 1 | 0.863 | 0 | 0.976 | 0 | 0.891 | 0 |
+| 2026Q3 | 23 | 26.809 | 1.004 | 1 | 1.256 | 2 | 1.269 | 3 | 0.891 | 0 |
+
+### D. Yıl bazında — canlı 5 coin + BTC, 2020-10 → 2026-08
+
+| dönem | n_coin | getiri_ort_% | VR(1d;1h) | z>2 1d;1h | VR(5d;1h) | z>2 5d;1h | VR(5d;4h) | z>2 5d;4h | VR(4h;5m) | z>2 4h;5m |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2020 | 4 | 61.209 | 0.930 | 0 | 0.783 | 0 | 0.801 | 0 | 0.862 | 0 |
+| 2021 | 4 | 149.353 | 0.855 | 0 | 0.776 | 0 | 0.792 | 0 | 0.760 | 0 |
+| 2022 | 5 | -137.227 | 0.944 | 0 | 0.926 | 0 | 0.992 | 0 | 0.872 | 0 |
+| 2023 | 5 | 131.387 | 0.953 | 0 | 0.978 | 0 | 0.983 | 0 | 0.866 | 0 |
+| 2024 | 6 | 25.062 | 0.904 | 0 | 0.919 | 0 | 0.989 | 0 | 0.897 | 0 |
+| 2025 | 6 | -101.656 | 0.954 | 0 | 0.804 | 0 | 0.824 | 0 | 0.749 | 0 |
+| 2026 | 6 | -2.013 | 0.953 | 0 | 0.964 | 0 | 1.052 | 0 | 0.865 | 0 |
+
+### E. Doğrudan hasat, yıl bazında — canlı 5 + BTC (L=4h→H=8h ve L=1d→H=1d ve L=5d→H=5d)
+
+| yıl | n_coin | 4h→8h % ort | 4h→8h % coin+ | 1d→1d % ort | 1d→1d % coin+ | 5d→5d % ort | 5d→5d % coin+ |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2020 | 4 | -0.138 | 1 | 0.142 | 2 | -2.701 | 1 |
+| 2021 | 4 | -0.208 | 0 | -0.421 | 0 | 0.402 | 2 |
+| 2022 | 5 | -0.016 | 2 | -0.165 | 0 | -0.529 | 2 |
+| 2023 | 5 | 0.025 | 3 | -0.018 | 2 | 0.537 | 4 |
+| 2024 | 6 | -0.125 | 0 | 0.015 | 2 | -0.563 | 1 |
+| 2025 | 6 | 0.003 | 2 | 0.221 | 6 | -0.445 | 0 |
+| 2026 | 6 | 0.067 | 6 | 0.100 | 5 | -0.218 | 2 |
+
+### F. UZUN-YALNIZ, MALİYET SONRASI — r_L>0 iken r_H ortalaması − 0.15% gidiş-dönüş; 23 coin, 665g
+
+| L | H | net_%/işlem | t | coin+ | n |
+|--:|--:|--:|--:|--:|--:|
+| 1h | 1h | -0.158 | -65.051 | 0 | 191131 |
+| 1h | 4h | -0.177 | -18.922 | 0 | 47920 |
+| 1h | 8h | -0.205 | -10.631 | 0 | 23964 |
+| 1h | 1d | -0.232 | -3.916 | 1 | 8310 |
+| 1h | 5d | -1.117 | -3.853 | 0 | 1685 |
+| 4h | 1h | -0.149 | -63.640 | 0 | 191205 |
+| 4h | 4h | -0.164 | -17.603 | 0 | 47973 |
+| 4h | 8h | -0.163 | -8.483 | 0 | 23614 |
+| 4h | 1d | -0.170 | -2.855 | 5 | 8023 |
+| 4h | 5d | -0.566 | -1.986 | 5 | 1591 |
+| 1d | 1h | -0.160 | -67.476 | 0 | 187924 |
+| 1d | 4h | -0.177 | -18.842 | 0 | 47049 |
+| 1d | 8h | -0.179 | -8.608 | 1 | 23516 |
+| 1d | 1d | -0.196 | -3.579 | 3 | 7866 |
+| 1d | 5d | -1.209 | -4.483 | 3 | 1513 |
+| 5d | 1h | -0.153 | -62.234 | 0 | 176469 |
+| 5d | 4h | -0.169 | -17.194 | 0 | 44033 |
+| 5d | 8h | -0.199 | -9.911 | 1 | 21979 |
+| 5d | 1d | -0.341 | -5.858 | 2 | 7323 |
+| 5d | 5d | -0.789 | -2.803 | 4 | 1490 |
+
+### Okuma
+
+**H11.1 DOĞRU.** 2024-09 → 2026-08'de 23 coinin havuzunda hiçbir ufukta VR > 1
+yok; 1h tabanda 1g 0.89, 5g 0.82, 15g 0.79 — ufuk uzadıkça **daha çok**
+ortalamaya dönüş. Tek istisna 2026Q3 (Tem–Ağu, 55 gün): VR(5g) 1.26, 2–3 coin
+z*>2 — 11 örtüşmeyen 5g penceresiyle telkin, kanıt değil; ve bu tam olarak
+canlı dönem + geometrinin seçildiği pencerenin sonu.
+
+**Doğrudan hasat (B):** uzun-kısa naif momentumun tek anlamlı hücreleri 4h
+geriye bakış → 1h (+0.006%, t 3.3 — sürtünmenin 1/25'i), → 8h (+0.030%, t 2.3),
+→ 1g (+0.109%, t 2.7, 17/23 coin). Hepsi 0.15% gidiş-dönüş maliyetinin
+**altında**. 4h→5g +0.367% (t 1.86) tek maliyet-üstü hücre, anlamlı değil.
+1g→1h −0.004% (t −2.1): günlük hareketin ardından saatlik geri dönüş.
+
+**Uzun-yalnız, maliyet sonrası (F) — botun gerçek durumu:** 20 hücrenin
+**20'si negatif**, en iyisi 4h→1g −0.17%/işlem (t −2.9), 23 coinin en fazla
+5'i pozitif. Dönem düşüş dönemi (çeyrek getirileri −65%, −70%, −36%); uzun-yalnız
+momentum bu sürüklenmeyi miras alıyor ve üstüne sürtünme ödüyor.
+
+**H11.2 RED.** 2020–2026 yıl bazında (canlı 5 + BTC) hiçbir yılda VR > 1 yok:
+2021 boğasında bile VR(5g;4h) 0.79 ve uzun-kısa momentum 4h→8h −0.21%, 1g→1g
+−0.42%. **Boğa koşuları sürüklenmeydi, otokorelasyon değil.** Trailing-stop'un
+hasat edeceği şey (Tur 10c'de sentetikte kanıtlanan) bu coinlerde hiçbir yılda
+olmamış. 2026'nın 8 ayında 4h→8h +0.067% (6/6 coin), 1g→1g +0.100% (5/6) —
+brüt, sürtünme altı, ve in-sample pencereyle örtüşüyor: geometrinin o pencerede
+"bulduğu" şeyin gerçek karşılığı bu kadar.
+
+**Karar:** Yönlü bot için ufuk yok. 5m'den 15g'ye, 2020'den 2026'ya, 23 coin:
+hasat edilebilir otokorelasyon bulunmuyor; tek sürtünme-üstü hücre (4h→5g
+uzun-kısa) anlamsız ve uzun-yalnız hâli negatif. Tur 4, 9, 10 ve 11 dört ayrı
+yöntemle aynı cümleye varıyor. Bir sonraki hipotez — eğer olacaksa — bu ufuk
+uzayında değil: ya kesitsel (coinler arası göreli, uzun-kısa: B'de 4h→1g'nin
+17/23 coinde pozitif olması tek işaret) ya da fiyat-dışı (funding/basis, Tur
+6–8'de "USDT borç vermeyi geçmiyor" diye kapanmıştı). Ya da hiç.
+
+**Durum: tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya deploy yok.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,

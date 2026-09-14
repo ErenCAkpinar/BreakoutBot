@@ -161,9 +161,18 @@ def period_table(frames: dict[str, pd.DataFrame], freq: str,
 
 
 def fmt(df: pd.DataFrame, md: bool) -> str:
-    if md:
-        return df.to_markdown(index=False, floatfmt=".3f")
-    return df.to_string(index=False, float_format=lambda x: f"{x:.3f}")
+    if not md:
+        return df.to_string(index=False, float_format=lambda x: f"{x:.3f}")
+    # plain markdown without the tabulate dependency
+    cols = list(df.columns)
+    def cell(v):
+        if isinstance(v, float):
+            return "" if np.isnan(v) else f"{v:.3f}"
+        return str(v)
+    lines = ["| " + " | ".join(map(str, cols)) + " |", "|" + "|".join("--:" for _ in cols) + "|"]
+    for _, row in df.iterrows():
+        lines.append("| " + " | ".join(cell(row[c]) for c in cols) + " |")
+    return "\n".join(lines)
 
 
 def main() -> None:
