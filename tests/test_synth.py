@@ -180,3 +180,34 @@ def test_random_entry_state_is_a_coin_flip_that_always_confirms():
     assert [st2.engine.analyze({})["signal"] for _ in range(200)] == sig[:200]
     st3 = RandomEntryState(symbol="ADAUSDT", p_entry=0.01, seed=4)
     assert [st3.engine.analyze({})["signal"] for _ in range(200)] != sig[:200]
+
+
+def test_xs_book_accounting_on_a_known_panel():
+    """Long-short book: top-K long, bottom-K short, cost on turnover only."""
+    from experiments.synth import xs_mom
+    # 10 coins; every coin's 'signal' return equals its index (coin 9 leads),
+    # and the hold return is the same ordering scaled — a perfect momentum panel.
+    n_s = 10
+    lc = np.zeros((xs_mom.LOOK + xs_mom.HOLD + 1, n_s))
+    lc[xs_mom.LOOK] = np.arange(n_s) * 0.001            # signal: coin j moved j·0.1%
+    lc[xs_mom.LOOK + xs_mom.HOLD] = lc[xs_mom.LOOK] + np.arange(n_s) * 0.01
+    pts = np.array([xs_mom.LOOK])
+    b = xs_mom.run_book(lc, pts, "ls", cost=0.001)
+    r = np.exp(np.arange(n_s) * 0.01) - 1
+    expect = 0.1 * r[-5:].sum() - 0.1 * r[:5].sum() - 0.001 * 1.0   # gross 100% turnover
+    assert abs(b["r"][0] - expect) < 1e-9
+    assert b["cost"][0] == 0.001
+    ew = xs_mom.run_book(lc, pts, "ew", cost=0.001)
+    assert abs(ew["r"][0] - (r.mean() - 0.001)) < 1e-9
+
+
+def test_xs_random_ranking_is_information_free():
+    """With a random ranking the expected gross is the equal-weight mean of the
+    long minus short legs ≈ 0 on a symmetric panel; only the cost remains."""
+    from experiments.synth import xs_mom
+    rng = np.random.default_rng(0)
+    n_t, n_s = 20_000, 8
+    lc = np.cumsum(rng.normal(0, 0.01, (n_t, n_s)), axis=0)
+    pts = np.arange(xs_mom.LOOK, n_t - xs_mom.HOLD, xs_mom.HOLD)
+    b = xs_mom.run_book(lc, pts, "rand", np.random.default_rng(1), cost=0.0)
+    assert abs(b["r"].mean()) < 4 * b["r"].std(ddof=1) / np.sqrt(len(pts))

@@ -149,6 +149,29 @@ YEAR_MIX: dict[str, dict[str, float]] = {
 }
 
 
+def coins_from_real(days: int = 665, symbols: list[str] | None = None) -> list[CoinSpec]:
+    """CoinSpecs (price, 5m σ, β to BTC, mean volume) measured from the cached
+    real frames, so a synthetic market can carry the real universe's cross-section.
+    BTC is always included (the factor) and listed first."""
+    from config import _FULL_UNIVERSE
+    symbols = symbols or list(_FULL_UNIVERSE)
+    if "BTCUSDT" not in symbols:
+        symbols = ["BTCUSDT"] + symbols
+    real = load_real(days, symbols=symbols)
+    rb = np.log(real["BTCUSDT"]["close"]).diff()
+    out: list[CoinSpec] = []
+    for sym in ["BTCUSDT"] + [x for x in symbols if x != "BTCUSDT"]:
+        f = real[sym]
+        r = np.log(f["close"]).diff()
+        j = pd.concat([r, rb], axis=1).dropna()
+        beta = 1.0 if sym == "BTCUSDT" else float(j.cov().iloc[0, 1] / j.iloc[:, 1].var())
+        beta = float(np.clip(beta, 0.3, 2.5))
+        px = float(f["close"].iloc[-1])
+        dp = 1 if px > 1000 else (2 if px > 100 else (3 if px > 1 else 4))
+        out.append(CoinSpec(sym, px, float(r.std()), beta, float(f["volume"].mean()), dp))
+    return out
+
+
 # ── Core simulation ─────────────────────────────────────────────────────────
 
 def _garch_path(rng: np.random.Generator, n: int, alpha: float, beta: float) -> np.ndarray:

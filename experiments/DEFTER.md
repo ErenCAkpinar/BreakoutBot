@@ -1991,6 +1991,106 @@ uzayında değil: ya kesitsel (coinler arası göreli, uzun-kısa: B'de 4h→1g'
 
 **Durum: tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya deploy yok.
 
+## Tur 12 — Kesitsel uzun-kısa momentum, 4h → 1g · 14 Eyl 2026
+
+**Kullanıcı isteği:** Tur 11'in tek işaretini — 4h→1g uzun-kısa naif momentumun
+17/23 coinde pozitif olmasını — kesitsel kol olarak sentetikte ve OOS'ta test et.
+
+**Kol (ölçümden önce sabit, parametre taraması yok):**
+- Evren: 23 coin (`_FULL_UNIVERSE`), 665g cache.
+- Her gün 00:00 UTC kapanışında coinler son **4h** (48 bar) log getirisine göre
+  sıralanır; **ilk 5 uzun, son 5 kısa**, eşit ağırlık, dolar-nötr, brüt %100
+  (%50 uzun / %50 kısa). Pozisyon sinyal barının kapanışında açılır, **1 gün**
+  (288 bar) sonra aynı saatte yeniden dengelenir — gecikme yapısal, lookahead
+  imkânsız.
+- Maliyet: devir üzerinden, 0.075%/taraf × Σ|Δw| (repo'nun `EXEC_COST_PER_SIDE`);
+  aynı bacakta kalan pozisyon ücret ödemez. Funding modellenmiyor (not: kısa bacak
+  perp'te funding alır/öder; dönem ortalaması küçük ama sıfır değil).
+- Bağlam satırları: ilk-5 yalnız-uzun, eşit-ağırlık 23 (buy&hold), ve
+  **rastgele sıralama** kontrolü (aynı devir, sinyalsiz → ≈ −maliyet).
+
+**Piyasalar:** sentetik `null_mart` / `trend` / `chop` (üreteç 23 coine
+genişletilir: σ, β, fiyat gerçek 665g'den; 3 tohum), bootstrap in-sample ve OOS
+(3 tohum; bloklar tüm coinlerde ortak, kesit korunur), **GERÇEK in-sample 240g
+ve GERÇEK OOS 466g gerçek sırayla** — karar OOS satırında.
+
+**Hipotez H12.1:** Gerçek OOS'ta kesitsel 4h→1g uzun-kısa **maliyet sonrası ≤ 0**.
+Gerekçe: Tur 11 B'de brüt +0.109%/işlem zaman-serisi işaretiyle; kesitsel
+sıralama piyasa faktörünü çıkarır ama günlük tam devir 0.15%'e yakın maliyet
+üretir; Tur 4'te aynı aile "brüt +1.6% / maliyet −2.5%" vermişti. Sentetik
+`trend`'de pozitif (idiyosenkratik OU sürüklenme ekili → kesit hasat eder),
+`null_mart`'ta ≈ −maliyet, rastgele-sıralama kontrolü her piyasada ≈ −maliyet.
+- DOĞRU ise: kesitsel yön de kapalı; bu evrende fiyat-türevi hasat yok.
+- YANLIŞ ise (OOS net > 0, t > 2, rastgele kontrolün üstünde): ilk gerçek
+  OOS-pozitif fiyat sinyali; sonraki adım hysteresis/devir azaltma değil,
+  önce in-sample'da da tutup tutmadığı ve yıl bazında kararlılığı.
+
+Araç: `experiments/synth/xs_mom.py`.
+
+### Sonuçlar (14 Eyl 2026, xs_mom, ~2 dk CPU)
+
+Sütunlar: LS = kesitsel uzun-kısa net; RASTGELE = aynı defter, rastgele sıralama
+(maliyet tabanı); top5-uzun = yalnız uzun bacak; EW = 23 coin eşit ağırlık.
+
+| piyasa | n_gün | LS net %/g | t | Sharpe | toplam % | maxDD % | uzun %/g | kısa %/g | maliyet %/g | RASTGELE net %/g | top5-uzun %/g | EW %/g |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| synth null_mart s1 | 239 | -0.014 | -0.125 | -0.154 | -6.577 | -29.583 | 0.211 | -0.111 | 0.114 | -0.152 | 0.307 | 0.388 |
+| synth null_mart s2 | 239 | -0.075 | -0.683 | -0.844 | -19.294 | -30.594 | 0.355 | -0.313 | 0.117 | -0.115 | 0.594 | 0.465 |
+| synth null_mart s3 | 239 | -0.222 | -1.853 | -2.290 | -43.644 | -49.209 | -0.083 | -0.027 | 0.113 | 0.035 | -0.277 | -0.048 |
+| synth trend s1 | 239 | 1.266 | 8.657 | 10.698 | 1804.062 | -7.150 | 1.054 | 0.326 | 0.115 | 0.163 | 1.994 | 0.828 |
+| synth trend s2 | 239 | 1.261 | 8.475 | 10.474 | 1781.457 | -6.010 | 1.314 | 0.061 | 0.114 | -0.045 | 2.514 | 1.110 |
+| synth trend s3 | 239 | 0.911 | 7.120 | 8.799 | 733.618 | -9.558 | 0.507 | 0.520 | 0.116 | -0.148 | 0.898 | -0.000 |
+| synth chop s1 | 239 | -0.207 | -2.003 | -2.475 | -40.877 | -45.419 | 0.061 | -0.154 | 0.114 | -0.123 | 0.009 | 0.163 |
+| synth chop s2 | 239 | -0.150 | -1.580 | -1.953 | -31.949 | -34.806 | 0.108 | -0.144 | 0.114 | -0.110 | 0.101 | 0.112 |
+| synth chop s3 | 239 | -0.334 | -3.550 | -4.388 | -56.118 | -56.709 | -0.028 | -0.191 | 0.114 | -0.013 | -0.170 | 0.148 |
+| bootstrap in-sample s1 | 239 | 0.055 | 0.600 | 0.742 | 11.454 | -12.676 | 0.222 | -0.052 | 0.116 | -0.082 | 0.330 | 0.179 |
+| bootstrap OOS s1 | 239 | -0.015 | -0.196 | -0.242 | -5.214 | -17.907 | -0.060 | 0.157 | 0.113 | -0.194 | -0.233 | -0.224 |
+| bootstrap in-sample s2 | 239 | 0.060 | 0.974 | 1.203 | 14.218 | -6.563 | 0.017 | 0.155 | 0.112 | -0.114 | -0.079 | -0.204 |
+| bootstrap OOS s2 | 239 | -0.049 | -0.715 | -0.884 | -12.213 | -18.119 | -0.053 | 0.118 | 0.114 | -0.052 | -0.220 | -0.192 |
+| bootstrap in-sample s3 | 239 | 0.085 | 1.012 | 1.251 | 20.153 | -12.126 | -0.035 | 0.234 | 0.114 | -0.181 | -0.183 | -0.324 |
+| bootstrap OOS s3 | 239 | 0.008 | 0.110 | 0.136 | 0.374 | -20.477 | 0.029 | 0.093 | 0.113 | -0.079 | -0.057 | -0.081 |
+| GERÇEK in-sample (2025-12-29→2026-08, 665g cache) | 237 | 0.070 | 0.827 | 1.026 | 15.770 | -13.938 | 0.135 | 0.049 | 0.114 | -0.199 | 0.156 | 0.003 |
+| GERÇEK OOS (2024-09→2025-12, gerçek sıra) | 464 | 0.017 | 0.289 | 0.256 | 4.265 | -34.893 | 0.054 | 0.077 | 0.113 | -0.071 | -0.007 | -0.001 |
+| GERÇEK tümü (2024-09→2026-08) | 703 | 0.031 | 0.655 | 0.472 | 17.944 | -34.893 | 0.077 | 0.068 | 0.113 | -0.086 | 0.041 | -0.004 |
+
+### Okuma
+
+**Kalibrasyon ✓.** Sentetik `trend` (23 coin, idiyosenkratik OU sürüklenme
+ekili): LS **+1.27%/gün, t 8.7, Sharpe 10** — kesitsel kol ekilen momentumu
+eksiksiz hasat ediyor; `null_mart` ≈ −maliyet (−0.10 ort), `chop` −0.15…−0.33,
+rastgele sıralama her piyasada ≈ −maliyet. Araç neyi ölçtüğünü biliyor.
+
+**H12.1 TUTUYOR.** Gerçek OOS (464 gün, gerçek sıra): net **+0.017%/gün, t
+0.29, Sharpe 0.26**, toplam +4.3%, maxDD **−34.9%**. Brüt sinyal var: +0.13%/gün
+(uzun bacak +0.054, kısa bacak +0.077 — ikisi de pozitif; rastgele kontrolün
+brütü ≈ +0.04, yani sinyalin katkısı ≈ +0.09%/gün). Bu, Tur 4'ün "brüt kesitsel
+spread +%1.6, devir maliyeti −%2.5" bulgusunun aynısı, başka ufukta. Günlük tam
+devir 0.113%/gün maliyet üretiyor ve sinyali tam olarak yiyor. In-sample
++0.070 (t 0.83), tüm dönem +0.031 (t 0.66) — hiçbiri sıfırdan ayrılmıyor.
+
+Bootstrap: in-sample günlerden +0.055/+0.060/+0.085 (t ≤ 1.0), OOS günlerden
+−0.015/−0.049/+0.008 — gerçek sırayla aynı resim; kesit gün-içi yapıda değil,
+günler arası sıralamada da değil.
+
+**Ne değil:** deploy edilebilir bir kol değil. Sharpe 0.26'lık dolar-nötr bir
+defter için −35% DD, alt-coin kısa bacağının sıkışma riski; funding
+modellenmedi (kısa bacak dönem ortalamasında funding **alır**, bu hafif lehte —
+ama t 0.29'u 2'ye taşıyacak büyüklükte değil).
+
+**Ne olabilir (yeni hipotez, bu tur değil):** brüt +0.09%/gün sinyal ile
+0.113%/gün maliyet arasındaki fark tamamen **devir**. Tutuşu 1g → 3–5g'ye
+uzatmak ya da sıralama sınırında hysteresis (lab `xs_mom(buffer=…)`) devri
+1/3–1/5'e indirir; brüt sinyal 5g'de ne kadar kalıyor, Tur 11 B'de 4h→5g
++0.37% (t 1.86) idi — anlamsız. Bu, Tur 4'ün lab araması içinde denenmişti
+(aile DSR 0.000). Yeniden açılırsa: önce `synth/trend`'de tutuş uzadıkça
+hasadın nasıl değiştiği, sonra OOS; ve **tek** varyant, ızgara değil.
+
+**Karar:** Kesitsel 4h→1g uzun-kısa: brüt sinyal gerçek ve küçük, net sıfır.
+Tur 11'in tek işareti sürtünmede kapanıyor. Bu evrende fiyat-türevi hasat —
+zaman-serisi, kesitsel, her ufuk — yok ya da sürtünmenin altında.
+
+**Durum: tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya deploy yok.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
