@@ -1807,6 +1807,45 @@ tohum-koşu. Çalışan bota değişiklik veya deploy yok.
 
 ---
 
+## Tur 11 — Gerçek veride hangi ufukta VR > 1? · 14 Eyl 2026
+
+**Kullanıcı isteği:** "gerçek veride hangi ufukta VR > 1 var, onu tara."
+
+Tur 9–10'un bıraktığı tek soru bu. Sentetik çalışma "ufka ölçekli çıkış
+otokorelasyonu hasat eder" dedi; gerçek veride hasat edilecek otokorelasyon
+hangi ufukta var, var mı?
+
+**Veri:** 23 coin × 2024-09-18 → 2026-08-24 (665g+40w cache) ve canlı 5 coin +
+BTC × 2020-10-19 → 2026-08-24 (2095g+40w). Hepsi 5m, yeniden örnekleme ile
+1h ve 4h taban.
+
+**Ölçüm:** Lo–MacKinlay varyans oranı VR(k) = Var(r_k) / (k·Var(r_taban)),
+heteroskedastisiteye dayanıklı z* (LM 1988, θ(q)). Üç taban: 5m (mikro-yapı
+dahil), 1h, 4h (mikro-yapıdan arınmış). Ufuklar 15m → 15g. Coinler arası havuz
+ortalaması ± coin-arası SE; z* > 1.96 olan coin oranı. Ayrıca:
+- dönem kırılımı: 665g'de çeyrek bazında, 2095g'de yıl bazında VR(1g; 1h) ve
+  VR(5g; 1h) — otokorelasyon rejime bağlıysa nerede ve ne zaman;
+- **doğrudan hasat matrisi:** sign(r_L)·r_H (uzun-kısa naif momentum), L ∈
+  {{1h, 4h, 1g, 5g}}, H ∈ {{1h, 4h, 8h, 1g, 5g}}, örtüşmeyen H pencereleri, havuz
+  ortalama % ve t. VR simetriktir ve "otokorelasyon var" der; bu matris "kural
+  kazanır mı" der — ikisi birlikte okunur.
+
+**Hipotez H11.1 (ölçümden önce):** 2024-09 → 2026-08 döneminde, 1h–5g
+ufuklarında havuz VR anlamlı olarak 1'in üstünde DEĞİLDİR; 5m tabanda kısa
+ufuklarda < 1 (bid-ask sekmesi), uzun ufuklarda ≈ 1. Gerekçe: Tur 4 (357
+konfig, 1h/4h/1g, hiçbiri buy&hold'u geçemedi), H10.2 (naif 4h→8h OOS −0.04R),
+gerçek 240g VR 4h 0.93 / 1g 0.97 / 5g 0.98.
+- DOĞRU ise: bu dönemde yönlü bot için ufuk yok; karar "daha iyi bot" değil.
+- YANLIŞ ise: VR > 1 olan ufuk ve dönem, bir sonraki hipotezin (giriş =
+  basit, çıkış = ufka ölçekli) tek ufkudur; önce `synth`, sonra OOS.
+
+**H11.2:** 2020–2023'te (2095g verisi) 1g–5g ufkunda VR > 1 dönemleri vardı
+(2021 boğası) ve 2024 sonrasında kayboldu — "PBO düşük + sıralı test felaket =
+rejim" bulgusunun (Tur 4) VR karşılığı.
+
+Araç: `experiments/synth/vr_scan.py`. Parametre taraması yok; ufuk ızgarası
+ölçümden önce sabit.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
