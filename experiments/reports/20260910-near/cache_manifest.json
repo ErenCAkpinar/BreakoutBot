@@ -1,0 +1,44 @@
+{
+  "UNIUSDT": {
+    "file": "backtests/data/UNIUSDT_240d+40w.pkl",
+    "sha256": "a90bddf04530dc16ead2b716c7b451c4a3de97d31a8f0491e659f33eee4f2e13",
+    "bars": 80641,
+    "start": 1763409900000,
+    "end": 1787601900000
+  },
+  "INJUSDT": {
+    "file": "backtests/data/INJUSDT_240d+40w.pkl",
+    "sha256": "cf199115961df595079d68361befd2bbc926e68bd45cff95b8b9fe5a0dcc4e4b",
+    "bars": 80640,
+    "start": 1763410200000,
+    "end": 1787601900000
+  },
+  "ADAUSDT": {
+    "file": "backtests/data/ADAUSDT_240d+40w.pkl",
+    "sha256": "5b310f6730e275e6fe045d94f9903f8a20c822fe141b7d4e525de9e089d78d37",
+    "bars": 80640,
+    "start": 1763410200000,
+    "end": 1787601900000
+  },
+  "POLUSDT": {
+    "file": "backtests/data/POLUSDT_240d+40w.pkl",
+    "sha256": "833cb15667cabf5cc74e09d5a1a50ab52f5567159aa9d1d01652ce7a7f1e972e",
+    "bars": 80640,
+    "start": 1763410200000,
+    "end": 1787601900000
+  },
+  "NEARUSDT": {
+    "file": "backtests/data/NEARUSDT_240d+40w.pkl",
+    "sha256": "d8f52ec87d70f609403fa6b8fe08d55462d483596505792ac1a4270900d13726",
+    "bars": 80640,
+    "start": 1763410200000,
+    "end": 1787601900000
+  },
+  "BTCUSDT": {
+    "file": "backtests/data/BTCUSDT_240d+40w.pkl",
+    "sha256": "93633c63c67514097f05fef75a4c273c41c169a097d4eef28dc544b7447063ea",
+    "bars": 80640,
+    "start": 1763410200000,
+    "end": 1787601900000
+  }
+}

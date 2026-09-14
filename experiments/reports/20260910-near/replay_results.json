@@ -1,0 +1,3990 @@
+[
+  {
+    "source": {
+      "start": "2026-09-04T06:40:00+00:00",
+      "end": "2026-09-04T07:55:00+00:00",
+      "entry": 1.94,
+      "exit": 1.958379610939563,
+      "reason": "TRAIL",
+      "notional": 511.33,
+      "entry_fee": -0.3835,
+      "exit_pnl": 4.4604,
+      "net": 4.0769
+    },
+    "no_tp2": false,
+    "atr": 0.008432103749449856,
+    "notional": 511.27348989181786,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-04T07:55:00+00:00",
+      "price": 1.958379610939563,
+      "reason": "TRAIL",
+      "exit_pnl": 4.460363350583329,
+      "net": 4.076908233164465,
+      "transitions": [
+        [
+          "2026-09-04T07:05:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T07:55:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-04T06:40:00+00:00",
+        "decision_time": "2026-09-04T06:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.94,
+        "high": 1.946,
+        "low": 1.938,
+        "close": 1.943
+      },
+      {
+        "open_time": "2026-09-04T06:45:00+00:00",
+        "decision_time": "2026-09-04T06:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.943,
+        "high": 1.946,
+        "low": 1.939,
+        "close": 1.945
+      },
+      {
+        "open_time": "2026-09-04T06:50:00+00:00",
+        "decision_time": "2026-09-04T06:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.946,
+        "high": 1.949,
+        "low": 1.943,
+        "close": 1.949
+      },
+      {
+        "open_time": "2026-09-04T06:55:00+00:00",
+        "decision_time": "2026-09-04T07:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.948,
+        "high": 1.959,
+        "low": 1.947,
+        "close": 1.957
+      },
+      {
+        "open_time": "2026-09-04T07:00:00+00:00",
+        "decision_time": "2026-09-04T07:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 1.956,
+        "high": 1.979,
+        "low": 1.956,
+        "close": 1.978
+      },
+      {
+        "open_time": "2026-09-04T07:05:00+00:00",
+        "decision_time": "2026-09-04T07:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9473796109395631,
+        "open": 1.978,
+        "high": 1.987,
+        "low": 1.974,
+        "close": 1.985
+      },
+      {
+        "open_time": "2026-09-04T07:10:00+00:00",
+        "decision_time": "2026-09-04T07:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9553796109395631,
+        "open": 1.985,
+        "high": 1.99,
+        "low": 1.975,
+        "close": 1.978
+      },
+      {
+        "open_time": "2026-09-04T07:15:00+00:00",
+        "decision_time": "2026-09-04T07:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.978,
+        "high": 1.983,
+        "low": 1.97,
+        "close": 1.977
+      },
+      {
+        "open_time": "2026-09-04T07:20:00+00:00",
+        "decision_time": "2026-09-04T07:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.976,
+        "high": 1.978,
+        "low": 1.97,
+        "close": 1.973
+      },
+      {
+        "open_time": "2026-09-04T07:25:00+00:00",
+        "decision_time": "2026-09-04T07:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.973,
+        "high": 1.975,
+        "low": 1.971,
+        "close": 1.974
+      },
+      {
+        "open_time": "2026-09-04T07:30:00+00:00",
+        "decision_time": "2026-09-04T07:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.974,
+        "high": 1.977,
+        "low": 1.968,
+        "close": 1.971
+      },
+      {
+        "open_time": "2026-09-04T07:35:00+00:00",
+        "decision_time": "2026-09-04T07:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.971,
+        "high": 1.971,
+        "low": 1.961,
+        "close": 1.963
+      },
+      {
+        "open_time": "2026-09-04T07:40:00+00:00",
+        "decision_time": "2026-09-04T07:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.964,
+        "high": 1.967,
+        "low": 1.963,
+        "close": 1.965
+      },
+      {
+        "open_time": "2026-09-04T07:45:00+00:00",
+        "decision_time": "2026-09-04T07:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.965,
+        "high": 1.969,
+        "low": 1.96,
+        "close": 1.968
+      },
+      {
+        "open_time": "2026-09-04T07:50:00+00:00",
+        "decision_time": "2026-09-04T07:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 1.958379610939563,
+        "open": 1.968,
+        "high": 1.969,
+        "low": 1.956,
+        "close": 1.958
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-04T06:40:00+00:00",
+      "end": "2026-09-04T07:55:00+00:00",
+      "entry": 1.94,
+      "exit": 1.958379610939563,
+      "reason": "TRAIL",
+      "notional": 511.33,
+      "entry_fee": -0.3835,
+      "exit_pnl": 4.4604,
+      "net": 4.0769
+    },
+    "no_tp2": true,
+    "atr": 0.008432103749449856,
+    "notional": 511.27348989181786,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-04T07:55:00+00:00",
+      "price": 1.958379610939563,
+      "reason": "TRAIL",
+      "exit_pnl": 4.460363350583329,
+      "net": 4.076908233164465,
+      "transitions": [
+        [
+          "2026-09-04T07:05:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T07:55:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-04T06:40:00+00:00",
+        "decision_time": "2026-09-04T06:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.94,
+        "high": 1.946,
+        "low": 1.938,
+        "close": 1.943
+      },
+      {
+        "open_time": "2026-09-04T06:45:00+00:00",
+        "decision_time": "2026-09-04T06:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.943,
+        "high": 1.946,
+        "low": 1.939,
+        "close": 1.945
+      },
+      {
+        "open_time": "2026-09-04T06:50:00+00:00",
+        "decision_time": "2026-09-04T06:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.946,
+        "high": 1.949,
+        "low": 1.943,
+        "close": 1.949
+      },
+      {
+        "open_time": "2026-09-04T06:55:00+00:00",
+        "decision_time": "2026-09-04T07:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.948,
+        "high": 1.959,
+        "low": 1.947,
+        "close": 1.957
+      },
+      {
+        "open_time": "2026-09-04T07:00:00+00:00",
+        "decision_time": "2026-09-04T07:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 1.956,
+        "high": 1.979,
+        "low": 1.956,
+        "close": 1.978
+      },
+      {
+        "open_time": "2026-09-04T07:05:00+00:00",
+        "decision_time": "2026-09-04T07:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9473796109395631,
+        "open": 1.978,
+        "high": 1.987,
+        "low": 1.974,
+        "close": 1.985
+      },
+      {
+        "open_time": "2026-09-04T07:10:00+00:00",
+        "decision_time": "2026-09-04T07:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9553796109395631,
+        "open": 1.985,
+        "high": 1.99,
+        "low": 1.975,
+        "close": 1.978
+      },
+      {
+        "open_time": "2026-09-04T07:15:00+00:00",
+        "decision_time": "2026-09-04T07:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.978,
+        "high": 1.983,
+        "low": 1.97,
+        "close": 1.977
+      },
+      {
+        "open_time": "2026-09-04T07:20:00+00:00",
+        "decision_time": "2026-09-04T07:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.976,
+        "high": 1.978,
+        "low": 1.97,
+        "close": 1.973
+      },
+      {
+        "open_time": "2026-09-04T07:25:00+00:00",
+        "decision_time": "2026-09-04T07:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.973,
+        "high": 1.975,
+        "low": 1.971,
+        "close": 1.974
+      },
+      {
+        "open_time": "2026-09-04T07:30:00+00:00",
+        "decision_time": "2026-09-04T07:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.974,
+        "high": 1.977,
+        "low": 1.968,
+        "close": 1.971
+      },
+      {
+        "open_time": "2026-09-04T07:35:00+00:00",
+        "decision_time": "2026-09-04T07:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.971,
+        "high": 1.971,
+        "low": 1.961,
+        "close": 1.963
+      },
+      {
+        "open_time": "2026-09-04T07:40:00+00:00",
+        "decision_time": "2026-09-04T07:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.964,
+        "high": 1.967,
+        "low": 1.963,
+        "close": 1.965
+      },
+      {
+        "open_time": "2026-09-04T07:45:00+00:00",
+        "decision_time": "2026-09-04T07:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.958379610939563,
+        "open": 1.965,
+        "high": 1.969,
+        "low": 1.96,
+        "close": 1.968
+      },
+      {
+        "open_time": "2026-09-04T07:50:00+00:00",
+        "decision_time": "2026-09-04T07:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 1.958379610939563,
+        "open": 1.968,
+        "high": 1.969,
+        "low": 1.956,
+        "close": 1.958
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-04T09:00:00+00:00",
+      "end": "2026-09-04T10:05:00+00:00",
+      "entry": 1.981,
+      "exit": 2.034693232281222,
+      "reason": "TP2",
+      "notional": 491.87,
+      "entry_fee": -0.3689,
+      "exit_pnl": 12.9644,
+      "net": 12.5955
+    },
+    "no_tp2": false,
+    "atr": 0.008948872046870338,
+    "notional": 491.93040186129366,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-04T10:05:00+00:00",
+      "price": 2.034693232281222,
+      "reason": "TP2",
+      "exit_pnl": 12.964385531937365,
+      "net": 12.595437730541395,
+      "transitions": [
+        [
+          "2026-09-04T09:40:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T10:05:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-04T09:00:00+00:00",
+        "decision_time": "2026-09-04T09:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.981,
+        "high": 1.982,
+        "low": 1.974,
+        "close": 1.978
+      },
+      {
+        "open_time": "2026-09-04T09:05:00+00:00",
+        "decision_time": "2026-09-04T09:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.979,
+        "high": 1.992,
+        "low": 1.976,
+        "close": 1.991
+      },
+      {
+        "open_time": "2026-09-04T09:10:00+00:00",
+        "decision_time": "2026-09-04T09:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.99,
+        "high": 2.003,
+        "low": 1.988,
+        "close": 1.988
+      },
+      {
+        "open_time": "2026-09-04T09:15:00+00:00",
+        "decision_time": "2026-09-04T09:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.989,
+        "high": 2.0,
+        "low": 1.988,
+        "close": 1.995
+      },
+      {
+        "open_time": "2026-09-04T09:20:00+00:00",
+        "decision_time": "2026-09-04T09:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.996,
+        "high": 1.997,
+        "low": 1.981,
+        "close": 1.982
+      },
+      {
+        "open_time": "2026-09-04T09:25:00+00:00",
+        "decision_time": "2026-09-04T09:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.983,
+        "high": 1.997,
+        "low": 1.982,
+        "close": 1.994
+      },
+      {
+        "open_time": "2026-09-04T09:30:00+00:00",
+        "decision_time": "2026-09-04T09:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.993,
+        "high": 2.007,
+        "low": 1.989,
+        "close": 2.003
+      },
+      {
+        "open_time": "2026-09-04T09:35:00+00:00",
+        "decision_time": "2026-09-04T09:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.003,
+        "high": 2.016,
+        "low": 2.002,
+        "close": 2.01
+      },
+      {
+        "open_time": "2026-09-04T09:40:00+00:00",
+        "decision_time": "2026-09-04T09:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9824417298242363,
+        "open": 2.01,
+        "high": 2.023,
+        "low": 2.009,
+        "close": 2.019
+      },
+      {
+        "open_time": "2026-09-04T09:45:00+00:00",
+        "decision_time": "2026-09-04T09:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9894417298242364,
+        "open": 2.02,
+        "high": 2.022,
+        "low": 2.008,
+        "close": 2.012
+      },
+      {
+        "open_time": "2026-09-04T09:50:00+00:00",
+        "decision_time": "2026-09-04T09:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9894417298242364,
+        "open": 2.013,
+        "high": 2.03,
+        "low": 2.011,
+        "close": 2.029
+      },
+      {
+        "open_time": "2026-09-04T09:55:00+00:00",
+        "decision_time": "2026-09-04T10:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.996441729824236,
+        "open": 2.029,
+        "high": 2.031,
+        "low": 2.019,
+        "close": 2.02
+      },
+      {
+        "open_time": "2026-09-04T10:00:00+00:00",
+        "decision_time": "2026-09-04T10:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 1.9974417298242364,
+        "open": 2.021,
+        "high": 2.037,
+        "low": 2.02,
+        "close": 2.028
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-04T09:00:00+00:00",
+      "end": "2026-09-04T10:05:00+00:00",
+      "entry": 1.981,
+      "exit": 2.034693232281222,
+      "reason": "TP2",
+      "notional": 491.87,
+      "entry_fee": -0.3689,
+      "exit_pnl": 12.9644,
+      "net": 12.5955
+    },
+    "no_tp2": true,
+    "atr": 0.008948872046870338,
+    "notional": 491.93040186129366,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-04T10:15:00+00:00",
+      "price": 2.003441729824236,
+      "reason": "TRAIL",
+      "exit_pnl": 5.203878635201222,
+      "net": 4.8349308338052515,
+      "transitions": [
+        [
+          "2026-09-04T09:40:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T10:15:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-04T09:00:00+00:00",
+        "decision_time": "2026-09-04T09:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.981,
+        "high": 1.982,
+        "low": 1.974,
+        "close": 1.978
+      },
+      {
+        "open_time": "2026-09-04T09:05:00+00:00",
+        "decision_time": "2026-09-04T09:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.979,
+        "high": 1.992,
+        "low": 1.976,
+        "close": 1.991
+      },
+      {
+        "open_time": "2026-09-04T09:10:00+00:00",
+        "decision_time": "2026-09-04T09:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.99,
+        "high": 2.003,
+        "low": 1.988,
+        "close": 1.988
+      },
+      {
+        "open_time": "2026-09-04T09:15:00+00:00",
+        "decision_time": "2026-09-04T09:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.989,
+        "high": 2.0,
+        "low": 1.988,
+        "close": 1.995
+      },
+      {
+        "open_time": "2026-09-04T09:20:00+00:00",
+        "decision_time": "2026-09-04T09:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.996,
+        "high": 1.997,
+        "low": 1.981,
+        "close": 1.982
+      },
+      {
+        "open_time": "2026-09-04T09:25:00+00:00",
+        "decision_time": "2026-09-04T09:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.983,
+        "high": 1.997,
+        "low": 1.982,
+        "close": 1.994
+      },
+      {
+        "open_time": "2026-09-04T09:30:00+00:00",
+        "decision_time": "2026-09-04T09:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 1.993,
+        "high": 2.007,
+        "low": 1.989,
+        "close": 2.003
+      },
+      {
+        "open_time": "2026-09-04T09:35:00+00:00",
+        "decision_time": "2026-09-04T09:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.003,
+        "high": 2.016,
+        "low": 2.002,
+        "close": 2.01
+      },
+      {
+        "open_time": "2026-09-04T09:40:00+00:00",
+        "decision_time": "2026-09-04T09:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9824417298242363,
+        "open": 2.01,
+        "high": 2.023,
+        "low": 2.009,
+        "close": 2.019
+      },
+      {
+        "open_time": "2026-09-04T09:45:00+00:00",
+        "decision_time": "2026-09-04T09:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9894417298242364,
+        "open": 2.02,
+        "high": 2.022,
+        "low": 2.008,
+        "close": 2.012
+      },
+      {
+        "open_time": "2026-09-04T09:50:00+00:00",
+        "decision_time": "2026-09-04T09:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9894417298242364,
+        "open": 2.013,
+        "high": 2.03,
+        "low": 2.011,
+        "close": 2.029
+      },
+      {
+        "open_time": "2026-09-04T09:55:00+00:00",
+        "decision_time": "2026-09-04T10:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.996441729824236,
+        "open": 2.029,
+        "high": 2.031,
+        "low": 2.019,
+        "close": 2.02
+      },
+      {
+        "open_time": "2026-09-04T10:00:00+00:00",
+        "decision_time": "2026-09-04T10:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 1.9974417298242364,
+        "open": 2.021,
+        "high": 2.037,
+        "low": 2.02,
+        "close": 2.028
+      },
+      {
+        "open_time": "2026-09-04T10:05:00+00:00",
+        "decision_time": "2026-09-04T10:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.003441729824236,
+        "open": 2.029,
+        "high": 2.029,
+        "low": 2.012,
+        "close": 2.013
+      },
+      {
+        "open_time": "2026-09-04T10:10:00+00:00",
+        "decision_time": "2026-09-04T10:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 2.003441729824236,
+        "open": 2.013,
+        "high": 2.016,
+        "low": 1.998,
+        "close": 2.004
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-04T19:20:00+00:00",
+      "end": "2026-09-04T19:40:00+00:00",
+      "entry": 2.064,
+      "exit": 2.145664352359881,
+      "reason": "TP2",
+      "notional": 336.93,
+      "entry_fee": -0.2527,
+      "exit_pnl": 13.0806,
+      "net": 12.8279
+    },
+    "no_tp2": false,
+    "atr": 0.013610725393313464,
+    "notional": 336.98914158682214,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-04T19:40:00+00:00",
+      "price": 2.145664352359881,
+      "reason": "TP2",
+      "exit_pnl": 13.080591477143216,
+      "net": 12.8278496209531,
+      "transitions": [
+        [
+          "2026-09-04T19:30:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T19:40:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-04T19:20:00+00:00",
+        "decision_time": "2026-09-04T19:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.063,
+        "high": 2.084,
+        "low": 2.059,
+        "close": 2.082
+      },
+      {
+        "open_time": "2026-09-04T19:25:00+00:00",
+        "decision_time": "2026-09-04T19:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.081,
+        "high": 2.117,
+        "low": 2.08,
+        "close": 2.113
+      },
+      {
+        "open_time": "2026-09-04T19:30:00+00:00",
+        "decision_time": "2026-09-04T19:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.0659597797750746,
+        "open": 2.113,
+        "high": 2.126,
+        "low": 2.096,
+        "close": 2.117
+      },
+      {
+        "open_time": "2026-09-04T19:35:00+00:00",
+        "decision_time": "2026-09-04T19:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 2.0749597797750745,
+        "open": 2.116,
+        "high": 2.15,
+        "low": 2.113,
+        "close": 2.148
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-04T19:20:00+00:00",
+      "end": "2026-09-04T19:40:00+00:00",
+      "entry": 2.064,
+      "exit": 2.145664352359881,
+      "reason": "TP2",
+      "notional": 336.93,
+      "entry_fee": -0.2527,
+      "exit_pnl": 13.0806,
+      "net": 12.8279
+    },
+    "no_tp2": true,
+    "atr": 0.013610725393313464,
+    "notional": 336.98914158682214,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-04T20:10:00+00:00",
+      "price": 2.136959779775075,
+      "reason": "TRAIL",
+      "exit_pnl": 11.65939649495621,
+      "net": 11.406654638766094,
+      "transitions": [
+        [
+          "2026-09-04T19:30:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T20:10:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-04T19:20:00+00:00",
+        "decision_time": "2026-09-04T19:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.063,
+        "high": 2.084,
+        "low": 2.059,
+        "close": 2.082
+      },
+      {
+        "open_time": "2026-09-04T19:25:00+00:00",
+        "decision_time": "2026-09-04T19:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.081,
+        "high": 2.117,
+        "low": 2.08,
+        "close": 2.113
+      },
+      {
+        "open_time": "2026-09-04T19:30:00+00:00",
+        "decision_time": "2026-09-04T19:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.0659597797750746,
+        "open": 2.113,
+        "high": 2.126,
+        "low": 2.096,
+        "close": 2.117
+      },
+      {
+        "open_time": "2026-09-04T19:35:00+00:00",
+        "decision_time": "2026-09-04T19:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.0749597797750745,
+        "open": 2.116,
+        "high": 2.15,
+        "low": 2.113,
+        "close": 2.148
+      },
+      {
+        "open_time": "2026-09-04T19:40:00+00:00",
+        "decision_time": "2026-09-04T19:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.0989597797750745,
+        "open": 2.147,
+        "high": 2.164,
+        "low": 2.142,
+        "close": 2.164
+      },
+      {
+        "open_time": "2026-09-04T19:45:00+00:00",
+        "decision_time": "2026-09-04T19:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.1129597797750748,
+        "open": 2.163,
+        "high": 2.188,
+        "low": 2.15,
+        "close": 2.177
+      },
+      {
+        "open_time": "2026-09-04T19:50:00+00:00",
+        "decision_time": "2026-09-04T19:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.136959779775075,
+        "open": 2.177,
+        "high": 2.178,
+        "low": 2.162,
+        "close": 2.172
+      },
+      {
+        "open_time": "2026-09-04T19:55:00+00:00",
+        "decision_time": "2026-09-04T20:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.136959779775075,
+        "open": 2.172,
+        "high": 2.174,
+        "low": 2.159,
+        "close": 2.166
+      },
+      {
+        "open_time": "2026-09-04T20:00:00+00:00",
+        "decision_time": "2026-09-04T20:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.136959779775075,
+        "open": 2.166,
+        "high": 2.172,
+        "low": 2.143,
+        "close": 2.144
+      },
+      {
+        "open_time": "2026-09-04T20:05:00+00:00",
+        "decision_time": "2026-09-04T20:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 2.136959779775075,
+        "open": 2.144,
+        "high": 2.145,
+        "low": 2.122,
+        "close": 2.126
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-06T05:25:00+00:00",
+      "end": "2026-09-06T08:10:00+00:00",
+      "entry": 2.226,
+      "exit": 2.3242929492431474,
+      "reason": "TP2",
+      "notional": 302.0,
+      "entry_fee": -0.2265,
+      "exit_pnl": 13.1069,
+      "net": 12.8804
+    },
+    "no_tp2": false,
+    "atr": 0.016382158207191244,
+    "notional": 301.95451686550297,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-06T08:10:00+00:00",
+      "price": 2.3242929492431474,
+      "reason": "TP2",
+      "exit_pnl": 13.106867445684207,
+      "net": 12.88040155803508,
+      "transitions": [
+        [
+          "2026-09-06T07:10:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-06T08:10:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-06T05:25:00+00:00",
+        "decision_time": "2026-09-06T05:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.225,
+        "high": 2.228,
+        "low": 2.218,
+        "close": 2.225
+      },
+      {
+        "open_time": "2026-09-06T05:30:00+00:00",
+        "decision_time": "2026-09-06T05:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.225,
+        "high": 2.231,
+        "low": 2.218,
+        "close": 2.227
+      },
+      {
+        "open_time": "2026-09-06T05:35:00+00:00",
+        "decision_time": "2026-09-06T05:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.226,
+        "high": 2.228,
+        "low": 2.218,
+        "close": 2.227
+      },
+      {
+        "open_time": "2026-09-06T05:40:00+00:00",
+        "decision_time": "2026-09-06T05:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.227,
+        "high": 2.233,
+        "low": 2.223,
+        "close": 2.226
+      },
+      {
+        "open_time": "2026-09-06T05:45:00+00:00",
+        "decision_time": "2026-09-06T05:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.226,
+        "high": 2.228,
+        "low": 2.216,
+        "close": 2.218
+      },
+      {
+        "open_time": "2026-09-06T05:50:00+00:00",
+        "decision_time": "2026-09-06T05:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.218,
+        "high": 2.218,
+        "low": 2.211,
+        "close": 2.212
+      },
+      {
+        "open_time": "2026-09-06T05:55:00+00:00",
+        "decision_time": "2026-09-06T06:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.212,
+        "high": 2.213,
+        "low": 2.207,
+        "close": 2.213
+      },
+      {
+        "open_time": "2026-09-06T06:00:00+00:00",
+        "decision_time": "2026-09-06T06:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.213,
+        "high": 2.213,
+        "low": 2.203,
+        "close": 2.208
+      },
+      {
+        "open_time": "2026-09-06T06:05:00+00:00",
+        "decision_time": "2026-09-06T06:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.208,
+        "high": 2.212,
+        "low": 2.208,
+        "close": 2.208
+      },
+      {
+        "open_time": "2026-09-06T06:10:00+00:00",
+        "decision_time": "2026-09-06T06:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.209,
+        "high": 2.224,
+        "low": 2.208,
+        "close": 2.224
+      },
+      {
+        "open_time": "2026-09-06T06:15:00+00:00",
+        "decision_time": "2026-09-06T06:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.224,
+        "high": 2.227,
+        "low": 2.215,
+        "close": 2.221
+      },
+      {
+        "open_time": "2026-09-06T06:20:00+00:00",
+        "decision_time": "2026-09-06T06:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.222,
+        "high": 2.222,
+        "low": 2.213,
+        "close": 2.221
+      },
+      {
+        "open_time": "2026-09-06T06:25:00+00:00",
+        "decision_time": "2026-09-06T06:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.222,
+        "high": 2.223,
+        "low": 2.216,
+        "close": 2.218
+      },
+      {
+        "open_time": "2026-09-06T06:30:00+00:00",
+        "decision_time": "2026-09-06T06:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.218,
+        "high": 2.221,
+        "low": 2.212,
+        "close": 2.215
+      },
+      {
+        "open_time": "2026-09-06T06:35:00+00:00",
+        "decision_time": "2026-09-06T06:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.215,
+        "high": 2.223,
+        "low": 2.208,
+        "close": 2.221
+      },
+      {
+        "open_time": "2026-09-06T06:40:00+00:00",
+        "decision_time": "2026-09-06T06:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.221,
+        "high": 2.229,
+        "low": 2.219,
+        "close": 2.228
+      },
+      {
+        "open_time": "2026-09-06T06:45:00+00:00",
+        "decision_time": "2026-09-06T06:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.228,
+        "high": 2.229,
+        "low": 2.222,
+        "close": 2.224
+      },
+      {
+        "open_time": "2026-09-06T06:50:00+00:00",
+        "decision_time": "2026-09-06T06:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.224,
+        "high": 2.268,
+        "low": 2.224,
+        "close": 2.265
+      },
+      {
+        "open_time": "2026-09-06T06:55:00+00:00",
+        "decision_time": "2026-09-06T07:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.266,
+        "high": 2.271,
+        "low": 2.257,
+        "close": 2.261
+      },
+      {
+        "open_time": "2026-09-06T07:00:00+00:00",
+        "decision_time": "2026-09-06T07:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.262,
+        "high": 2.267,
+        "low": 2.255,
+        "close": 2.261
+      },
+      {
+        "open_time": "2026-09-06T07:05:00+00:00",
+        "decision_time": "2026-09-06T07:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.262,
+        "high": 2.276,
+        "low": 2.258,
+        "close": 2.272
+      },
+      {
+        "open_time": "2026-09-06T07:10:00+00:00",
+        "decision_time": "2026-09-06T07:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.271,
+        "high": 2.272,
+        "low": 2.228,
+        "close": 2.244
+      },
+      {
+        "open_time": "2026-09-06T07:15:00+00:00",
+        "decision_time": "2026-09-06T07:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.244,
+        "high": 2.248,
+        "low": 2.234,
+        "close": 2.236
+      },
+      {
+        "open_time": "2026-09-06T07:20:00+00:00",
+        "decision_time": "2026-09-06T07:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.236,
+        "high": 2.244,
+        "low": 2.231,
+        "close": 2.232
+      },
+      {
+        "open_time": "2026-09-06T07:25:00+00:00",
+        "decision_time": "2026-09-06T07:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.232,
+        "high": 2.256,
+        "low": 2.229,
+        "close": 2.251
+      },
+      {
+        "open_time": "2026-09-06T07:30:00+00:00",
+        "decision_time": "2026-09-06T07:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.251,
+        "high": 2.289,
+        "low": 2.25,
+        "close": 2.282
+      },
+      {
+        "open_time": "2026-09-06T07:35:00+00:00",
+        "decision_time": "2026-09-06T07:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.227566906723033,
+        "open": 2.282,
+        "high": 2.295,
+        "low": 2.271,
+        "close": 2.292
+      },
+      {
+        "open_time": "2026-09-06T07:40:00+00:00",
+        "decision_time": "2026-09-06T07:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.233566906723033,
+        "open": 2.291,
+        "high": 2.302,
+        "low": 2.286,
+        "close": 2.294
+      },
+      {
+        "open_time": "2026-09-06T07:45:00+00:00",
+        "decision_time": "2026-09-06T07:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.240566906723033,
+        "open": 2.294,
+        "high": 2.295,
+        "low": 2.282,
+        "close": 2.286
+      },
+      {
+        "open_time": "2026-09-06T07:50:00+00:00",
+        "decision_time": "2026-09-06T07:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.240566906723033,
+        "open": 2.286,
+        "high": 2.305,
+        "low": 2.284,
+        "close": 2.298
+      },
+      {
+        "open_time": "2026-09-06T07:55:00+00:00",
+        "decision_time": "2026-09-06T08:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.243566906723033,
+        "open": 2.298,
+        "high": 2.31,
+        "low": 2.295,
+        "close": 2.301
+      },
+      {
+        "open_time": "2026-09-06T08:00:00+00:00",
+        "decision_time": "2026-09-06T08:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.248566906723033,
+        "open": 2.3,
+        "high": 2.311,
+        "low": 2.296,
+        "close": 2.309
+      },
+      {
+        "open_time": "2026-09-06T08:05:00+00:00",
+        "decision_time": "2026-09-06T08:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 2.249566906723033,
+        "open": 2.308,
+        "high": 2.344,
+        "low": 2.303,
+        "close": 2.342
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-06T05:25:00+00:00",
+      "end": "2026-09-06T08:10:00+00:00",
+      "entry": 2.226,
+      "exit": 2.3242929492431474,
+      "reason": "TP2",
+      "notional": 302.0,
+      "entry_fee": -0.2265,
+      "exit_pnl": 13.1069,
+      "net": 12.8804
+    },
+    "no_tp2": true,
+    "atr": 0.016382158207191244,
+    "notional": 301.95451686550297,
+    "risk": 5,
+    "result": {
+      "time": "2026-09-06T08:30:00+00:00",
+      "price": 2.303566906723033,
+      "reason": "TRAIL",
+      "exit_pnl": 10.29540196693533,
+      "net": 10.068936079286203,
+      "transitions": [
+        [
+          "2026-09-06T07:10:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-06T08:30:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-06T05:25:00+00:00",
+        "decision_time": "2026-09-06T05:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.225,
+        "high": 2.228,
+        "low": 2.218,
+        "close": 2.225
+      },
+      {
+        "open_time": "2026-09-06T05:30:00+00:00",
+        "decision_time": "2026-09-06T05:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.225,
+        "high": 2.231,
+        "low": 2.218,
+        "close": 2.227
+      },
+      {
+        "open_time": "2026-09-06T05:35:00+00:00",
+        "decision_time": "2026-09-06T05:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.226,
+        "high": 2.228,
+        "low": 2.218,
+        "close": 2.227
+      },
+      {
+        "open_time": "2026-09-06T05:40:00+00:00",
+        "decision_time": "2026-09-06T05:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.227,
+        "high": 2.233,
+        "low": 2.223,
+        "close": 2.226
+      },
+      {
+        "open_time": "2026-09-06T05:45:00+00:00",
+        "decision_time": "2026-09-06T05:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.226,
+        "high": 2.228,
+        "low": 2.216,
+        "close": 2.218
+      },
+      {
+        "open_time": "2026-09-06T05:50:00+00:00",
+        "decision_time": "2026-09-06T05:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.218,
+        "high": 2.218,
+        "low": 2.211,
+        "close": 2.212
+      },
+      {
+        "open_time": "2026-09-06T05:55:00+00:00",
+        "decision_time": "2026-09-06T06:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.212,
+        "high": 2.213,
+        "low": 2.207,
+        "close": 2.213
+      },
+      {
+        "open_time": "2026-09-06T06:00:00+00:00",
+        "decision_time": "2026-09-06T06:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.213,
+        "high": 2.213,
+        "low": 2.203,
+        "close": 2.208
+      },
+      {
+        "open_time": "2026-09-06T06:05:00+00:00",
+        "decision_time": "2026-09-06T06:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.208,
+        "high": 2.212,
+        "low": 2.208,
+        "close": 2.208
+      },
+      {
+        "open_time": "2026-09-06T06:10:00+00:00",
+        "decision_time": "2026-09-06T06:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.209,
+        "high": 2.224,
+        "low": 2.208,
+        "close": 2.224
+      },
+      {
+        "open_time": "2026-09-06T06:15:00+00:00",
+        "decision_time": "2026-09-06T06:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.224,
+        "high": 2.227,
+        "low": 2.215,
+        "close": 2.221
+      },
+      {
+        "open_time": "2026-09-06T06:20:00+00:00",
+        "decision_time": "2026-09-06T06:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.222,
+        "high": 2.222,
+        "low": 2.213,
+        "close": 2.221
+      },
+      {
+        "open_time": "2026-09-06T06:25:00+00:00",
+        "decision_time": "2026-09-06T06:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.222,
+        "high": 2.223,
+        "low": 2.216,
+        "close": 2.218
+      },
+      {
+        "open_time": "2026-09-06T06:30:00+00:00",
+        "decision_time": "2026-09-06T06:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.218,
+        "high": 2.221,
+        "low": 2.212,
+        "close": 2.215
+      },
+      {
+        "open_time": "2026-09-06T06:35:00+00:00",
+        "decision_time": "2026-09-06T06:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.215,
+        "high": 2.223,
+        "low": 2.208,
+        "close": 2.221
+      },
+      {
+        "open_time": "2026-09-06T06:40:00+00:00",
+        "decision_time": "2026-09-06T06:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.221,
+        "high": 2.229,
+        "low": 2.219,
+        "close": 2.228
+      },
+      {
+        "open_time": "2026-09-06T06:45:00+00:00",
+        "decision_time": "2026-09-06T06:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.228,
+        "high": 2.229,
+        "low": 2.222,
+        "close": 2.224
+      },
+      {
+        "open_time": "2026-09-06T06:50:00+00:00",
+        "decision_time": "2026-09-06T06:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.224,
+        "high": 2.268,
+        "low": 2.224,
+        "close": 2.265
+      },
+      {
+        "open_time": "2026-09-06T06:55:00+00:00",
+        "decision_time": "2026-09-06T07:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.266,
+        "high": 2.271,
+        "low": 2.257,
+        "close": 2.261
+      },
+      {
+        "open_time": "2026-09-06T07:00:00+00:00",
+        "decision_time": "2026-09-06T07:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.262,
+        "high": 2.267,
+        "low": 2.255,
+        "close": 2.261
+      },
+      {
+        "open_time": "2026-09-06T07:05:00+00:00",
+        "decision_time": "2026-09-06T07:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.262,
+        "high": 2.276,
+        "low": 2.258,
+        "close": 2.272
+      },
+      {
+        "open_time": "2026-09-06T07:10:00+00:00",
+        "decision_time": "2026-09-06T07:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.271,
+        "high": 2.272,
+        "low": 2.228,
+        "close": 2.244
+      },
+      {
+        "open_time": "2026-09-06T07:15:00+00:00",
+        "decision_time": "2026-09-06T07:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.244,
+        "high": 2.248,
+        "low": 2.234,
+        "close": 2.236
+      },
+      {
+        "open_time": "2026-09-06T07:20:00+00:00",
+        "decision_time": "2026-09-06T07:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.236,
+        "high": 2.244,
+        "low": 2.231,
+        "close": 2.232
+      },
+      {
+        "open_time": "2026-09-06T07:25:00+00:00",
+        "decision_time": "2026-09-06T07:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.232,
+        "high": 2.256,
+        "low": 2.229,
+        "close": 2.251
+      },
+      {
+        "open_time": "2026-09-06T07:30:00+00:00",
+        "decision_time": "2026-09-06T07:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2145669067230327,
+        "open": 2.251,
+        "high": 2.289,
+        "low": 2.25,
+        "close": 2.282
+      },
+      {
+        "open_time": "2026-09-06T07:35:00+00:00",
+        "decision_time": "2026-09-06T07:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.227566906723033,
+        "open": 2.282,
+        "high": 2.295,
+        "low": 2.271,
+        "close": 2.292
+      },
+      {
+        "open_time": "2026-09-06T07:40:00+00:00",
+        "decision_time": "2026-09-06T07:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.233566906723033,
+        "open": 2.291,
+        "high": 2.302,
+        "low": 2.286,
+        "close": 2.294
+      },
+      {
+        "open_time": "2026-09-06T07:45:00+00:00",
+        "decision_time": "2026-09-06T07:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.240566906723033,
+        "open": 2.294,
+        "high": 2.295,
+        "low": 2.282,
+        "close": 2.286
+      },
+      {
+        "open_time": "2026-09-06T07:50:00+00:00",
+        "decision_time": "2026-09-06T07:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.240566906723033,
+        "open": 2.286,
+        "high": 2.305,
+        "low": 2.284,
+        "close": 2.298
+      },
+      {
+        "open_time": "2026-09-06T07:55:00+00:00",
+        "decision_time": "2026-09-06T08:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.243566906723033,
+        "open": 2.298,
+        "high": 2.31,
+        "low": 2.295,
+        "close": 2.301
+      },
+      {
+        "open_time": "2026-09-06T08:00:00+00:00",
+        "decision_time": "2026-09-06T08:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.248566906723033,
+        "open": 2.3,
+        "high": 2.311,
+        "low": 2.296,
+        "close": 2.309
+      },
+      {
+        "open_time": "2026-09-06T08:05:00+00:00",
+        "decision_time": "2026-09-06T08:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.249566906723033,
+        "open": 2.308,
+        "high": 2.344,
+        "low": 2.303,
+        "close": 2.342
+      },
+      {
+        "open_time": "2026-09-06T08:10:00+00:00",
+        "decision_time": "2026-09-06T08:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.2825669067230328,
+        "open": 2.341,
+        "high": 2.365,
+        "low": 2.323,
+        "close": 2.363
+      },
+      {
+        "open_time": "2026-09-06T08:15:00+00:00",
+        "decision_time": "2026-09-06T08:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.303566906723033,
+        "open": 2.363,
+        "high": 2.363,
+        "low": 2.326,
+        "close": 2.33
+      },
+      {
+        "open_time": "2026-09-06T08:20:00+00:00",
+        "decision_time": "2026-09-06T08:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.303566906723033,
+        "open": 2.329,
+        "high": 2.336,
+        "low": 2.304,
+        "close": 2.314
+      },
+      {
+        "open_time": "2026-09-06T08:25:00+00:00",
+        "decision_time": "2026-09-06T08:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 2.303566906723033,
+        "open": 2.313,
+        "high": 2.314,
+        "low": 2.263,
+        "close": 2.279
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-06T09:05:00+00:00",
+      "end": "2026-09-06T14:05:00+00:00",
+      "entry": 2.338,
+      "exit": 2.4745202725305893,
+      "reason": "TP2",
+      "notional": 456.67,
+      "entry_fee": -0.3425,
+      "exit_pnl": 26.3242,
+      "net": 25.9817
+    },
+    "no_tp2": false,
+    "atr": 0.022753378755098197,
+    "notional": 456.684311501774,
+    "risk": 10,
+    "result": {
+      "time": "2026-09-06T14:05:00+00:00",
+      "price": 2.4745202725305893,
+      "reason": "TP2",
+      "exit_pnl": 26.324153433040337,
+      "net": 25.981640199414006,
+      "transitions": [
+        [
+          "2026-09-06T10:40:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-06T14:05:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-06T09:05:00+00:00",
+        "decision_time": "2026-09-06T09:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.339,
+        "high": 2.366,
+        "low": 2.337,
+        "close": 2.362
+      },
+      {
+        "open_time": "2026-09-06T09:10:00+00:00",
+        "decision_time": "2026-09-06T09:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.362,
+        "high": 2.377,
+        "low": 2.357,
+        "close": 2.365
+      },
+      {
+        "open_time": "2026-09-06T09:15:00+00:00",
+        "decision_time": "2026-09-06T09:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.365,
+        "high": 2.372,
+        "low": 2.351,
+        "close": 2.354
+      },
+      {
+        "open_time": "2026-09-06T09:20:00+00:00",
+        "decision_time": "2026-09-06T09:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.355,
+        "high": 2.369,
+        "low": 2.355,
+        "close": 2.357
+      },
+      {
+        "open_time": "2026-09-06T09:25:00+00:00",
+        "decision_time": "2026-09-06T09:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.357,
+        "high": 2.358,
+        "low": 2.339,
+        "close": 2.346
+      },
+      {
+        "open_time": "2026-09-06T09:30:00+00:00",
+        "decision_time": "2026-09-06T09:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.347,
+        "high": 2.355,
+        "low": 2.34,
+        "close": 2.342
+      },
+      {
+        "open_time": "2026-09-06T09:35:00+00:00",
+        "decision_time": "2026-09-06T09:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.342,
+        "high": 2.366,
+        "low": 2.341,
+        "close": 2.366
+      },
+      {
+        "open_time": "2026-09-06T09:40:00+00:00",
+        "decision_time": "2026-09-06T09:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.365,
+        "high": 2.389,
+        "low": 2.361,
+        "close": 2.386
+      },
+      {
+        "open_time": "2026-09-06T09:45:00+00:00",
+        "decision_time": "2026-09-06T09:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.387,
+        "high": 2.401,
+        "low": 2.374,
+        "close": 2.39
+      },
+      {
+        "open_time": "2026-09-06T09:50:00+00:00",
+        "decision_time": "2026-09-06T09:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.39,
+        "high": 2.392,
+        "low": 2.376,
+        "close": 2.376
+      },
+      {
+        "open_time": "2026-09-06T09:55:00+00:00",
+        "decision_time": "2026-09-06T10:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.376,
+        "high": 2.394,
+        "low": 2.374,
+        "close": 2.38
+      },
+      {
+        "open_time": "2026-09-06T10:00:00+00:00",
+        "decision_time": "2026-09-06T10:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.38,
+        "high": 2.39,
+        "low": 2.374,
+        "close": 2.379
+      },
+      {
+        "open_time": "2026-09-06T10:05:00+00:00",
+        "decision_time": "2026-09-06T10:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.378,
+        "high": 2.386,
+        "low": 2.363,
+        "close": 2.371
+      },
+      {
+        "open_time": "2026-09-06T10:10:00+00:00",
+        "decision_time": "2026-09-06T10:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.371,
+        "high": 2.374,
+        "low": 2.356,
+        "close": 2.362
+      },
+      {
+        "open_time": "2026-09-06T10:15:00+00:00",
+        "decision_time": "2026-09-06T10:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.361,
+        "high": 2.377,
+        "low": 2.36,
+        "close": 2.363
+      },
+      {
+        "open_time": "2026-09-06T10:20:00+00:00",
+        "decision_time": "2026-09-06T10:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.363,
+        "high": 2.367,
+        "low": 2.359,
+        "close": 2.361
+      },
+      {
+        "open_time": "2026-09-06T10:25:00+00:00",
+        "decision_time": "2026-09-06T10:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.361,
+        "high": 2.372,
+        "low": 2.356,
+        "close": 2.367
+      },
+      {
+        "open_time": "2026-09-06T10:30:00+00:00",
+        "decision_time": "2026-09-06T10:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.367,
+        "high": 2.378,
+        "low": 2.364,
+        "close": 2.378
+      },
+      {
+        "open_time": "2026-09-06T10:35:00+00:00",
+        "decision_time": "2026-09-06T10:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.378,
+        "high": 2.411,
+        "low": 2.374,
+        "close": 2.401
+      },
+      {
+        "open_time": "2026-09-06T10:40:00+00:00",
+        "decision_time": "2026-09-06T10:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.325674829668382,
+        "open": 2.401,
+        "high": 2.404,
+        "low": 2.391,
+        "close": 2.398
+      },
+      {
+        "open_time": "2026-09-06T10:45:00+00:00",
+        "decision_time": "2026-09-06T10:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.325674829668382,
+        "open": 2.399,
+        "high": 2.412,
+        "low": 2.395,
+        "close": 2.408
+      },
+      {
+        "open_time": "2026-09-06T10:50:00+00:00",
+        "decision_time": "2026-09-06T10:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.408,
+        "high": 2.408,
+        "low": 2.398,
+        "close": 2.403
+      },
+      {
+        "open_time": "2026-09-06T10:55:00+00:00",
+        "decision_time": "2026-09-06T11:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.402,
+        "high": 2.408,
+        "low": 2.398,
+        "close": 2.399
+      },
+      {
+        "open_time": "2026-09-06T11:00:00+00:00",
+        "decision_time": "2026-09-06T11:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.399,
+        "high": 2.406,
+        "low": 2.384,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:05:00+00:00",
+        "decision_time": "2026-09-06T11:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.385,
+        "high": 2.388,
+        "low": 2.375,
+        "close": 2.381
+      },
+      {
+        "open_time": "2026-09-06T11:10:00+00:00",
+        "decision_time": "2026-09-06T11:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.382,
+        "high": 2.39,
+        "low": 2.378,
+        "close": 2.389
+      },
+      {
+        "open_time": "2026-09-06T11:15:00+00:00",
+        "decision_time": "2026-09-06T11:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.388,
+        "high": 2.406,
+        "low": 2.379,
+        "close": 2.388
+      },
+      {
+        "open_time": "2026-09-06T11:20:00+00:00",
+        "decision_time": "2026-09-06T11:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.388,
+        "high": 2.398,
+        "low": 2.387,
+        "close": 2.398
+      },
+      {
+        "open_time": "2026-09-06T11:25:00+00:00",
+        "decision_time": "2026-09-06T11:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.398,
+        "high": 2.402,
+        "low": 2.384,
+        "close": 2.394
+      },
+      {
+        "open_time": "2026-09-06T11:30:00+00:00",
+        "decision_time": "2026-09-06T11:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.393,
+        "high": 2.397,
+        "low": 2.383,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:35:00+00:00",
+        "decision_time": "2026-09-06T11:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.384,
+        "high": 2.392,
+        "low": 2.381,
+        "close": 2.386
+      },
+      {
+        "open_time": "2026-09-06T11:40:00+00:00",
+        "decision_time": "2026-09-06T11:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.386,
+        "high": 2.393,
+        "low": 2.381,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:45:00+00:00",
+        "decision_time": "2026-09-06T11:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.385,
+        "high": 2.413,
+        "low": 2.383,
+        "close": 2.4
+      },
+      {
+        "open_time": "2026-09-06T11:50:00+00:00",
+        "decision_time": "2026-09-06T11:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.4,
+        "high": 2.4,
+        "low": 2.384,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:55:00+00:00",
+        "decision_time": "2026-09-06T12:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.384,
+        "high": 2.394,
+        "low": 2.383,
+        "close": 2.391
+      },
+      {
+        "open_time": "2026-09-06T12:00:00+00:00",
+        "decision_time": "2026-09-06T12:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.39,
+        "high": 2.398,
+        "low": 2.38,
+        "close": 2.384
+      },
+      {
+        "open_time": "2026-09-06T12:05:00+00:00",
+        "decision_time": "2026-09-06T12:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.383,
+        "high": 2.385,
+        "low": 2.37,
+        "close": 2.378
+      },
+      {
+        "open_time": "2026-09-06T12:10:00+00:00",
+        "decision_time": "2026-09-06T12:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.377,
+        "high": 2.381,
+        "low": 2.359,
+        "close": 2.377
+      },
+      {
+        "open_time": "2026-09-06T12:15:00+00:00",
+        "decision_time": "2026-09-06T12:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.377,
+        "high": 2.377,
+        "low": 2.365,
+        "close": 2.365
+      },
+      {
+        "open_time": "2026-09-06T12:20:00+00:00",
+        "decision_time": "2026-09-06T12:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.365,
+        "high": 2.382,
+        "low": 2.363,
+        "close": 2.372
+      },
+      {
+        "open_time": "2026-09-06T12:25:00+00:00",
+        "decision_time": "2026-09-06T12:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.371,
+        "high": 2.373,
+        "low": 2.352,
+        "close": 2.361
+      },
+      {
+        "open_time": "2026-09-06T12:30:00+00:00",
+        "decision_time": "2026-09-06T12:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.361,
+        "high": 2.377,
+        "low": 2.36,
+        "close": 2.372
+      },
+      {
+        "open_time": "2026-09-06T12:35:00+00:00",
+        "decision_time": "2026-09-06T12:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.373,
+        "high": 2.38,
+        "low": 2.366,
+        "close": 2.373
+      },
+      {
+        "open_time": "2026-09-06T12:40:00+00:00",
+        "decision_time": "2026-09-06T12:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.372,
+        "high": 2.375,
+        "low": 2.366,
+        "close": 2.372
+      },
+      {
+        "open_time": "2026-09-06T12:45:00+00:00",
+        "decision_time": "2026-09-06T12:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.372,
+        "high": 2.375,
+        "low": 2.341,
+        "close": 2.346
+      },
+      {
+        "open_time": "2026-09-06T12:50:00+00:00",
+        "decision_time": "2026-09-06T12:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.346,
+        "high": 2.353,
+        "low": 2.329,
+        "close": 2.341
+      },
+      {
+        "open_time": "2026-09-06T12:55:00+00:00",
+        "decision_time": "2026-09-06T13:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.341,
+        "high": 2.348,
+        "low": 2.337,
+        "close": 2.348
+      },
+      {
+        "open_time": "2026-09-06T13:00:00+00:00",
+        "decision_time": "2026-09-06T13:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.348,
+        "high": 2.354,
+        "low": 2.34,
+        "close": 2.346
+      },
+      {
+        "open_time": "2026-09-06T13:05:00+00:00",
+        "decision_time": "2026-09-06T13:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.346,
+        "high": 2.368,
+        "low": 2.346,
+        "close": 2.367
+      },
+      {
+        "open_time": "2026-09-06T13:10:00+00:00",
+        "decision_time": "2026-09-06T13:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.368,
+        "high": 2.378,
+        "low": 2.36,
+        "close": 2.368
+      },
+      {
+        "open_time": "2026-09-06T13:15:00+00:00",
+        "decision_time": "2026-09-06T13:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.368,
+        "high": 2.376,
+        "low": 2.367,
+        "close": 2.373
+      },
+      {
+        "open_time": "2026-09-06T13:20:00+00:00",
+        "decision_time": "2026-09-06T13:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.374,
+        "high": 2.389,
+        "low": 2.37,
+        "close": 2.387
+      },
+      {
+        "open_time": "2026-09-06T13:25:00+00:00",
+        "decision_time": "2026-09-06T13:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.388,
+        "high": 2.388,
+        "low": 2.374,
+        "close": 2.374
+      },
+      {
+        "open_time": "2026-09-06T13:30:00+00:00",
+        "decision_time": "2026-09-06T13:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.374,
+        "high": 2.388,
+        "low": 2.368,
+        "close": 2.382
+      },
+      {
+        "open_time": "2026-09-06T13:35:00+00:00",
+        "decision_time": "2026-09-06T13:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.383,
+        "high": 2.422,
+        "low": 2.383,
+        "close": 2.416
+      },
+      {
+        "open_time": "2026-09-06T13:40:00+00:00",
+        "decision_time": "2026-09-06T13:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.336674829668382,
+        "open": 2.415,
+        "high": 2.438,
+        "low": 2.413,
+        "close": 2.432
+      },
+      {
+        "open_time": "2026-09-06T13:45:00+00:00",
+        "decision_time": "2026-09-06T13:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.352674829668382,
+        "open": 2.432,
+        "high": 2.472,
+        "low": 2.431,
+        "close": 2.451
+      },
+      {
+        "open_time": "2026-09-06T13:50:00+00:00",
+        "decision_time": "2026-09-06T13:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3866748296683817,
+        "open": 2.451,
+        "high": 2.465,
+        "low": 2.435,
+        "close": 2.463
+      },
+      {
+        "open_time": "2026-09-06T13:55:00+00:00",
+        "decision_time": "2026-09-06T14:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3866748296683817,
+        "open": 2.463,
+        "high": 2.472,
+        "low": 2.448,
+        "close": 2.469
+      },
+      {
+        "open_time": "2026-09-06T14:00:00+00:00",
+        "decision_time": "2026-09-06T14:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 2.3866748296683817,
+        "open": 2.468,
+        "high": 2.487,
+        "low": 2.457,
+        "close": 2.481
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-06T09:05:00+00:00",
+      "end": "2026-09-06T14:05:00+00:00",
+      "entry": 2.338,
+      "exit": 2.4745202725305893,
+      "reason": "TP2",
+      "notional": 456.67,
+      "entry_fee": -0.3425,
+      "exit_pnl": 26.3242,
+      "net": 25.9817
+    },
+    "no_tp2": true,
+    "atr": 0.022753378755098197,
+    "notional": 456.684311501774,
+    "risk": 10,
+    "result": {
+      "time": "2026-09-06T14:25:00+00:00",
+      "price": 2.401674829668382,
+      "reason": "TRAIL",
+      "exit_pnl": 12.095166726637855,
+      "net": 11.752653493011524,
+      "transitions": [
+        [
+          "2026-09-06T10:40:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-06T14:25:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-06T09:05:00+00:00",
+        "decision_time": "2026-09-06T09:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.339,
+        "high": 2.366,
+        "low": 2.337,
+        "close": 2.362
+      },
+      {
+        "open_time": "2026-09-06T09:10:00+00:00",
+        "decision_time": "2026-09-06T09:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.362,
+        "high": 2.377,
+        "low": 2.357,
+        "close": 2.365
+      },
+      {
+        "open_time": "2026-09-06T09:15:00+00:00",
+        "decision_time": "2026-09-06T09:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.365,
+        "high": 2.372,
+        "low": 2.351,
+        "close": 2.354
+      },
+      {
+        "open_time": "2026-09-06T09:20:00+00:00",
+        "decision_time": "2026-09-06T09:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.355,
+        "high": 2.369,
+        "low": 2.355,
+        "close": 2.357
+      },
+      {
+        "open_time": "2026-09-06T09:25:00+00:00",
+        "decision_time": "2026-09-06T09:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.357,
+        "high": 2.358,
+        "low": 2.339,
+        "close": 2.346
+      },
+      {
+        "open_time": "2026-09-06T09:30:00+00:00",
+        "decision_time": "2026-09-06T09:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.347,
+        "high": 2.355,
+        "low": 2.34,
+        "close": 2.342
+      },
+      {
+        "open_time": "2026-09-06T09:35:00+00:00",
+        "decision_time": "2026-09-06T09:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.342,
+        "high": 2.366,
+        "low": 2.341,
+        "close": 2.366
+      },
+      {
+        "open_time": "2026-09-06T09:40:00+00:00",
+        "decision_time": "2026-09-06T09:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.365,
+        "high": 2.389,
+        "low": 2.361,
+        "close": 2.386
+      },
+      {
+        "open_time": "2026-09-06T09:45:00+00:00",
+        "decision_time": "2026-09-06T09:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.387,
+        "high": 2.401,
+        "low": 2.374,
+        "close": 2.39
+      },
+      {
+        "open_time": "2026-09-06T09:50:00+00:00",
+        "decision_time": "2026-09-06T09:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.39,
+        "high": 2.392,
+        "low": 2.376,
+        "close": 2.376
+      },
+      {
+        "open_time": "2026-09-06T09:55:00+00:00",
+        "decision_time": "2026-09-06T10:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.376,
+        "high": 2.394,
+        "low": 2.374,
+        "close": 2.38
+      },
+      {
+        "open_time": "2026-09-06T10:00:00+00:00",
+        "decision_time": "2026-09-06T10:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.38,
+        "high": 2.39,
+        "low": 2.374,
+        "close": 2.379
+      },
+      {
+        "open_time": "2026-09-06T10:05:00+00:00",
+        "decision_time": "2026-09-06T10:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.378,
+        "high": 2.386,
+        "low": 2.363,
+        "close": 2.371
+      },
+      {
+        "open_time": "2026-09-06T10:10:00+00:00",
+        "decision_time": "2026-09-06T10:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.371,
+        "high": 2.374,
+        "low": 2.356,
+        "close": 2.362
+      },
+      {
+        "open_time": "2026-09-06T10:15:00+00:00",
+        "decision_time": "2026-09-06T10:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.361,
+        "high": 2.377,
+        "low": 2.36,
+        "close": 2.363
+      },
+      {
+        "open_time": "2026-09-06T10:20:00+00:00",
+        "decision_time": "2026-09-06T10:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.363,
+        "high": 2.367,
+        "low": 2.359,
+        "close": 2.361
+      },
+      {
+        "open_time": "2026-09-06T10:25:00+00:00",
+        "decision_time": "2026-09-06T10:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.361,
+        "high": 2.372,
+        "low": 2.356,
+        "close": 2.367
+      },
+      {
+        "open_time": "2026-09-06T10:30:00+00:00",
+        "decision_time": "2026-09-06T10:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.367,
+        "high": 2.378,
+        "low": 2.364,
+        "close": 2.378
+      },
+      {
+        "open_time": "2026-09-06T10:35:00+00:00",
+        "decision_time": "2026-09-06T10:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "TRAILING",
+        "trail_before": null,
+        "open": 2.378,
+        "high": 2.411,
+        "low": 2.374,
+        "close": 2.401
+      },
+      {
+        "open_time": "2026-09-06T10:40:00+00:00",
+        "decision_time": "2026-09-06T10:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.325674829668382,
+        "open": 2.401,
+        "high": 2.404,
+        "low": 2.391,
+        "close": 2.398
+      },
+      {
+        "open_time": "2026-09-06T10:45:00+00:00",
+        "decision_time": "2026-09-06T10:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.325674829668382,
+        "open": 2.399,
+        "high": 2.412,
+        "low": 2.395,
+        "close": 2.408
+      },
+      {
+        "open_time": "2026-09-06T10:50:00+00:00",
+        "decision_time": "2026-09-06T10:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.408,
+        "high": 2.408,
+        "low": 2.398,
+        "close": 2.403
+      },
+      {
+        "open_time": "2026-09-06T10:55:00+00:00",
+        "decision_time": "2026-09-06T11:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.402,
+        "high": 2.408,
+        "low": 2.398,
+        "close": 2.399
+      },
+      {
+        "open_time": "2026-09-06T11:00:00+00:00",
+        "decision_time": "2026-09-06T11:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.399,
+        "high": 2.406,
+        "low": 2.384,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:05:00+00:00",
+        "decision_time": "2026-09-06T11:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.385,
+        "high": 2.388,
+        "low": 2.375,
+        "close": 2.381
+      },
+      {
+        "open_time": "2026-09-06T11:10:00+00:00",
+        "decision_time": "2026-09-06T11:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.382,
+        "high": 2.39,
+        "low": 2.378,
+        "close": 2.389
+      },
+      {
+        "open_time": "2026-09-06T11:15:00+00:00",
+        "decision_time": "2026-09-06T11:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.388,
+        "high": 2.406,
+        "low": 2.379,
+        "close": 2.388
+      },
+      {
+        "open_time": "2026-09-06T11:20:00+00:00",
+        "decision_time": "2026-09-06T11:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.388,
+        "high": 2.398,
+        "low": 2.387,
+        "close": 2.398
+      },
+      {
+        "open_time": "2026-09-06T11:25:00+00:00",
+        "decision_time": "2026-09-06T11:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.398,
+        "high": 2.402,
+        "low": 2.384,
+        "close": 2.394
+      },
+      {
+        "open_time": "2026-09-06T11:30:00+00:00",
+        "decision_time": "2026-09-06T11:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.393,
+        "high": 2.397,
+        "low": 2.383,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:35:00+00:00",
+        "decision_time": "2026-09-06T11:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.384,
+        "high": 2.392,
+        "low": 2.381,
+        "close": 2.386
+      },
+      {
+        "open_time": "2026-09-06T11:40:00+00:00",
+        "decision_time": "2026-09-06T11:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.386,
+        "high": 2.393,
+        "low": 2.381,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:45:00+00:00",
+        "decision_time": "2026-09-06T11:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3266748296683817,
+        "open": 2.385,
+        "high": 2.413,
+        "low": 2.383,
+        "close": 2.4
+      },
+      {
+        "open_time": "2026-09-06T11:50:00+00:00",
+        "decision_time": "2026-09-06T11:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.4,
+        "high": 2.4,
+        "low": 2.384,
+        "close": 2.385
+      },
+      {
+        "open_time": "2026-09-06T11:55:00+00:00",
+        "decision_time": "2026-09-06T12:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.384,
+        "high": 2.394,
+        "low": 2.383,
+        "close": 2.391
+      },
+      {
+        "open_time": "2026-09-06T12:00:00+00:00",
+        "decision_time": "2026-09-06T12:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.39,
+        "high": 2.398,
+        "low": 2.38,
+        "close": 2.384
+      },
+      {
+        "open_time": "2026-09-06T12:05:00+00:00",
+        "decision_time": "2026-09-06T12:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.383,
+        "high": 2.385,
+        "low": 2.37,
+        "close": 2.378
+      },
+      {
+        "open_time": "2026-09-06T12:10:00+00:00",
+        "decision_time": "2026-09-06T12:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.377,
+        "high": 2.381,
+        "low": 2.359,
+        "close": 2.377
+      },
+      {
+        "open_time": "2026-09-06T12:15:00+00:00",
+        "decision_time": "2026-09-06T12:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.377,
+        "high": 2.377,
+        "low": 2.365,
+        "close": 2.365
+      },
+      {
+        "open_time": "2026-09-06T12:20:00+00:00",
+        "decision_time": "2026-09-06T12:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.365,
+        "high": 2.382,
+        "low": 2.363,
+        "close": 2.372
+      },
+      {
+        "open_time": "2026-09-06T12:25:00+00:00",
+        "decision_time": "2026-09-06T12:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.371,
+        "high": 2.373,
+        "low": 2.352,
+        "close": 2.361
+      },
+      {
+        "open_time": "2026-09-06T12:30:00+00:00",
+        "decision_time": "2026-09-06T12:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.361,
+        "high": 2.377,
+        "low": 2.36,
+        "close": 2.372
+      },
+      {
+        "open_time": "2026-09-06T12:35:00+00:00",
+        "decision_time": "2026-09-06T12:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.373,
+        "high": 2.38,
+        "low": 2.366,
+        "close": 2.373
+      },
+      {
+        "open_time": "2026-09-06T12:40:00+00:00",
+        "decision_time": "2026-09-06T12:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.372,
+        "high": 2.375,
+        "low": 2.366,
+        "close": 2.372
+      },
+      {
+        "open_time": "2026-09-06T12:45:00+00:00",
+        "decision_time": "2026-09-06T12:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.372,
+        "high": 2.375,
+        "low": 2.341,
+        "close": 2.346
+      },
+      {
+        "open_time": "2026-09-06T12:50:00+00:00",
+        "decision_time": "2026-09-06T12:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.346,
+        "high": 2.353,
+        "low": 2.329,
+        "close": 2.341
+      },
+      {
+        "open_time": "2026-09-06T12:55:00+00:00",
+        "decision_time": "2026-09-06T13:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.341,
+        "high": 2.348,
+        "low": 2.337,
+        "close": 2.348
+      },
+      {
+        "open_time": "2026-09-06T13:00:00+00:00",
+        "decision_time": "2026-09-06T13:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.348,
+        "high": 2.354,
+        "low": 2.34,
+        "close": 2.346
+      },
+      {
+        "open_time": "2026-09-06T13:05:00+00:00",
+        "decision_time": "2026-09-06T13:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.346,
+        "high": 2.368,
+        "low": 2.346,
+        "close": 2.367
+      },
+      {
+        "open_time": "2026-09-06T13:10:00+00:00",
+        "decision_time": "2026-09-06T13:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.368,
+        "high": 2.378,
+        "low": 2.36,
+        "close": 2.368
+      },
+      {
+        "open_time": "2026-09-06T13:15:00+00:00",
+        "decision_time": "2026-09-06T13:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.368,
+        "high": 2.376,
+        "low": 2.367,
+        "close": 2.373
+      },
+      {
+        "open_time": "2026-09-06T13:20:00+00:00",
+        "decision_time": "2026-09-06T13:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.374,
+        "high": 2.389,
+        "low": 2.37,
+        "close": 2.387
+      },
+      {
+        "open_time": "2026-09-06T13:25:00+00:00",
+        "decision_time": "2026-09-06T13:30:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.388,
+        "high": 2.388,
+        "low": 2.374,
+        "close": 2.374
+      },
+      {
+        "open_time": "2026-09-06T13:30:00+00:00",
+        "decision_time": "2026-09-06T13:35:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.374,
+        "high": 2.388,
+        "low": 2.368,
+        "close": 2.382
+      },
+      {
+        "open_time": "2026-09-06T13:35:00+00:00",
+        "decision_time": "2026-09-06T13:40:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3276748296683816,
+        "open": 2.383,
+        "high": 2.422,
+        "low": 2.383,
+        "close": 2.416
+      },
+      {
+        "open_time": "2026-09-06T13:40:00+00:00",
+        "decision_time": "2026-09-06T13:45:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.336674829668382,
+        "open": 2.415,
+        "high": 2.438,
+        "low": 2.413,
+        "close": 2.432
+      },
+      {
+        "open_time": "2026-09-06T13:45:00+00:00",
+        "decision_time": "2026-09-06T13:50:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.352674829668382,
+        "open": 2.432,
+        "high": 2.472,
+        "low": 2.431,
+        "close": 2.451
+      },
+      {
+        "open_time": "2026-09-06T13:50:00+00:00",
+        "decision_time": "2026-09-06T13:55:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3866748296683817,
+        "open": 2.451,
+        "high": 2.465,
+        "low": 2.435,
+        "close": 2.463
+      },
+      {
+        "open_time": "2026-09-06T13:55:00+00:00",
+        "decision_time": "2026-09-06T14:00:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3866748296683817,
+        "open": 2.463,
+        "high": 2.472,
+        "low": 2.448,
+        "close": 2.469
+      },
+      {
+        "open_time": "2026-09-06T14:00:00+00:00",
+        "decision_time": "2026-09-06T14:05:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.3866748296683817,
+        "open": 2.468,
+        "high": 2.487,
+        "low": 2.457,
+        "close": 2.481
+      },
+      {
+        "open_time": "2026-09-06T14:05:00+00:00",
+        "decision_time": "2026-09-06T14:10:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.401674829668382,
+        "open": 2.481,
+        "high": 2.486,
+        "low": 2.449,
+        "close": 2.453
+      },
+      {
+        "open_time": "2026-09-06T14:10:00+00:00",
+        "decision_time": "2026-09-06T14:15:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.401674829668382,
+        "open": 2.454,
+        "high": 2.462,
+        "low": 2.422,
+        "close": 2.429
+      },
+      {
+        "open_time": "2026-09-06T14:15:00+00:00",
+        "decision_time": "2026-09-06T14:20:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "TRAILING",
+        "trail_before": 2.401674829668382,
+        "open": 2.429,
+        "high": 2.448,
+        "low": 2.414,
+        "close": 2.422
+      },
+      {
+        "open_time": "2026-09-06T14:20:00+00:00",
+        "decision_time": "2026-09-06T14:25:00+00:00",
+        "state_before": "TRAILING",
+        "state_after": "IDLE",
+        "trail_before": 2.401674829668382,
+        "open": 2.422,
+        "high": 2.424,
+        "low": 2.38,
+        "close": 2.384
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-06T22:35:00+00:00",
+      "end": "2026-09-07T00:55:00+00:00",
+      "entry": 2.455,
+      "exit": 2.404428234290022,
+      "reason": "SL",
+      "notional": 485.47,
+      "entry_fee": -0.3641,
+      "exit_pnl": -10.3641,
+      "net": -10.7282
+    },
+    "no_tp2": false,
+    "atr": 0.022476340315545882,
+    "notional": 485.44874111753785,
+    "risk": 10,
+    "result": {
+      "time": "2026-09-07T00:55:00+00:00",
+      "price": 2.404428234290022,
+      "reason": "SL",
+      "exit_pnl": -10.364086555838153,
+      "net": -10.728173111676305,
+      "transitions": [
+        [
+          "2026-09-07T00:55:00+00:00",
+          "SCALE_OPEN",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-06T22:35:00+00:00",
+        "decision_time": "2026-09-06T22:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.456,
+        "high": 2.461,
+        "low": 2.447,
+        "close": 2.453
+      },
+      {
+        "open_time": "2026-09-06T22:40:00+00:00",
+        "decision_time": "2026-09-06T22:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.452,
+        "high": 2.458,
+        "low": 2.446,
+        "close": 2.447
+      },
+      {
+        "open_time": "2026-09-06T22:45:00+00:00",
+        "decision_time": "2026-09-06T22:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.448,
+        "high": 2.451,
+        "low": 2.437,
+        "close": 2.437
+      },
+      {
+        "open_time": "2026-09-06T22:50:00+00:00",
+        "decision_time": "2026-09-06T22:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.437,
+        "high": 2.449,
+        "low": 2.434,
+        "close": 2.435
+      },
+      {
+        "open_time": "2026-09-06T22:55:00+00:00",
+        "decision_time": "2026-09-06T23:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.434,
+        "high": 2.444,
+        "low": 2.432,
+        "close": 2.442
+      },
+      {
+        "open_time": "2026-09-06T23:00:00+00:00",
+        "decision_time": "2026-09-06T23:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.441,
+        "high": 2.456,
+        "low": 2.437,
+        "close": 2.449
+      },
+      {
+        "open_time": "2026-09-06T23:05:00+00:00",
+        "decision_time": "2026-09-06T23:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.448,
+        "high": 2.483,
+        "low": 2.447,
+        "close": 2.469
+      },
+      {
+        "open_time": "2026-09-06T23:10:00+00:00",
+        "decision_time": "2026-09-06T23:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.468,
+        "high": 2.469,
+        "low": 2.455,
+        "close": 2.456
+      },
+      {
+        "open_time": "2026-09-06T23:15:00+00:00",
+        "decision_time": "2026-09-06T23:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.455,
+        "high": 2.464,
+        "low": 2.449,
+        "close": 2.456
+      },
+      {
+        "open_time": "2026-09-06T23:20:00+00:00",
+        "decision_time": "2026-09-06T23:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.455,
+        "high": 2.457,
+        "low": 2.446,
+        "close": 2.455
+      },
+      {
+        "open_time": "2026-09-06T23:25:00+00:00",
+        "decision_time": "2026-09-06T23:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.456,
+        "high": 2.458,
+        "low": 2.45,
+        "close": 2.451
+      },
+      {
+        "open_time": "2026-09-06T23:30:00+00:00",
+        "decision_time": "2026-09-06T23:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.451,
+        "high": 2.454,
+        "low": 2.433,
+        "close": 2.438
+      },
+      {
+        "open_time": "2026-09-06T23:35:00+00:00",
+        "decision_time": "2026-09-06T23:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.438,
+        "high": 2.442,
+        "low": 2.433,
+        "close": 2.439
+      },
+      {
+        "open_time": "2026-09-06T23:40:00+00:00",
+        "decision_time": "2026-09-06T23:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.439,
+        "high": 2.442,
+        "low": 2.433,
+        "close": 2.44
+      },
+      {
+        "open_time": "2026-09-06T23:45:00+00:00",
+        "decision_time": "2026-09-06T23:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.441,
+        "high": 2.447,
+        "low": 2.436,
+        "close": 2.44
+      },
+      {
+        "open_time": "2026-09-06T23:50:00+00:00",
+        "decision_time": "2026-09-06T23:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.44,
+        "high": 2.444,
+        "low": 2.435,
+        "close": 2.439
+      },
+      {
+        "open_time": "2026-09-06T23:55:00+00:00",
+        "decision_time": "2026-09-07T00:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.439,
+        "high": 2.442,
+        "low": 2.431,
+        "close": 2.439
+      },
+      {
+        "open_time": "2026-09-07T00:00:00+00:00",
+        "decision_time": "2026-09-07T00:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.439,
+        "high": 2.444,
+        "low": 2.434,
+        "close": 2.44
+      },
+      {
+        "open_time": "2026-09-07T00:05:00+00:00",
+        "decision_time": "2026-09-07T00:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.44,
+        "high": 2.44,
+        "low": 2.428,
+        "close": 2.429
+      },
+      {
+        "open_time": "2026-09-07T00:10:00+00:00",
+        "decision_time": "2026-09-07T00:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.429,
+        "high": 2.435,
+        "low": 2.418,
+        "close": 2.42
+      },
+      {
+        "open_time": "2026-09-07T00:15:00+00:00",
+        "decision_time": "2026-09-07T00:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.42,
+        "high": 2.436,
+        "low": 2.418,
+        "close": 2.419
+      },
+      {
+        "open_time": "2026-09-07T00:20:00+00:00",
+        "decision_time": "2026-09-07T00:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.42,
+        "high": 2.437,
+        "low": 2.42,
+        "close": 2.426
+      },
+      {
+        "open_time": "2026-09-07T00:25:00+00:00",
+        "decision_time": "2026-09-07T00:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.427,
+        "high": 2.428,
+        "low": 2.418,
+        "close": 2.418
+      },
+      {
+        "open_time": "2026-09-07T00:30:00+00:00",
+        "decision_time": "2026-09-07T00:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.419,
+        "high": 2.429,
+        "low": 2.418,
+        "close": 2.42
+      },
+      {
+        "open_time": "2026-09-07T00:35:00+00:00",
+        "decision_time": "2026-09-07T00:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.421,
+        "high": 2.429,
+        "low": 2.418,
+        "close": 2.418
+      },
+      {
+        "open_time": "2026-09-07T00:40:00+00:00",
+        "decision_time": "2026-09-07T00:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.418,
+        "high": 2.42,
+        "low": 2.409,
+        "close": 2.416
+      },
+      {
+        "open_time": "2026-09-07T00:45:00+00:00",
+        "decision_time": "2026-09-07T00:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.417,
+        "high": 2.42,
+        "low": 2.41,
+        "close": 2.41
+      },
+      {
+        "open_time": "2026-09-07T00:50:00+00:00",
+        "decision_time": "2026-09-07T00:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "IDLE",
+        "trail_before": null,
+        "open": 2.411,
+        "high": 2.414,
+        "low": 2.404,
+        "close": 2.407
+      }
+    ]
+  },
+  {
+    "source": {
+      "start": "2026-09-06T22:35:00+00:00",
+      "end": "2026-09-07T00:55:00+00:00",
+      "entry": 2.455,
+      "exit": 2.404428234290022,
+      "reason": "SL",
+      "notional": 485.47,
+      "entry_fee": -0.3641,
+      "exit_pnl": -10.3641,
+      "net": -10.7282
+    },
+    "no_tp2": true,
+    "atr": 0.022476340315545882,
+    "notional": 485.44874111753785,
+    "risk": 10,
+    "result": {
+      "time": "2026-09-07T00:55:00+00:00",
+      "price": 2.404428234290022,
+      "reason": "SL",
+      "exit_pnl": -10.364086555838153,
+      "net": -10.728173111676305,
+      "transitions": [
+        [
+          "2026-09-07T00:55:00+00:00",
+          "SCALE_OPEN",
+          "IDLE"
+        ]
+      ]
+    },
+    "path": [
+      {
+        "open_time": "2026-09-06T22:35:00+00:00",
+        "decision_time": "2026-09-06T22:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.456,
+        "high": 2.461,
+        "low": 2.447,
+        "close": 2.453
+      },
+      {
+        "open_time": "2026-09-06T22:40:00+00:00",
+        "decision_time": "2026-09-06T22:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.452,
+        "high": 2.458,
+        "low": 2.446,
+        "close": 2.447
+      },
+      {
+        "open_time": "2026-09-06T22:45:00+00:00",
+        "decision_time": "2026-09-06T22:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.448,
+        "high": 2.451,
+        "low": 2.437,
+        "close": 2.437
+      },
+      {
+        "open_time": "2026-09-06T22:50:00+00:00",
+        "decision_time": "2026-09-06T22:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.437,
+        "high": 2.449,
+        "low": 2.434,
+        "close": 2.435
+      },
+      {
+        "open_time": "2026-09-06T22:55:00+00:00",
+        "decision_time": "2026-09-06T23:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.434,
+        "high": 2.444,
+        "low": 2.432,
+        "close": 2.442
+      },
+      {
+        "open_time": "2026-09-06T23:00:00+00:00",
+        "decision_time": "2026-09-06T23:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.441,
+        "high": 2.456,
+        "low": 2.437,
+        "close": 2.449
+      },
+      {
+        "open_time": "2026-09-06T23:05:00+00:00",
+        "decision_time": "2026-09-06T23:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.448,
+        "high": 2.483,
+        "low": 2.447,
+        "close": 2.469
+      },
+      {
+        "open_time": "2026-09-06T23:10:00+00:00",
+        "decision_time": "2026-09-06T23:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.468,
+        "high": 2.469,
+        "low": 2.455,
+        "close": 2.456
+      },
+      {
+        "open_time": "2026-09-06T23:15:00+00:00",
+        "decision_time": "2026-09-06T23:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.455,
+        "high": 2.464,
+        "low": 2.449,
+        "close": 2.456
+      },
+      {
+        "open_time": "2026-09-06T23:20:00+00:00",
+        "decision_time": "2026-09-06T23:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.455,
+        "high": 2.457,
+        "low": 2.446,
+        "close": 2.455
+      },
+      {
+        "open_time": "2026-09-06T23:25:00+00:00",
+        "decision_time": "2026-09-06T23:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.456,
+        "high": 2.458,
+        "low": 2.45,
+        "close": 2.451
+      },
+      {
+        "open_time": "2026-09-06T23:30:00+00:00",
+        "decision_time": "2026-09-06T23:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.451,
+        "high": 2.454,
+        "low": 2.433,
+        "close": 2.438
+      },
+      {
+        "open_time": "2026-09-06T23:35:00+00:00",
+        "decision_time": "2026-09-06T23:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.438,
+        "high": 2.442,
+        "low": 2.433,
+        "close": 2.439
+      },
+      {
+        "open_time": "2026-09-06T23:40:00+00:00",
+        "decision_time": "2026-09-06T23:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.439,
+        "high": 2.442,
+        "low": 2.433,
+        "close": 2.44
+      },
+      {
+        "open_time": "2026-09-06T23:45:00+00:00",
+        "decision_time": "2026-09-06T23:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.441,
+        "high": 2.447,
+        "low": 2.436,
+        "close": 2.44
+      },
+      {
+        "open_time": "2026-09-06T23:50:00+00:00",
+        "decision_time": "2026-09-06T23:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.44,
+        "high": 2.444,
+        "low": 2.435,
+        "close": 2.439
+      },
+      {
+        "open_time": "2026-09-06T23:55:00+00:00",
+        "decision_time": "2026-09-07T00:00:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.439,
+        "high": 2.442,
+        "low": 2.431,
+        "close": 2.439
+      },
+      {
+        "open_time": "2026-09-07T00:00:00+00:00",
+        "decision_time": "2026-09-07T00:05:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.439,
+        "high": 2.444,
+        "low": 2.434,
+        "close": 2.44
+      },
+      {
+        "open_time": "2026-09-07T00:05:00+00:00",
+        "decision_time": "2026-09-07T00:10:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.44,
+        "high": 2.44,
+        "low": 2.428,
+        "close": 2.429
+      },
+      {
+        "open_time": "2026-09-07T00:10:00+00:00",
+        "decision_time": "2026-09-07T00:15:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.429,
+        "high": 2.435,
+        "low": 2.418,
+        "close": 2.42
+      },
+      {
+        "open_time": "2026-09-07T00:15:00+00:00",
+        "decision_time": "2026-09-07T00:20:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.42,
+        "high": 2.436,
+        "low": 2.418,
+        "close": 2.419
+      },
+      {
+        "open_time": "2026-09-07T00:20:00+00:00",
+        "decision_time": "2026-09-07T00:25:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.42,
+        "high": 2.437,
+        "low": 2.42,
+        "close": 2.426
+      },
+      {
+        "open_time": "2026-09-07T00:25:00+00:00",
+        "decision_time": "2026-09-07T00:30:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.427,
+        "high": 2.428,
+        "low": 2.418,
+        "close": 2.418
+      },
+      {
+        "open_time": "2026-09-07T00:30:00+00:00",
+        "decision_time": "2026-09-07T00:35:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.419,
+        "high": 2.429,
+        "low": 2.418,
+        "close": 2.42
+      },
+      {
+        "open_time": "2026-09-07T00:35:00+00:00",
+        "decision_time": "2026-09-07T00:40:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.421,
+        "high": 2.429,
+        "low": 2.418,
+        "close": 2.418
+      },
+      {
+        "open_time": "2026-09-07T00:40:00+00:00",
+        "decision_time": "2026-09-07T00:45:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.418,
+        "high": 2.42,
+        "low": 2.409,
+        "close": 2.416
+      },
+      {
+        "open_time": "2026-09-07T00:45:00+00:00",
+        "decision_time": "2026-09-07T00:50:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "SCALE_OPEN",
+        "trail_before": null,
+        "open": 2.417,
+        "high": 2.42,
+        "low": 2.41,
+        "close": 2.41
+      },
+      {
+        "open_time": "2026-09-07T00:50:00+00:00",
+        "decision_time": "2026-09-07T00:55:00+00:00",
+        "state_before": "SCALE_OPEN",
+        "state_after": "IDLE",
+        "trail_before": null,
+        "open": 2.411,
+        "high": 2.414,
+        "low": 2.404,
+        "close": 2.407
+      }
+    ]
+  }
+]

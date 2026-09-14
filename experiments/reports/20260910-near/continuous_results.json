@@ -1,0 +1,142 @@
+[
+  {
+    "name": "Sep4 all intraday",
+    "first_entry": "2026-09-04T06:40:00+00:00",
+    "endpoint": "2026-09-04T19:40:00+00:00",
+    "endpoint_price": 2.145664352359881,
+    "initial_risk": 5,
+    "initial_notional": 511.27348989181786,
+    "same_initial_notional_hindsight_net": 53.4344975885524,
+    "actual_legs_net": 29.50019558465896,
+    "actual_legs_at_equal_initial_risk_net": 29.50019558465896,
+    "max_trail_drawdown_abs": 0.1319999999999999,
+    "required_trail_atr_gt": 15.654456339986577,
+    "max_trail_drawdown_pct": 6.480117820324001,
+    "max_dd_bar": "2026-09-04T14:50:00+00:00",
+    "timeout_would_occur": "2026-09-04T15:05:00+00:00",
+    "no_tp2_actual_rule_exit": {
+      "time": "2026-09-04T07:55:00+00:00",
+      "price": 1.958379610939563,
+      "reason": "TRAIL",
+      "exit_pnl": 4.460363350583329,
+      "net": 4.076908233164465,
+      "transitions": [
+        [
+          "2026-09-04T07:05:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T07:55:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    }
+  },
+  {
+    "name": "Sep4 screenshot TP2 trades",
+    "first_entry": "2026-09-04T09:00:00+00:00",
+    "endpoint": "2026-09-04T19:40:00+00:00",
+    "endpoint_price": 2.145664352359881,
+    "initial_risk": 5,
+    "initial_notional": 491.93040186129366,
+    "same_initial_notional_hindsight_net": 40.152261403076714,
+    "actual_legs_net": 25.423287351494494,
+    "actual_legs_at_equal_initial_risk_net": 25.423287351494494,
+    "max_trail_drawdown_abs": 0.1319999999999999,
+    "required_trail_atr_gt": 14.75046232739062,
+    "max_trail_drawdown_pct": 6.480117820324001,
+    "max_dd_bar": "2026-09-04T14:50:00+00:00",
+    "timeout_would_occur": "2026-09-04T17:40:00+00:00",
+    "no_tp2_actual_rule_exit": {
+      "time": "2026-09-04T10:15:00+00:00",
+      "price": 2.003441729824236,
+      "reason": "TRAIL",
+      "exit_pnl": 5.203878635201222,
+      "net": 4.8349308338052515,
+      "transitions": [
+        [
+          "2026-09-04T09:40:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-04T10:15:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    }
+  },
+  {
+    "name": "Sep6 two TP2 trades",
+    "first_entry": "2026-09-06T05:25:00+00:00",
+    "endpoint": "2026-09-06T14:05:00+00:00",
+    "endpoint_price": 2.4745202725305893,
+    "initial_risk": 5,
+    "initial_notional": 301.95451686550297,
+    "same_initial_notional_hindsight_net": 33.25857713002844,
+    "actual_legs_net": 38.862041757449084,
+    "actual_legs_at_equal_initial_risk_net": 25.871221657742083,
+    "max_trail_drawdown_abs": 0.10200000000000031,
+    "required_trail_atr_gt": 6.226285859895161,
+    "max_trail_drawdown_pct": 4.312896405919674,
+    "max_dd_bar": "2026-09-06T08:25:00+00:00",
+    "timeout_would_occur": "2026-09-06T15:10:00+00:00",
+    "no_tp2_actual_rule_exit": {
+      "time": "2026-09-06T08:30:00+00:00",
+      "price": 2.303566906723033,
+      "reason": "TRAIL",
+      "exit_pnl": 10.29540196693533,
+      "net": 10.068936079286203,
+      "transitions": [
+        [
+          "2026-09-06T07:10:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-06T08:30:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    }
+  },
+  {
+    "name": "Sep6 through late SL",
+    "first_entry": "2026-09-06T05:25:00+00:00",
+    "endpoint": "2026-09-07T00:55:00+00:00",
+    "endpoint_price": 2.404428234290022,
+    "initial_risk": 5,
+    "initial_notional": 301.95451686550297,
+    "same_initial_notional_hindsight_net": 23.75066718256712,
+    "actual_legs_net": 28.13386864577278,
+    "actual_legs_at_equal_initial_risk_net": 20.50713510190393,
+    "max_trail_drawdown_abs": 0.15100000000000025,
+    "required_trail_atr_gt": 9.217344753374196,
+    "max_trail_drawdown_pct": 6.07157217531163,
+    "max_dd_bar": "2026-09-06T15:20:00+00:00",
+    "timeout_would_occur": "2026-09-06T15:10:00+00:00",
+    "no_tp2_actual_rule_exit": {
+      "time": "2026-09-06T08:30:00+00:00",
+      "price": 2.303566906723033,
+      "reason": "TRAIL",
+      "exit_pnl": 10.29540196693533,
+      "net": 10.068936079286203,
+      "transitions": [
+        [
+          "2026-09-06T07:10:00+00:00",
+          "SCALE_OPEN",
+          "TRAILING"
+        ],
+        [
+          "2026-09-06T08:30:00+00:00",
+          "TRAILING",
+          "IDLE"
+        ]
+      ]
+    }
+  }
+]

@@ -1,0 +1,339 @@
+{
+  "windows": {
+    "240": {
+      "baseline": {
+        "file": "experiments/results/N1-control-20260910_240d.json",
+        "sha256": "373a9ed394831cc1cd5fdbf9557657953757551ad40b03878bb78a34a487702f",
+        "arm": {
+          "id": "N1-control-20260910",
+          "days": 240,
+          "env": []
+        },
+        "net": 435.46054682801764,
+        "final_balance": 1435.4605468279738,
+        "max_drawdown_pct": -6.140591189514887,
+        "hard_stops": 0,
+        "full_positions": 114,
+        "probes": 545,
+        "partial_tp2_positions": 0,
+        "all_legs": 1318,
+        "entry_cost": 84.6365594123089,
+        "by_symbol_net": {
+          "UNIUSDT": 57.756260317684735,
+          "NEARUSDT": 56.82017868388631,
+          "POLUSDT": 91.06249906249575,
+          "INJUSDT": 186.7709938222397,
+          "ADAUSDT": 43.05061494171174
+        },
+        "partial_terminal_exits": {},
+        "maxopen_full_confirm_bars": 4,
+        "verification": {
+          "all_positions_closed": true,
+          "every_exit_fee_reconciled": true,
+          "cash_and_bar_drawdown_reconciled": true
+        }
+      },
+      "no_tp2": {
+        "file": "experiments/results/N1-no-tp2-20260910_240d.json",
+        "sha256": "b39dd8dfed68e773b3a0389ef5cafa18780e2ee74ef05dc1022bc0f86f0a35b9",
+        "arm": {
+          "id": "N1-no-tp2-20260910",
+          "days": 240,
+          "env": [
+            "X_TP2_ATR=inf"
+          ]
+        },
+        "net": 540.5767384282367,
+        "final_balance": 1540.5767384281935,
+        "max_drawdown_pct": -6.2349330800614275,
+        "hard_stops": 0,
+        "full_positions": 114,
+        "probes": 552,
+        "partial_tp2_positions": 0,
+        "all_legs": 1332,
+        "entry_cost": 84.63641968365845,
+        "by_symbol_net": {
+          "UNIUSDT": 15.595617125866074,
+          "NEARUSDT": 83.13220112911976,
+          "POLUSDT": 82.82324864961937,
+          "INJUSDT": 280.4929711840026,
+          "ADAUSDT": 78.53270033963028
+        },
+        "partial_terminal_exits": {},
+        "maxopen_full_confirm_bars": 10,
+        "verification": {
+          "all_positions_closed": true,
+          "every_exit_fee_reconciled": true,
+          "cash_and_bar_drawdown_reconciled": true
+        }
+      },
+      "half_tp2": {
+        "file": "experiments/results/N2-tp2-half-20260911_240d.json",
+        "sha256": "9c6abb07bc3089639a4a776da1d43c6ab44c4afaea02124476065b83306ee6b1",
+        "arm": {
+          "id": "N2-tp2-half-20260911",
+          "days": 240,
+          "env": [
+            "BT_TP2_CLOSE_FRAC=0.5"
+          ]
+        },
+        "net": 508.618093951039,
+        "final_balance": 1508.6180939509957,
+        "max_drawdown_pct": -6.178887572716082,
+        "hard_stops": 0,
+        "full_positions": 114,
+        "probes": 552,
+        "partial_tp2_positions": 35,
+        "all_legs": 1367,
+        "entry_cost": 84.63641968365845,
+        "by_symbol_net": {
+          "UNIUSDT": 47.460328258154036,
+          "NEARUSDT": 69.93924337822737,
+          "POLUSDT": 88.93809928592172,
+          "INJUSDT": 239.7677208595052,
+          "ADAUSDT": 62.51270216923193
+        },
+        "partial_terminal_exits": {
+          "TRAIL": 31,
+          "TIMEOUT": 4
+        },
+        "maxopen_full_confirm_bars": 10,
+        "verification": {
+          "all_positions_closed": true,
+          "every_exit_fee_reconciled": true,
+          "cash_and_bar_drawdown_reconciled": true
+        }
+      },
+      "comparison": {
+        "half_minus_baseline_net": 73.15754712302135,
+        "half_minus_baseline_dd_percentage_points": -0.038296383201195106,
+        "half_minus_no_tp2_net": -31.95864447719771,
+        "half_beats_baseline": true,
+        "half_no_tp2_same_entry_keys": true,
+        "half_no_tp2_changed_notionals": 0
+      }
+    },
+    "665": {
+      "baseline": {
+        "file": "experiments/results/R1-sl225t96_665d.json",
+        "sha256": "b308e57b28c2c6ecb3281965d0b2b4cc752219814dc3d7af28bac781bb936751",
+        "arm": {
+          "id": "R1-sl225t96",
+          "days": 665,
+          "env": [
+            "BT_RESTARTS=1",
+            "X_TP1_CLOSE_FRAC=0.0",
+            "X_MR_ENABLED=0",
+            "X_SL_FULL_ATR=2.25",
+            "X_TP1_ATR=3.0",
+            "X_TP2_ATR=6.0",
+            "X_TRAIL_ATR=3.75",
+            "X_TIMEOUT_BARS=96"
+          ]
+        },
+        "net": 85.22335588846212,
+        "final_balance": 1085.223355888475,
+        "max_drawdown_pct": -37.55893908718189,
+        "hard_stops": 3,
+        "full_positions": 396,
+        "probes": 2157,
+        "partial_tp2_positions": 0,
+        "all_legs": 5106,
+        "entry_cost": 222.66690474905354,
+        "by_symbol_net": {
+          "UNIUSDT": -65.59561423443398,
+          "ADAUSDT": -120.57407398287512,
+          "INJUSDT": 226.5741025699764,
+          "POLUSDT": 99.34670132621012,
+          "NEARUSDT": -54.52775979041196
+        },
+        "partial_terminal_exits": {},
+        "maxopen_full_confirm_bars": 82,
+        "verification": {
+          "all_positions_closed": true,
+          "every_exit_fee_reconciled": true,
+          "cash_and_bar_drawdown_reconciled": true
+        }
+      },
+      "no_tp2": {
+        "file": "experiments/results/N1-no-tp2-20260910_665d.json",
+        "sha256": "d341d8b2ed25fcbc1a792f8616aa4585f5764fb7932881ec99056678beacf0fe",
+        "arm": {
+          "id": "N1-no-tp2-20260910",
+          "days": 665,
+          "env": [
+            "BT_RESTARTS=1",
+            "X_TP2_ATR=inf"
+          ]
+        },
+        "net": 68.89242343106847,
+        "final_balance": 1068.8924234310875,
+        "max_drawdown_pct": -45.57088885763896,
+        "hard_stops": 4,
+        "full_positions": 387,
+        "probes": 2158,
+        "partial_tp2_positions": 0,
+        "all_legs": 5090,
+        "entry_cost": 215.2962347682293,
+        "by_symbol_net": {
+          "UNIUSDT": -104.68460818984619,
+          "ADAUSDT": -85.759945999161,
+          "INJUSDT": 244.99348385624174,
+          "POLUSDT": 23.53299479700491,
+          "NEARUSDT": -9.189501033167678
+        },
+        "partial_terminal_exits": {},
+        "maxopen_full_confirm_bars": 103,
+        "verification": {
+          "all_positions_closed": true,
+          "every_exit_fee_reconciled": true,
+          "cash_and_bar_drawdown_reconciled": true
+        }
+      },
+      "half_tp2": {
+        "file": "experiments/results/N2-tp2-half-20260911_665d.json",
+        "sha256": "ed0cdaaabd89ab6c3585f1efe6242d7246ed7bb280f8e841ae30803adc7476f3",
+        "arm": {
+          "id": "N2-tp2-half-20260911",
+          "days": 665,
+          "env": [
+            "BT_RESTARTS=1",
+            "BT_TP2_CLOSE_FRAC=0.5"
+          ]
+        },
+        "net": 58.705137646057416,
+        "final_balance": 1058.7051376460834,
+        "max_drawdown_pct": -37.34961147493373,
+        "hard_stops": 3,
+        "full_positions": 387,
+        "probes": 2158,
+        "partial_tp2_positions": 81,
+        "all_legs": 5171,
+        "entry_cost": 219.4017281393849,
+        "by_symbol_net": {
+          "UNIUSDT": -49.38180017876054,
+          "ADAUSDT": -123.22782951691977,
+          "INJUSDT": 255.08320123636034,
+          "POLUSDT": 10.095973998502918,
+          "NEARUSDT": -33.86440789312306
+        },
+        "partial_terminal_exits": {
+          "TRAIL": 74,
+          "TIMEOUT": 7
+        },
+        "maxopen_full_confirm_bars": 103,
+        "verification": {
+          "all_positions_closed": true,
+          "every_exit_fee_reconciled": true,
+          "cash_and_bar_drawdown_reconciled": true
+        }
+      },
+      "comparison": {
+        "half_minus_baseline_net": -26.518218242404707,
+        "half_minus_baseline_dd_percentage_points": 0.20932761224815977,
+        "half_minus_no_tp2_net": -10.18728578501105,
+        "half_beats_baseline": false,
+        "half_no_tp2_same_entry_keys": true,
+        "half_no_tp2_changed_notionals": 96
+      }
+    }
+  },
+  "cache_manifest": {
+    "240": {
+      "UNIUSDT": {
+        "file": "backtests/data/UNIUSDT_240d+40w.pkl",
+        "sha256": "a90bddf04530dc16ead2b716c7b451c4a3de97d31a8f0491e659f33eee4f2e13",
+        "bars": 80641,
+        "start": 1763409900000,
+        "end": 1787601900000
+      },
+      "INJUSDT": {
+        "file": "backtests/data/INJUSDT_240d+40w.pkl",
+        "sha256": "cf199115961df595079d68361befd2bbc926e68bd45cff95b8b9fe5a0dcc4e4b",
+        "bars": 80640,
+        "start": 1763410200000,
+        "end": 1787601900000
+      },
+      "ADAUSDT": {
+        "file": "backtests/data/ADAUSDT_240d+40w.pkl",
+        "sha256": "5b310f6730e275e6fe045d94f9903f8a20c822fe141b7d4e525de9e089d78d37",
+        "bars": 80640,
+        "start": 1763410200000,
+        "end": 1787601900000
+      },
+      "POLUSDT": {
+        "file": "backtests/data/POLUSDT_240d+40w.pkl",
+        "sha256": "833cb15667cabf5cc74e09d5a1a50ab52f5567159aa9d1d01652ce7a7f1e972e",
+        "bars": 80640,
+        "start": 1763410200000,
+        "end": 1787601900000
+      },
+      "NEARUSDT": {
+        "file": "backtests/data/NEARUSDT_240d+40w.pkl",
+        "sha256": "d8f52ec87d70f609403fa6b8fe08d55462d483596505792ac1a4270900d13726",
+        "bars": 80640,
+        "start": 1763410200000,
+        "end": 1787601900000
+      },
+      "BTCUSDT": {
+        "file": "backtests/data/BTCUSDT_240d+40w.pkl",
+        "sha256": "93633c63c67514097f05fef75a4c273c41c169a097d4eef28dc544b7447063ea",
+        "bars": 80640,
+        "start": 1763410200000,
+        "end": 1787601900000
+      }
+    },
+    "665": {
+      "UNIUSDT": {
+        "file": "backtests/data/UNIUSDT_665d+40w.pkl",
+        "sha256": "51117cc2805343cd73bf63696e53d1fa76f53e1168419d5f790fad465415ed1d",
+        "bars": 203041,
+        "start": 1726692900000,
+        "end": 1787604900000
+      },
+      "INJUSDT": {
+        "file": "backtests/data/INJUSDT_665d+40w.pkl",
+        "sha256": "b29b83b977aa3656163e431c834387866f1a4b99c028c1d19ce83eb5766fc5e1",
+        "bars": 203041,
+        "start": 1726693500000,
+        "end": 1787605500000
+      },
+      "ADAUSDT": {
+        "file": "backtests/data/ADAUSDT_665d+40w.pkl",
+        "sha256": "1c5ab8f5e4006a3b2be516112505291b26fd60f15a7a028b5522104c77aba64c",
+        "bars": 203041,
+        "start": 1726692600000,
+        "end": 1787604600000
+      },
+      "POLUSDT": {
+        "file": "backtests/data/POLUSDT_665d+40w.pkl",
+        "sha256": "a30cd7bee327ddbfd70638af8b65a4e63d7fa9afade75cb52f1e0a93936c4042",
+        "bars": 203040,
+        "start": 1726693200000,
+        "end": 1787604900000
+      },
+      "NEARUSDT": {
+        "file": "backtests/data/NEARUSDT_665d+40w.pkl",
+        "sha256": "55217b886ef059290abdf1c19f582685c8b3e7268bf82d9d472f06e12e3d8b04",
+        "bars": 203041,
+        "start": 1726692300000,
+        "end": 1787604300000
+      },
+      "BTCUSDT": {
+        "file": "backtests/data/BTCUSDT_665d+40w.pkl",
+        "sha256": "1e843203fa978476fbd36309ec8ccc2c28da378310231257d790e2bb2ac1be3a",
+        "bars": 203040,
+        "start": 1726692000000,
+        "end": 1787603700000
+      }
+    }
+  },
+  "core_matches_adopted_commit": {
+    "strategy.py": "ea8b60388cfd71793bd0c3e34adf748435f790e959902961233fbae9e1215afc",
+    "config.py": "8670ef5dd9ffd6b313502fa649ce81592989405839c604f06f50bd7c1051ce31",
+    "metrics.py": "0831b328833bc9e928088e9ccaf834bbd57cbc3b0ea31137105a47da53875151",
+    "backtest.py": "94a2bd69f60ab84daafe3d0283b4daff9f0b52a49466a795810af533e8d9de29"
+  },
+  "live_paper_file_unchanged_from_head": "735fd43b4e31f8c46d988866d0e98ea76c935892c50028aab8ff7d8f799d7269",
+  "adopt": false
+}

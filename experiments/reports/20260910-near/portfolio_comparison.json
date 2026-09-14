@@ -1,0 +1,219 @@
+{
+  "windows_240d": [
+    {
+      "final_balance": 1435.460546827963,
+      "max_dd": -6.140591189514956,
+      "halted": false,
+      "n_halts": 0,
+      "days_run": 240.0,
+      "tally": {
+        "probe": 545,
+        "full": 114,
+        "confirm_ok": 116,
+        "confirm_fail": 374,
+        "maxopen_block": 4,
+        "probe_cost": -15.66941949625263,
+        "TP1": 0,
+        "TP2": 35,
+        "SL": 45,
+        "TRAIL": 31,
+        "TIMEOUT": 3,
+        "MR_TP": 0,
+        "MR_SL": 0,
+        "MR_TIMEOUT": 0
+      },
+      "recon_err": -5.4569682106375694e-11,
+      "arm": "N1-control-20260910",
+      "net_by_symbol": {
+        "UNIUSDT": 57.756260317684735,
+        "NEARUSDT": 56.82017868388631,
+        "POLUSDT": 91.06249906249575,
+        "INJUSDT": 186.7709938222397,
+        "ADAUSDT": 43.05061494171174
+      },
+      "unclosed": 0,
+      "entry_fees": -84.6365594123089
+    },
+    {
+      "final_balance": 1540.576738428182,
+      "max_dd": -6.2349330800615,
+      "halted": false,
+      "n_halts": 0,
+      "days_run": 240.0,
+      "tally": {
+        "probe": 552,
+        "full": 114,
+        "confirm_ok": 118,
+        "confirm_fail": 379,
+        "maxopen_block": 10,
+        "probe_cost": -15.571870561698402,
+        "TP1": 0,
+        "TP2": 0,
+        "SL": 42,
+        "TRAIL": 65,
+        "TIMEOUT": 7,
+        "MR_TP": 0,
+        "MR_SL": 0,
+        "MR_TIMEOUT": 0
+      },
+      "recon_err": -5.4797055781818926e-11,
+      "arm": "N1-no-tp2-20260910",
+      "net_by_symbol": {
+        "UNIUSDT": 15.595617125866074,
+        "NEARUSDT": 83.13220112911976,
+        "POLUSDT": 82.82324864961937,
+        "INJUSDT": 280.4929711840026,
+        "ADAUSDT": 78.53270033963028
+      },
+      "unclosed": 0,
+      "entry_fees": -84.63641968365845
+    }
+  ],
+  "common_full_entries": 110,
+  "control_only_entries": 4,
+  "candidate_only_entries": 4,
+  "top_matched_deltas": [
+    {
+      "symbol": "INJUSDT",
+      "start": 1776269100000,
+      "control": 25.1906034583151,
+      "candidate": 82.44402684967496,
+      "delta": 57.25342339135986
+    },
+    {
+      "symbol": "INJUSDT",
+      "start": 1773935700000,
+      "control": 24.804863587563776,
+      "candidate": 79.49429785648647,
+      "delta": 54.689434268922696
+    },
+    {
+      "symbol": "INJUSDT",
+      "start": 1779131100000,
+      "control": 25.832721124139812,
+      "candidate": 67.34335990036766,
+      "delta": 41.51063877622785
+    },
+    {
+      "symbol": "POLUSDT",
+      "start": 1767613500000,
+      "control": 25.017746228532406,
+      "candidate": 49.285099572325365,
+      "delta": 24.26735334379296
+    },
+    {
+      "symbol": "ADAUSDT",
+      "start": 1785746700000,
+      "control": 25.047725071899713,
+      "candidate": 49.02396635830358,
+      "delta": 23.97624128640387
+    }
+  ],
+  "bottom_matched_deltas": [
+    {
+      "symbol": "UNIUSDT",
+      "start": 1778255100000,
+      "control": 25.45968318711674,
+      "candidate": 10.687352630536804,
+      "delta": -14.772330556579938
+    },
+    {
+      "symbol": "INJUSDT",
+      "start": 1777625700000,
+      "control": 25.44581806759978,
+      "candidate": 10.130840492309762,
+      "delta": -15.314977575290019
+    },
+    {
+      "symbol": "INJUSDT",
+      "start": 1787498700000,
+      "control": 25.89298450218949,
+      "candidate": 9.889464300676929,
+      "delta": -16.003520201512558
+    },
+    {
+      "symbol": "INJUSDT",
+      "start": 1779445500000,
+      "control": 25.674039453347675,
+      "candidate": 9.394223488794207,
+      "delta": -16.279815964553467
+    },
+    {
+      "symbol": "POLUSDT",
+      "start": 1767885000000,
+      "control": 25.801822051698682,
+      "candidate": 9.503930010270611,
+      "delta": -16.29789204142807
+    }
+  ],
+  "windows_665d": [
+    {
+      "final_balance": 1085.2233558884727,
+      "max_dd": -37.5589390871818,
+      "halted": false,
+      "n_halts": 3,
+      "days_run": 665.0069444444445,
+      "tally": {
+        "probe": 2157,
+        "full": 396,
+        "confirm_ok": 423,
+        "confirm_fail": 1521,
+        "maxopen_block": 82,
+        "probe_cost": -63.62042899971243,
+        "TP1": 0,
+        "TP2": 83,
+        "SL": 203,
+        "TRAIL": 99,
+        "TIMEOUT": 11,
+        "MR_TP": 0,
+        "MR_SL": 0,
+        "MR_TIMEOUT": 0
+      },
+      "recon_err": 1.0601297617540695e-11,
+      "entry_fees": -222.66690474905354,
+      "arm": "R1-sl225t96",
+      "net_by_symbol": {
+        "UNIUSDT": -65.59561423443398,
+        "ADAUSDT": -120.57407398287512,
+        "INJUSDT": 226.5741025699764,
+        "POLUSDT": 99.34670132621012,
+        "NEARUSDT": -54.52775979041196
+      },
+      "unclosed": 0
+    },
+    {
+      "final_balance": 1068.8924234310866,
+      "max_dd": -45.57088885763886,
+      "halted": false,
+      "n_halts": 4,
+      "days_run": 665.0069444444445,
+      "tally": {
+        "probe": 2158,
+        "full": 387,
+        "confirm_ok": 418,
+        "confirm_fail": 1528,
+        "maxopen_block": 103,
+        "probe_cost": -63.70172101128139,
+        "TP1": 0,
+        "TP2": 0,
+        "SL": 193,
+        "TRAIL": 175,
+        "TIMEOUT": 19,
+        "MR_TP": 0,
+        "MR_SL": 0,
+        "MR_TIMEOUT": 0
+      },
+      "recon_err": 1.816147232602816e-11,
+      "entry_fees": -215.2962347682293,
+      "arm": "N1-no-tp2-20260910",
+      "net_by_symbol": {
+        "UNIUSDT": -104.68460818984619,
+        "ADAUSDT": -85.759945999161,
+        "INJUSDT": 244.99348385624174,
+        "POLUSDT": 23.53299479700491,
+        "NEARUSDT": -9.189501033167678
+      },
+      "unclosed": 0
+    }
+  ]
+}

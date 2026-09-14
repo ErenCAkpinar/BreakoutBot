@@ -24,7 +24,7 @@ LOG="experiments/logs/${ARM}_${DAYS}d.log"
 # Arms are declared as ENV=VAL pairs on the command line so the arm definition
 # and the run are the same string — nothing to keep in sync by hand.
 env "$@" BT_RUN_TAG="$TAG" \
-    python3.12 backtest.py --days "$DAYS" --cache > "$LOG" 2>&1
+    python3.12 experiments/run_backtest.py --days "$DAYS" --cache > "$LOG" 2>&1
 
 SRC="backtests/data/last_run_${DAYS}d_${TAG}.json"
 DST="experiments/results/${ARM}_${DAYS}d.json"

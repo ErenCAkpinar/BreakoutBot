@@ -1,0 +1,681 @@
+{
+  "scope": "Fixed-entry diagnostic, not a portfolio backtest; all times UTC",
+  "notes": [
+    "Same six recorded entries, exact archived ATR/notional/risk; probes excluded.",
+    "One original entry fee plus proportional exit fees; no new entry fee for the runner.",
+    "Same trail and original phase timeout; simulation continues until the residual exits.",
+    "Later signals, cooldown, throttle and cross-symbol slot competition are not regenerated."
+  ],
+  "sha256": {
+    "experiments/reports/20260910-near/replay_results.json": "813a851fdfc2ffe87fa2e70fba4bd22398e07929c0670ba80e5721bfc0efce2f",
+    "experiments/reports/20260910-near/near_5m.csv": "e570bd92005f9fff11f216d88da4b7b370292abd58bb1d8eb352d622a5932449",
+    "strategy.py": "ea8b60388cfd71793bd0c3e34adf748435f790e959902961233fbae9e1215afc",
+    "experiments/tp2_runner.py": "a3f81b5c24bd6b9965e5491dd9d86b58b5f0fa0b1208af2f5c65c2b9663de7da",
+    "experiments/reports/20260911-tp2-half/replay_near_fixed_entries.py": "11c816b1f263edb3367e3e4f213f813f3307bf92bcdf7f1a64fb18feac3f6426"
+  },
+  "rows": [
+    {
+      "entry_time": "2026-09-04T06:40:00+00:00",
+      "entry": 1.94,
+      "initial_risk": 5,
+      "atr": 0.008432103749449856,
+      "notional": 511.27348989181786,
+      "actual_recorded_net": 4.0769,
+      "baseline": {
+        "close_fraction": 1.0,
+        "entry_fee": 0.3834551174188634,
+        "exit_fee_total": 0.3834551174188634,
+        "gross_pnl": 4.843818468002192,
+        "net": 4.076908233164465,
+        "final_time": "2026-09-04T07:55:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-04T07:55:00+00:00",
+            "reason": "TRAIL",
+            "price": 1.958379610939563,
+            "entry_notional_closed": 511.27348989181786,
+            "gross_pnl": 4.843818468002192,
+            "exit_fee": 0.3834551174188634,
+            "exit_pnl": 4.460363350583329
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T07:05:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T07:55:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "no_tp2": {
+        "close_fraction": 0.0,
+        "entry_fee": 0.3834551174188634,
+        "exit_fee_total": 0.3834551174188634,
+        "gross_pnl": 4.843818468002192,
+        "net": 4.076908233164465,
+        "final_time": "2026-09-04T07:55:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-04T07:55:00+00:00",
+            "reason": "TRAIL",
+            "price": 1.958379610939563,
+            "entry_notional_closed": 511.27348989181786,
+            "gross_pnl": 4.843818468002192,
+            "exit_fee": 0.3834551174188634,
+            "exit_pnl": 4.460363350583329
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T07:05:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T07:55:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_tp2": {
+        "close_fraction": 0.5,
+        "entry_fee": 0.3834551174188634,
+        "exit_fee_total": 0.3834551174188634,
+        "gross_pnl": 4.843818468002192,
+        "net": 4.076908233164465,
+        "final_time": "2026-09-04T07:55:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-04T07:55:00+00:00",
+            "reason": "TRAIL",
+            "price": 1.958379610939563,
+            "entry_notional_closed": 511.27348989181786,
+            "gross_pnl": 4.843818468002192,
+            "exit_fee": 0.3834551174188634,
+            "exit_pnl": 4.460363350583329
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T07:05:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T07:55:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_minus_baseline": 0.0
+    },
+    {
+      "entry_time": "2026-09-04T09:00:00+00:00",
+      "entry": 1.981,
+      "initial_risk": 5,
+      "atr": 0.008948872046870338,
+      "notional": 491.93040186129366,
+      "actual_recorded_net": 12.5955,
+      "baseline": {
+        "close_fraction": 1.0,
+        "entry_fee": 0.3689478013959703,
+        "exit_fee_total": 0.3689478013959703,
+        "gross_pnl": 13.333333333333336,
+        "net": 12.595437730541395,
+        "final_time": "2026-09-04T10:05:00+00:00",
+        "final_reason": "TP2",
+        "legs": [
+          {
+            "time": "2026-09-04T10:05:00+00:00",
+            "reason": "TP2",
+            "price": 2.034693232281222,
+            "entry_notional_closed": 491.93040186129366,
+            "gross_pnl": 13.333333333333336,
+            "exit_fee": 0.3689478013959703,
+            "exit_pnl": 12.964385531937365
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T09:40:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T10:05:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "no_tp2": {
+        "close_fraction": 0.0,
+        "entry_fee": 0.3689478013959703,
+        "exit_fee_total": 0.3689478013959703,
+        "gross_pnl": 5.572826436597192,
+        "net": 4.8349308338052515,
+        "final_time": "2026-09-04T10:15:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-04T10:15:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.003441729824236,
+            "entry_notional_closed": 491.93040186129366,
+            "gross_pnl": 5.572826436597192,
+            "exit_fee": 0.3689478013959703,
+            "exit_pnl": 5.203878635201222
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T09:40:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T10:15:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_tp2": {
+        "close_fraction": 0.5,
+        "entry_fee": 0.3689478013959703,
+        "exit_fee_total": 0.3689478013959703,
+        "gross_pnl": 9.453079884965264,
+        "net": 8.715184282173324,
+        "final_time": "2026-09-04T10:15:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-04T10:05:00+00:00",
+            "reason": "TP2_PARTIAL",
+            "price": 2.034693232281222,
+            "entry_notional_closed": 245.96520093064683,
+            "gross_pnl": 6.666666666666668,
+            "exit_fee": 0.18447390069798514,
+            "exit_pnl": 6.482192765968683
+          },
+          {
+            "time": "2026-09-04T10:15:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.003441729824236,
+            "entry_notional_closed": 245.96520093064683,
+            "gross_pnl": 2.786413218298596,
+            "exit_fee": 0.18447390069798514,
+            "exit_pnl": 2.601939317600611
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T09:40:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T10:15:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_minus_baseline": -3.8802534483680713
+    },
+    {
+      "entry_time": "2026-09-04T19:20:00+00:00",
+      "entry": 2.064,
+      "initial_risk": 5,
+      "atr": 0.013610725393313464,
+      "notional": 336.98914158682214,
+      "actual_recorded_net": 12.8279,
+      "baseline": {
+        "close_fraction": 1.0,
+        "entry_fee": 0.25274185619011663,
+        "exit_fee_total": 0.25274185619011663,
+        "gross_pnl": 13.333333333333332,
+        "net": 12.8278496209531,
+        "final_time": "2026-09-04T19:40:00+00:00",
+        "final_reason": "TP2",
+        "legs": [
+          {
+            "time": "2026-09-04T19:40:00+00:00",
+            "reason": "TP2",
+            "price": 2.145664352359881,
+            "entry_notional_closed": 336.98914158682214,
+            "gross_pnl": 13.333333333333332,
+            "exit_fee": 0.25274185619011663,
+            "exit_pnl": 13.080591477143216
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T19:30:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T19:40:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "no_tp2": {
+        "close_fraction": 0.0,
+        "entry_fee": 0.25274185619011663,
+        "exit_fee_total": 0.25274185619011663,
+        "gross_pnl": 11.912138351146327,
+        "net": 11.406654638766094,
+        "final_time": "2026-09-04T20:10:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-04T20:10:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.136959779775075,
+            "entry_notional_closed": 336.98914158682214,
+            "gross_pnl": 11.912138351146327,
+            "exit_fee": 0.25274185619011663,
+            "exit_pnl": 11.65939649495621
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T19:30:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T20:10:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_tp2": {
+        "close_fraction": 0.5,
+        "entry_fee": 0.25274185619011663,
+        "exit_fee_total": 0.25274185619011663,
+        "gross_pnl": 12.62273584223983,
+        "net": 12.117252129859597,
+        "final_time": "2026-09-04T20:10:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-04T19:40:00+00:00",
+            "reason": "TP2_PARTIAL",
+            "price": 2.145664352359881,
+            "entry_notional_closed": 168.49457079341107,
+            "gross_pnl": 6.666666666666666,
+            "exit_fee": 0.12637092809505832,
+            "exit_pnl": 6.540295738571608
+          },
+          {
+            "time": "2026-09-04T20:10:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.136959779775075,
+            "entry_notional_closed": 168.49457079341107,
+            "gross_pnl": 5.956069175573163,
+            "exit_fee": 0.12637092809505832,
+            "exit_pnl": 5.829698247478105
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-04T19:30:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-04T20:10:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_minus_baseline": -0.7105974910935018
+    },
+    {
+      "entry_time": "2026-09-06T05:25:00+00:00",
+      "entry": 2.226,
+      "initial_risk": 5,
+      "atr": 0.016382158207191244,
+      "notional": 301.95451686550297,
+      "actual_recorded_net": 12.8804,
+      "baseline": {
+        "close_fraction": 1.0,
+        "entry_fee": 0.22646588764912723,
+        "exit_fee_total": 0.22646588764912723,
+        "gross_pnl": 13.333333333333334,
+        "net": 12.88040155803508,
+        "final_time": "2026-09-06T08:10:00+00:00",
+        "final_reason": "TP2",
+        "legs": [
+          {
+            "time": "2026-09-06T08:10:00+00:00",
+            "reason": "TP2",
+            "price": 2.3242929492431474,
+            "entry_notional_closed": 301.95451686550297,
+            "gross_pnl": 13.333333333333334,
+            "exit_fee": 0.22646588764912723,
+            "exit_pnl": 13.106867445684207
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-06T07:10:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-06T08:10:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "no_tp2": {
+        "close_fraction": 0.0,
+        "entry_fee": 0.22646588764912723,
+        "exit_fee_total": 0.22646588764912723,
+        "gross_pnl": 10.521867854584457,
+        "net": 10.068936079286203,
+        "final_time": "2026-09-06T08:30:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-06T08:30:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.303566906723033,
+            "entry_notional_closed": 301.95451686550297,
+            "gross_pnl": 10.521867854584457,
+            "exit_fee": 0.22646588764912723,
+            "exit_pnl": 10.29540196693533
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-06T07:10:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-06T08:30:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_tp2": {
+        "close_fraction": 0.5,
+        "entry_fee": 0.22646588764912723,
+        "exit_fee_total": 0.22646588764912723,
+        "gross_pnl": 11.927600593958896,
+        "net": 11.474668818660643,
+        "final_time": "2026-09-06T08:30:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-06T08:10:00+00:00",
+            "reason": "TP2_PARTIAL",
+            "price": 2.3242929492431474,
+            "entry_notional_closed": 150.97725843275148,
+            "gross_pnl": 6.666666666666667,
+            "exit_fee": 0.11323294382456361,
+            "exit_pnl": 6.553433722842104
+          },
+          {
+            "time": "2026-09-06T08:30:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.303566906723033,
+            "entry_notional_closed": 150.97725843275148,
+            "gross_pnl": 5.260933927292228,
+            "exit_fee": 0.11323294382456361,
+            "exit_pnl": 5.147700983467665
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-06T07:10:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-06T08:30:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_minus_baseline": -1.4057327393744377
+    },
+    {
+      "entry_time": "2026-09-06T09:05:00+00:00",
+      "entry": 2.338,
+      "initial_risk": 10,
+      "atr": 0.022753378755098197,
+      "notional": 456.684311501774,
+      "actual_recorded_net": 25.9817,
+      "baseline": {
+        "close_fraction": 1.0,
+        "entry_fee": 0.3425132336263305,
+        "exit_fee_total": 0.3425132336263305,
+        "gross_pnl": 26.666666666666668,
+        "net": 25.981640199414006,
+        "final_time": "2026-09-06T14:05:00+00:00",
+        "final_reason": "TP2",
+        "legs": [
+          {
+            "time": "2026-09-06T14:05:00+00:00",
+            "reason": "TP2",
+            "price": 2.4745202725305893,
+            "entry_notional_closed": 456.684311501774,
+            "gross_pnl": 26.666666666666668,
+            "exit_fee": 0.3425132336263305,
+            "exit_pnl": 26.324153433040337
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-06T10:40:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-06T14:05:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "no_tp2": {
+        "close_fraction": 0.0,
+        "entry_fee": 0.3425132336263305,
+        "exit_fee_total": 0.3425132336263305,
+        "gross_pnl": 12.437679960264186,
+        "net": 11.752653493011524,
+        "final_time": "2026-09-06T14:25:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-06T14:25:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.401674829668382,
+            "entry_notional_closed": 456.684311501774,
+            "gross_pnl": 12.437679960264186,
+            "exit_fee": 0.3425132336263305,
+            "exit_pnl": 12.095166726637855
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-06T10:40:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-06T14:25:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_tp2": {
+        "close_fraction": 0.5,
+        "entry_fee": 0.3425132336263305,
+        "exit_fee_total": 0.3425132336263305,
+        "gross_pnl": 19.552173313465428,
+        "net": 18.867146846212766,
+        "final_time": "2026-09-06T14:25:00+00:00",
+        "final_reason": "TRAIL",
+        "legs": [
+          {
+            "time": "2026-09-06T14:05:00+00:00",
+            "reason": "TP2_PARTIAL",
+            "price": 2.4745202725305893,
+            "entry_notional_closed": 228.342155750887,
+            "gross_pnl": 13.333333333333334,
+            "exit_fee": 0.17125661681316526,
+            "exit_pnl": 13.162076716520168
+          },
+          {
+            "time": "2026-09-06T14:25:00+00:00",
+            "reason": "TRAIL",
+            "price": 2.401674829668382,
+            "entry_notional_closed": 228.342155750887,
+            "gross_pnl": 6.218839980132093,
+            "exit_fee": 0.17125661681316526,
+            "exit_pnl": 6.047583363318927
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-06T10:40:00+00:00",
+            "SCALE_OPEN",
+            "TRAILING"
+          ],
+          [
+            "2026-09-06T14:25:00+00:00",
+            "TRAILING",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_minus_baseline": -7.11449335320124
+    },
+    {
+      "entry_time": "2026-09-06T22:35:00+00:00",
+      "entry": 2.455,
+      "initial_risk": 10,
+      "atr": 0.022476340315545882,
+      "notional": 485.44874111753785,
+      "actual_recorded_net": -10.7282,
+      "baseline": {
+        "close_fraction": 1.0,
+        "entry_fee": 0.3640865558381534,
+        "exit_fee_total": 0.3640865558381534,
+        "gross_pnl": -10.0,
+        "net": -10.728173111676305,
+        "final_time": "2026-09-07T00:55:00+00:00",
+        "final_reason": "SL",
+        "legs": [
+          {
+            "time": "2026-09-07T00:55:00+00:00",
+            "reason": "SL",
+            "price": 2.404428234290022,
+            "entry_notional_closed": 485.44874111753785,
+            "gross_pnl": -10.0,
+            "exit_fee": 0.3640865558381534,
+            "exit_pnl": -10.364086555838153
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-07T00:55:00+00:00",
+            "SCALE_OPEN",
+            "IDLE"
+          ]
+        ]
+      },
+      "no_tp2": {
+        "close_fraction": 0.0,
+        "entry_fee": 0.3640865558381534,
+        "exit_fee_total": 0.3640865558381534,
+        "gross_pnl": -10.0,
+        "net": -10.728173111676305,
+        "final_time": "2026-09-07T00:55:00+00:00",
+        "final_reason": "SL",
+        "legs": [
+          {
+            "time": "2026-09-07T00:55:00+00:00",
+            "reason": "SL",
+            "price": 2.404428234290022,
+            "entry_notional_closed": 485.44874111753785,
+            "gross_pnl": -10.0,
+            "exit_fee": 0.3640865558381534,
+            "exit_pnl": -10.364086555838153
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-07T00:55:00+00:00",
+            "SCALE_OPEN",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_tp2": {
+        "close_fraction": 0.5,
+        "entry_fee": 0.3640865558381534,
+        "exit_fee_total": 0.3640865558381534,
+        "gross_pnl": -10.0,
+        "net": -10.728173111676305,
+        "final_time": "2026-09-07T00:55:00+00:00",
+        "final_reason": "SL",
+        "legs": [
+          {
+            "time": "2026-09-07T00:55:00+00:00",
+            "reason": "SL",
+            "price": 2.404428234290022,
+            "entry_notional_closed": 485.44874111753785,
+            "gross_pnl": -10.0,
+            "exit_fee": 0.3640865558381534,
+            "exit_pnl": -10.364086555838153
+          }
+        ],
+        "transitions": [
+          [
+            "2026-09-07T00:55:00+00:00",
+            "SCALE_OPEN",
+            "IDLE"
+          ]
+        ]
+      },
+      "half_minus_baseline": 0.0
+    }
+  ],
+  "total_net": {
+    "baseline": 57.63406423043174,
+    "no_tp2": 31.41191016635723,
+    "half_tp2": 44.52298719839449
+  },
+  "half_minus_baseline": -13.111077032037251,
+  "verification": {
+    "baseline_exits_matched": 6,
+    "no_tp2_exits_matched": 6,
+    "fee_reconciliations_passed": 18,
+    "halfway_pnl_checks_passed": 6
+  }
+}

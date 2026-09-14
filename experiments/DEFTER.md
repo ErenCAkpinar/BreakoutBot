@@ -945,6 +945,167 @@ inşa etmeden önce öğrenildi.
 
 ---
 
+## NEAR tekrar giriş incelemesi — 2026-09-10
+
+**Soru:** 4 ve 6 Eylül'de NEARUSDT aynı BULL rejiminde birkaç kez TP2'de
+kapanıp yeniden LONG açıyor. Tek pozisyon taşımak daha fazla net getiri sağlar mı?
+
+**Önceden belirlenen H-N1:** Sabit TP2 tavanını kaldırıp mevcut 3.75 ATR trail,
+96 bar faz timeout'u, giriş sinyalleri ve risk kurallarını korumak, güçlü
+hareketlerde kazananı uzatır ve yeniden giriş maliyetini azaltabilir. Ters risk:
+gerçekleşmemiş kârın geri verilmesi ve iki portföy yuvasından birinin daha uzun
+meşgul kalması. Günlük tek işlem kotası ayrı hipotezdir; bu deney onu ölçmez.
+
+Kontrol `N1-control-20260910`: güncel config varsayılanları.
+Aday `N1-no-tp2-20260910`: yalnız `X_TP2_ATR=inf` (sonlu fiyatlarda TP2 erişilemez;
+SL/trail/timeout hâlâ işler). Çalışan botun kodu veya ayarları değiştirilmedi.
+
+İlk tarama: aynı sabitlenmiş 240g verisi, 5 coin, ortak hesap, tüm yürütme
+maliyetleri ve portföy kapılarıyla `experiments/run_arm.sh` üzerinden iki kol.
+240g'de hesap getirisini iyileştirmezse ret; iyileştirirse 665g karşılaştırması
+gerekir. İki pencereyi geçmeden benimseme yok; geçmesi de istatistiksel kanıt
+veya yeni veri üzerinde doğrulama yerine geçmez.
+
+### 240g sonucu — 11 Eylül'de incelendi
+
+| Kol | Net hesap kârı | Son bakiye | Full | MaxDD (gerçekleşmiş bakiye) | Hard stop |
+|---|---:|---:|---:|---:|---:|
+| N1-control-20260910 | +$435.46 | $1435.46 | 114 | −%6.14 | 0 |
+| N1-no-tp2-20260910 | **+$540.58** | **$1540.58** | 114 | −%6.23 | 0 |
+
+Kontrol, benimsenmiş `R1-sl225t96_240d` sonucunun **1.318 bacağını ve bakiyesini
+birebir** tekrar üretti. Her iki kol tam 240g koştu; açık bacak yok, mutabakat
+hatası ~0. Adayda TP2=0, SL=42, TRAIL=65, TIMEOUT=7.
+
+Fark +$105.12; komisyon tasarrufu değil (giriş maliyeti iki kolda da $84.64,
+full sayısı 114). INJ net katkı artışı +$93.72, NEAR +$26.31, ADA +$35.48;
+UNI −$42.16, POL −$8.24. İki eşleşen INJ işleminin ek kârı toplam farktan
+büyük: nadir uzun kazananlara bağımlılık var. 240g taraması olumlu; **benimseme
+kararı değil**.
+
+Eylül'deki altı gerçek NEAR girişinde ayrı çıkış replay'i yapıldı. Kontrolün
+altı çıkış zamanı/türü/fiyatı kayıtları tekrar üretti. Yalnız TP2 kaldırılınca
+dört TP2 kazancı da azaldı: net $12.60→$4.83, $12.83→$11.41,
+$12.88→$10.07, $25.98→$11.75; mevcut trail geri çekilmelerde kapatıyor.
+Bu eşleşmiş-giriş teşhisi portföy testi değildir; yeniden giriş zamanlarını
+aynı varsayar. Eylül örneği ile 240g sonucun ters yönlü olması, tek ekranın
+strateji değişikliği için kanıt olamayacağını gösteriyor.
+
+665g aday başlatıldı: `./experiments/run_arm.sh N1-no-tp2-20260910 665
+BT_RESTARTS=1 X_TP2_ATR=inf`. Referans kayıtlı `R1-sl225t96_665d` ($1085.22,
+MaxDD −%37.56, 3 hard stop); çekirdek kod benimsenmiş sürümle aynı, taze 240g
+kontrolü de bunu davranışsal olarak doğruladı. 665g kontrolü yeniden koşulmadı.
+### 665g tamamlandı — N1 reddedildi
+
+| Kol | Net hesap kârı | Son bakiye | Full | MaxDD (gerçekleşmiş bakiye) | Hard stop |
+|---|---:|---:|---:|---:|---:|
+| R1-sl225t96 (kayıtlı kontrol) | **+$85.22** | **$1085.22** | 396 | **−%37.56** | **3** |
+| N1-no-tp2-20260910 (yeni) | +$68.89 | $1068.89 | 387 | −%45.57 | 4 |
+
+Aday tam 665g'yi tamamladı; TP2=0, SL=193, TRAIL=175, TIMEOUT=19; 5.090 bacak,
+açık bacak yok, mutabakat ~0. Giriş maliyeti $222.67→$215.30 azalsa da
+net kâr **$16.33 azaldı**; MaxDD **8.01 yüzde puan kötüleşti**, bir ek hard
+stop gerekti. Her iki 665g sonucu operatör restart'ı varsayımı içerir.
+
+**Karar: RED.** 240g'de +$105.12 iyileşme, 665g'de −$16.33 kötüleşme:
+iki pencere şartını geçmiyor. Bu küçük kâr farkı, hangi kuralın daha iyi
+olduğuna ilişkin istatistiksel kanıt değildir; benimseme şartı sağlanmadı ve risk davranışı da
+kötüleşti. Mevcut TP2 ve yeniden giriş düzeni korundu; canlı değişiklik yok.
+
+NEAR katkısı tek başına iki pencerede iyileşti (240g +$56.82→+$83.13;
+665g −$54.53→−$9.19). Bütün coinlerin çıkışı değişmiş bir portföyden geldiği
+için bu, NEAR'a özel parametre kararı değildir. Ayrı hipotez ve yeni veri
+doğrulaması olmadan coin bazında seçip uygulama yok. Eylül'deki dört gerçek
+TP2 işleminin eşleşmiş giriş analizinde hepsi kötüleşti.
+
+Ayrıntılar ve fiyat grafiği: [NEAR incelemesi](reports/20260910-near/REPORT.md).
+
+---
+
+## N2 — TP2'de yarım kapanış, kalanla devam — 2026-09-11
+
+**Kullanıcı isteği:** TP2'de bir kısmını kapatıp kalanı taşıma fikrini dene.
+**Önceden belirlenen tek kol:** %50 TP2 kapanışı; kalan %50 aynı 3.75 ATR trail
+ve mevcut 96 bar faz deadline'ıyla devam eder. TP2'de sayaç sıfırlanmaz. Başlangıç
+riski, SL, TP1, sinyal, cooldown ve portföy slotu kuralları aynı. Kalan parça
+açıkken sembolde yeni giriş olmaz ve MAX_OPEN slotu serbest kalmaz.
+
+Hipotez: N1'in büyük kazananlarını kısmen korurken TP2'de kârın yarısını
+gerçekleştirmek, geri vermeyi ve bakiye düşüşünü azaltabilir. Karşı risk:
+pozisyonlar slot tutmaya devam eder, uzun kazananların getirisi yarılanır ve
+partial PnL hesap risk frenlerinin sonraki kararlarını değiştirir.
+
+Uygulama yalnız `experiments/tp2_runner.py` ve araştırma başlatıcısında;
+`strategy.py`, `config.py`, `paper_bb.py`, `metrics.py` değişmedi. Başlatıcı
+yalnız kendi replay sürecinde strateji sınıfını ve TP2_PARTIAL toplama kuralını
+seçer. İki çıkış bacağı tek pozisyon sayılır; her parçanın çıkış maliyeti
+yalnız kendi büyüklüğünden alınır. Hedef+eski trail aynı mumda görülürse tam
+TRAIL öncelikli; hedef+timeout aynı mumda görülürse yarım TP2 ve kalan için
+aynı mum kapanışında TIMEOUT. Kısmi TP2 tek seferliktir.
+
+Koşular (iki pencere de tamamlanacak; oran taraması yok):
+
+```sh
+./experiments/run_arm.sh N2-tp2-half-20260911 240 BT_TP2_CLOSE_FRAC=0.5
+./experiments/run_arm.sh N2-tp2-half-20260911 665 BT_RESTARTS=1 BT_TP2_CLOSE_FRAC=0.5
+python3.12 experiments/ledger.py
+```
+
+Mevcut referanslar N1-control-20260910_240d ($1435.46) ve
+R1-sl225t96_665d ($1085.22). İkinci referans operatör restart'ları varsayar;
+aday da aynı varsayımla koşar. Aynı sabitlenmiş veriler kullanılır. N1'in
+TP2'siz uç noktası ayrıca karşılaştırmada gösterilir. Benimseme için her iki
+pencerede mevcut hesabın net getirisini geçmek gerekir; DD ve hard stop da
+raporlanır. Deney sonucundan bağımsız, bu istek çalışan bota deploy kapsamıyor.
+
+**Durum: tamamlandı — RED.** İki koşu da tüm pencereyi bitirdi. Net rakamlar
+probe + giriş + çıkış maliyetleri dahil tek $1000 hesabın getirisidir.
+
+| Pencere | Mevcut net | N2 yarım TP2 net | Fark | Mevcut DD → N2 DD | Hard stop |
+|---|---:|---:|---:|---:|---:|
+| 240g | +$435.46 | +$508.62 | **+$73.16** | %6.14 → %6.18 | 0 → 0 |
+| 665g | +$85.22 | +$58.71 | **−$26.52** | %37.56 → %37.35 | 3 → 3 |
+
+665g üç karşılaştırma da operatör restart varsayımıyla; kesintisiz çalışma
+değil. N1 TP2'siz kolun netleri +$540.58 / +$68.89 ve DD'leri %6.23 / %45.57
+idi. N2 uzun dönemde N1'in düşüşünü azaltıyor, fakat getirisi iki referansın
+da altında. Mevcut sisteme göre 0.21 yüzde puanlık DD iyileşmesi, iki pencerede
+birden üstünlük şartının sağlanmadığı gerçeğini değiştirmiyor.
+
+240g: 114 ana pozisyon, 35 yarım TP2 (kalan 31 TRAIL / 4 TIMEOUT).
+665g: 387 ana pozisyon, 81 yarım TP2 (kalan 74 TRAIL / 7 TIMEOUT).
+N1 ve N2'nin girişleri iki pencerede aynı; 665g'de 96 pozisyonun büyüklüğü
+farklı. Erken kâr gerçekleşmesi hesap risk frenlerini değiştiriyor; portföy
+sonucu iki uç kuralın aritmetik ortalaması değil.
+
+Eylül'deki altı gerçek NEAR girişi sabit tutulduğunda mevcut **+$57.63**,
+yarım TP2 **+$44.52**, TP2'siz **+$31.41**. N2 farkı **−$13.11**; dört TP2
+işlemi kötüleşti, ilk TRAIL ve son SL değişmedi. Bu ayrı çalışma girişleri ve
+büyüklükleri sabit tutan çıkış teşhisi; portföy backtest'i değildir.
+
+Kontroller: 117 pytest geçti (23 yeni mekanizma testi); yeni araştırma
+dosyaları Ruff temiz, strateji/başlatıcı mypy temiz. Altı koşunun her çıkış
+maliyeti, pozisyon eşleşmesi, hesap neti ve bar sonu nakit DD'si bağımsız
+hesapla uzlaştı. Açık pozisyon kalmadı. 12 veri cache hash'i önceki manifestle
+aynı. İki pencere örtüşür; funding ve mum içi açık PnL düşüşü modellenmiyor.
+
+`ledger.py` çalıştırıldı, fakat varsayılan karşılaştırması eski `R1-baseline`'ı
+kullanıyor; oradaki “AL” bugünkü referansa göre geçerli değil. N2 için karar
+yukarıda açıkça belirtilen mevcut geometriye göre verildi. Karşılaştırmayı
+tekrar üretmek için:
+
+```sh
+python3.12 experiments/reports/20260911-tp2-half/compare_portfolios.py
+python3.12 experiments/reports/20260911-tp2-half/replay_near_fixed_entries.py
+```
+
+**Karar:** %50/%50 kolu alınmadı; mevcut TP2 ve yeniden giriş düzeni korundu.
+Diğer oranlar denenmedi; bu sonuç bütün kısmi çıkış tasarımları için genelleme
+değil. Çalışan simülasyon botuna değişiklik veya deploy yok.
+[Tam rapor ve ham sonuçlar](reports/20260911-tp2-half/REPORT.md).
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
