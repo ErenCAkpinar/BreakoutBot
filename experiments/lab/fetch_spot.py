@@ -93,7 +93,19 @@ def main() -> None:
         if not bars:
             print(f"  [{i:>2}/{len(syms)}] {sym:<12} kayıt yok")
             continue
-        with open(f"{OUT}/{sym}_{args.tf}.json", "w") as fh:
+        path = f"{OUT}/{sym}_{args.tf}.json"
+        # Append-only: merge with what is on disk, de-duplicate on ts. (Before
+        # 2026-09-14 this overwrote the file and a --since re-run threw the
+        # history away.)
+        if os.path.exists(path):
+            try:
+                old = json.load(open(path)).get("bars", [])
+            except Exception:
+                old = []
+            merged = {b[0]: b for b in old}
+            merged.update({b[0]: b for b in bars})
+            bars = [merged[k] for k in sorted(merged)]
+        with open(path, "w") as fh:
             json.dump({"symbol": sym, "tf": args.tf, "bars": bars}, fh)
         print(f"  [{i:>2}/{len(syms)}] {sym:<12} {len(bars):>6} bar  "
               f"{f(bars[0][0]):%Y-%m-%d} → {f(bars[-1][0]):%Y-%m-%d}", flush=True)

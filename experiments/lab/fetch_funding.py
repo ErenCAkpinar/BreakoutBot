@@ -106,6 +106,17 @@ def main() -> None:
         if not recs:
             print(f"  [{i:>2}/{len(syms)}] {sym:<12} kayıt yok")
             continue
+        # Append-only, as the docstring promises: merge with what is on disk,
+        # de-duplicate on ts, keep the union. (Before 2026-09-14 this overwrote
+        # the file and a --since re-run silently threw the history away.)
+        if os.path.exists(path):
+            try:
+                old = json.load(open(path)).get("records", [])
+            except Exception:
+                old = []
+            merged = {r["ts"]: r for r in old}
+            merged.update({r["ts"]: r for r in recs})
+            recs = [merged[k] for k in sorted(merged)]
         with open(path, "w") as fh:
             json.dump({"symbol": sym, "records": recs}, fh)
         rates = [r["rate"] for r in recs]

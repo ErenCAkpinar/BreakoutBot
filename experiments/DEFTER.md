@@ -2164,6 +2164,122 @@ denenmedi ve bu defterde hipotez olarak açılmadı.
 **Durum: Tur 12 tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya
 deploy yok.
 
+## Tur 13 — Funding/basis kolu, gerçek OOS · 14 Eyl 2026
+
+**Kullanıcı isteği:** "funding/basis kolunu OOS'ta yeniden test edelim."
+
+**Tur 7–8'de ne ölçülmüştü, neresi in-sample:** `lab/basis.py` ızgarası (top
+3/5/8 × lb 7/15/30g × rebal 7/30/90g × minF 0/0.005%/4h = 54 konfig) 5.8 yılın
+**tamamında** koşuldu, "en iyi Sharpe" seçildi, alt-dönemler o seçimle
+gösterildi. "Son 2 yıl +%4.55" bir alt-dönem, OOS değil. Tur 8'in likit-6
+evreni derinlikle (getiriyle değil) seçildi — bu bir getiri-seçimi değil.
+
+**İki OOS katmanı:**
+1. **Walk-forward (tarih):** test yılları 2022, 2023, 2024, 2025, 2026 (Oca–Ağu).
+   Her test yılı için 54'lük ızgara **yalnız o yıldan önceki** veride koşulur,
+   en iyi Sharpe konfigi (Tur 7'nin kriteri) seçilir, test yılında ölçülür.
+   Beş yılın OOS serisi birleştirilir. Kontroller (parametresiz): BTC+ETH
+   eşit ağırlık **hep açık** basis, likit-6 hep açık, 23 hep açık.
+2. **Zaman-OOS (görülmemiş veri):** funding ve spot 2026-08-28'de bitiyor;
+   bugüne (2026-09-14) kadar çekilir (append-only fetch), perp 4h aynı pencere
+   için çekilir. ~17 günde gerçekleşen funding + basis kayması, yıllıklandırılır.
+   Kısa; yalnız "prim hâlâ var mı, işaret aynı mı" sorusuna cevap verir.
+
+**H13.1 (ölçümden önce):** Walk-forward OOS net **+%2 … +%5/yıl**, DD < %3,
+her OOS yılında funding bileşeni pozitif; en iyi-Sharpe seçimi OOS'ta "hep
+açık BTC+ETH" kontrolünü **geçmez** (Tur 7 (a): en iyi Sharpe konfigi flat
+kalmanın Sharpe'ıydı). Gerekçe: mekanizma ilan edilmiş bir oran, seçim
+transfer ediyor (Tur 6: eğitim-test korelasyonu +0.77), ama seçilecek çok
+şey yok.
+**H13.2:** Ağu 28 → Eyl 14 gerçekleşen funding BTC/ETH'de yıllık +%2…+%8
+aralığında, negatif değil.
+**Karar kuralı (değişmedi, Tur 8):** OOS net, stablecoin borç verme aralığını
+(~%4–8, DD ≈ 0) **belirgin** geçmedikçe kol alınmaz. Geçse bile Portfolio Margin
+ön koşulu ve tek-borsa karşı taraf riski duruyor.
+
+Araç: `experiments/lab/basis_oos.py`.
+
+### Harness kusuru — fetch betikleri "append-only" değildi (14 Eyl)
+
+`lab/fetch_funding.py` ve `fetch_spot.py` docstring'de "append-only, re-runs
+extend it" diyordu; `--since 2026-08-27` ile koşulunca **cache'i üzerine yazdı**
+(funding 6563 → 57 kayıt). 5.8 yıllık veri gitignore'da, git'te yoktu.
+Kurtarma: aynı herkese açık uç noktalardan 2020-09-01'den yeniden çekildi
+(deterministik; 6615 kayıt / 13229 bar, bugüne kadar). İki betik artık gerçekten
+birleştiriyor (ts üzerinde tekilleştirme). Perp bacağı için `lab/fetch_perp.py`
+(append-only, 4h) eklendi — `basis.py` perp kapanışlarını 5m backtest cache'inden
+alıyordu ve o 08-24'te bitiyor; OOS penceresi için bağımsız kaynak şarttı.
+
+### Sonuçlar (14 Eyl 2026, basis_oos.py, 2.6 s; 23 coin × 2020-09-01 → 2026-09-14)
+
+### A. Walk-forward: her test yılı için konfig yalnız önceki veride seçildi (en iyi Sharpe)
+
+| test yılı | seçilen (top,lb,reb,minF) | eğitim SR | eğitim yıllık % | OOS net_% | OOS funding_% | OOS basis_% | OOS cost_% | OOS ann_% | OOS vol_% | OOS DD_% | OOS SR | OOS n | BTC+ETH hep açık net % | likit-6 hep açık net % | 23 hep açık net % |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2022 | 8,180,42,0.005% | 8.81 | 39.76 | -0.11 | 0.07 | -0.04 | -0.15 | -0.11 | 0.18 | -0.13 | -0.62 | 2190 | 2.40 | 2.05 | -2.51 |
+| 2023 | 8,180,42,0.005% | 6.59 | 21.03 | 4.35 | 6.10 | 0.18 | -1.93 | 4.43 | 2.19 | -1.35 | 1.99 | 2190 | 7.82 | 8.24 | 6.16 |
+| 2024 | 8,180,180,0.005% | 5.73 | 15.02 | 11.12 | 11.71 | 0.31 | -0.90 | 11.76 | 0.98 | -0.32 | 11.31 | 2196 | 12.52 | 13.48 | 14.37 |
+| 2025 | 8,180,180,0.005% | 6.07 | 14.26 | 0.46 | 0.89 | 0.02 | -0.45 | 0.46 | 0.56 | -0.35 | 0.82 | 2190 | 5.01 | 4.68 | 2.10 |
+| 2026 | 8,42,540,0.000% | 5.58 | 14.21 | 1.74 | 2.34 | 0.04 | -0.64 | 1.75 | 1.02 | -0.30 | 1.71 | 1541 | 2.42 | 2.12 | -0.40 |
+
+### B. 2022-01 → veri sonu: birleşik OOS serisi vs parametresiz kontroller vs in-sample seçim
+
+| seri | yıllık % | vol % | DD % | SR | funding %/y | basis %/y | maliyet %/y | net %/y | cfg |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| walk-forward OOS 2022→ | 3.69 | 1.21 | -1.35 | 3.00 | 4.34 | 0.11 | -0.90 | 3.56 |  |
+| BTC+ETH hep açık 2022→ | 6.45 | 1.60 | -2.17 | 3.91 | 6.30 | -0.03 | -0.00 | 6.27 |  |
+| likit-6 hep açık 2022→ | 6.57 | 1.46 | -1.78 | 4.36 | 6.44 | -0.07 | -0.00 | 6.37 |  |
+| 23 hep açık 2022→ | 4.30 | 1.85 | -4.80 | 2.28 | 4.34 | -0.07 | -0.05 | 4.23 |  |
+| in-sample en iyi SR (tüm veri seçimi) 2022→ | 6.62 | 1.70 | -1.87 | 3.78 | 7.10 | -0.07 | -0.61 | 6.42 | (8, 42, 540, 0.0) |
+
+### C. Zaman-OOS: 2026-08-24 → 2026-09-14 (önceki turların görmediği günler), yıllıklandırılmış
+
+| set | gün | funding yıllık % | basis kayması yıllık % | brüt yıllık % | pozitif coin |
+|--:|--:|--:|--:|--:|--:|
+| BTC | 21.70 | 7.23 | 2.72 | 9.95 | 1/1 |
+| ETH | 21.70 | 5.00 | 2.09 | 7.09 | 1/1 |
+| likit-6 ort | 21.70 | 5.64 | 2.26 | 7.90 | 6/6 |
+| 23 medyan | 21.70 | 5.13 | 2.72 | 7.94 | 21/23 |
+
+### Okuma
+
+**H13.1 TUTUYOR.** Walk-forward OOS (2022-01 → 2026-09, konfig her yıl yalnız
+önceki veride seçildi): **+%3.69/yıl, SR 3.0, DD −%1.35**; funding bileşeni her
+OOS yılında pozitif (2022'de +0.07 — seçilen konfig neredeyse hiç pozisyon
+tutmadı: Tur 7 (a)'nın "flat olmanın Sharpe'ı" tam olarak bu). In-sample "en
+iyi Sharpe" aynı dilimde **+%6.62** — seçim, dürüst sayının ~%80 üstünde.
+
+**Asıl bulgu: ızgara gereksiz.** Parametresiz "BTC+ETH hep açık" basis
+**+%6.45/yıl, SR 3.9, DD −%2.2** — walk-forward'ın neredeyse iki katı ve
+in-sample en iyiyle aynı. Likit-6 hep açık +%6.57, SR 4.4. Seçim (hangi coin,
+hangi eşik, ne zaman) OOS'ta değer eklemiyor; mekanizma "ilan edilmiş oranı
+tut" ve en iyi hâli en basit hâli. Yıllara göre: 2022 +2.4, 2023 +7.8, **2024
++12.5**, 2025 +5.0, 2026 +2.4 — beşi de pozitif, varyans yüksek, 2024 tek
+başına ortalamayı taşıyor.
+
+**H13.2 TUTUYOR.** Görülmemiş 21.7 günde (08-24 → 09-14) BTC funding yıllık
+**+%7.2**, ETH +%5.0, likit-6 +%5.6, 23 medyan +%5.1 (21/23 pozitif); basis
+kayması +%2–3 (3 haftalık gürültü). Prim duruyor, işaret aynı, aralık
+Tur 8'in +%4–5'iyle uyumlu, hafif üstünde.
+
+**Karar (kural: stablecoin borç verme aralığını ~%4–8 belirgin geçmeli):**
+- Walk-forward +%3.7 → geçmiyor.
+- BTC+ETH hep açık +%6.45 → aralığın **içinde**; Tur 8'in sermaye haircut'ıyla
+  (Portfolio Margin: ×0.89) ≈ +%5.7. Belirgin geçmiyor. SR 3.9 ve DD −%2.2
+  cazip görünür ama karşılaştırma nesnesi DD ≈ 0 olan bir borç verme oranı;
+  üstüne tek-borsa karşı taraf riski, iki bacaklı margin operasyonu ve
+  Portfolio Margin ön koşulu (Tur 7: ayrı hesaplarda 1× bile 5 kez likide).
+- **Kol alınmadı — ama bu defterdeki tek OOS-pozitif, mekanizmalı ve beş
+  OOS yılının beşinde pozitif fiyat-dışı gelir olarak kayda geçti.** Karar
+  yeniden açılırsa değişecek olan strateji değil, ön koşullar: (i) Portfolio
+  Margin erişimi, (ii) stablecoin borç verme oranının o günkü değeri — %4'ün
+  altına inerse +%5.7 "belirgin" olur; (iii) sermaye ölçeği (Tur 8 derinlik:
+  BTC+ETH'de $250k'ya kadar kayma sıfır).
+
+Not: "USDT borç verme ~%4–8" Tur 8'in varsayımı; bu turda yeniden ölçülmedi.
+
+**Durum: tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya deploy yok.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
