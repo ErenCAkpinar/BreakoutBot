@@ -19,3 +19,6 @@ experiments/candidates_halted/
 experiments/lab/results/
 experiments/lab/funding/
 experiments/lab/spot/
+experiments/synth/logs/
+# Codex CLI session marker
+.context/

@@ -1,0 +1,506 @@
+{
+ "scenario": "bootstrap",
+ "days": 240,
+ "restarts": false,
+ "env": {},
+ "rows": [
+  {
+   "scenario": "bootstrap",
+   "seed": 1,
+   "block_days": 5,
+   "drift_ann": 0.0,
+   "source": "backtests/data/*_665d+40w.pkl before 2025-12-29 (466 source days)",
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.413,
+     "VR_1h": 0.72,
+     "VR_4h": 0.59,
+     "VR_8h": 0.58,
+     "VR_1d": 0.56,
+     "VR_5d": 0.52,
+     "hurst_mean": 0.657,
+     "range_over_co": 1.98,
+     "total_ret_pct": -35.0
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.146,
+     "VR_1h": 0.89,
+     "VR_4h": 0.85,
+     "VR_8h": 0.81,
+     "VR_1d": 0.72,
+     "VR_5d": 0.63,
+     "hurst_mean": 0.647,
+     "range_over_co": 1.9,
+     "total_ret_pct": -5.1
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 849.92,
+   "total_return": -15.01,
+   "max_dd": -15.01,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 105.4,
+   "n_positions": 464,
+   "win_rate": 37.7,
+   "payoff": 0.95,
+   "expectancy": -0.25,
+   "expectancy_r": -0.025,
+   "profit_factor": 0.58,
+   "entry_fees": -32.04,
+   "allin": {
+    "MOMENTUM": {
+     "n": 76,
+     "allin_r": -0.182,
+     "pnl": -138.13
+    }
+   },
+   "tally": {
+    "probe": 388,
+    "full": 76,
+    "confirm_ok": 84,
+    "confirm_fail": 265,
+    "maxopen_block": 19,
+    "probe_cost": -11.04,
+    "TP1": 0,
+    "TP2": 9,
+    "SL": 40,
+    "TRAIL": 24,
+    "TIMEOUT": 3,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 67368,
+    "NEUTRAL": 12960,
+    "BEAR": 68352
+   },
+   "per_symbol": {
+    "UNIUSDT": -26.96,
+    "ADAUSDT": -9.41,
+    "NEARUSDT": -15.5,
+    "INJUSDT": -55.56,
+    "POLUSDT": -10.62
+   },
+   "recon_err": 0.0,
+   "cpu_min": 25.3
+  },
+  {
+   "scenario": "bootstrap",
+   "seed": 2,
+   "block_days": 5,
+   "drift_ann": 0.0,
+   "source": "backtests/data/*_665d+40w.pkl before 2025-12-29 (466 source days)",
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.399,
+     "VR_1h": 0.72,
+     "VR_4h": 0.63,
+     "VR_8h": 0.61,
+     "VR_1d": 0.54,
+     "VR_5d": 0.43,
+     "hurst_mean": 0.652,
+     "range_over_co": 1.98,
+     "total_ret_pct": -69.3
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.148,
+     "VR_1h": 0.91,
+     "VR_4h": 0.91,
+     "VR_8h": 0.94,
+     "VR_1d": 0.84,
+     "VR_5d": 0.75,
+     "hurst_mean": 0.652,
+     "range_over_co": 1.89,
+     "total_ret_pct": 13.0
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 978.17,
+   "total_return": -2.18,
+   "max_dd": -12.23,
+   "halted": false,
+   "n_halts": 0,
+   "days_run": 240.0,
+   "n_positions": 529,
+   "win_rate": 38.0,
+   "payoff": 1.72,
+   "expectancy": 0.04,
+   "expectancy_r": 0.004,
+   "profit_factor": 1.06,
+   "entry_fees": -40.9,
+   "allin": {
+    "MOMENTUM": {
+     "n": 71,
+     "allin_r": -0.011,
+     "pnl": -7.63
+    }
+   },
+   "tally": {
+    "probe": 458,
+    "full": 71,
+    "confirm_ok": 78,
+    "confirm_fail": 324,
+    "maxopen_block": 14,
+    "probe_cost": -12.47,
+    "TP1": 0,
+    "TP2": 16,
+    "SL": 38,
+    "TRAIL": 13,
+    "TIMEOUT": 4,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 77182,
+    "NEUTRAL": 85104,
+    "BEAR": 180624
+   },
+   "per_symbol": {
+    "ADAUSDT": -35.65,
+    "NEARUSDT": 69.52,
+    "INJUSDT": 29.13,
+    "UNIUSDT": -44.39,
+    "POLUSDT": 0.46
+   },
+   "recon_err": -0.0,
+   "cpu_min": 47.1
+  },
+  {
+   "scenario": "bootstrap",
+   "seed": 3,
+   "block_days": 5,
+   "drift_ann": 0.0,
+   "source": "backtests/data/*_665d+40w.pkl before 2025-12-29 (466 source days)",
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.328,
+     "VR_1h": 0.98,
+     "VR_4h": 0.92,
+     "VR_8h": 0.88,
+     "VR_1d": 0.76,
+     "VR_5d": 0.53,
+     "hurst_mean": 0.654,
+     "range_over_co": 1.97,
+     "total_ret_pct": -41.3
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.143,
+     "VR_1h": 0.92,
+     "VR_4h": 0.9,
+     "VR_8h": 0.91,
+     "VR_1d": 0.82,
+     "VR_5d": 0.58,
+     "hurst_mean": 0.651,
+     "range_over_co": 1.89,
+     "total_ret_pct": 15.3
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 908.98,
+   "total_return": -9.1,
+   "max_dd": -15.03,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 234.8,
+   "n_positions": 775,
+   "win_rate": 39.5,
+   "payoff": 1.4,
+   "expectancy": -0.05,
+   "expectancy_r": -0.004,
+   "profit_factor": 0.91,
+   "entry_fees": -54.66,
+   "allin": {
+    "MOMENTUM": {
+     "n": 118,
+     "allin_r": -0.058,
+     "pnl": -68.84
+    }
+   },
+   "tally": {
+    "probe": 657,
+    "full": 118,
+    "confirm_ok": 124,
+    "confirm_fail": 459,
+    "maxopen_block": 22,
+    "probe_cost": -20.32,
+    "TP1": 0,
+    "TP2": 20,
+    "SL": 57,
+    "TRAIL": 35,
+    "TIMEOUT": 6,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 87713,
+    "NEUTRAL": 95934,
+    "BEAR": 150192
+   },
+   "per_symbol": {
+    "UNIUSDT": -22.76,
+    "INJUSDT": 46.32,
+    "NEARUSDT": -19.87,
+    "ADAUSDT": -81.25,
+    "POLUSDT": 41.2
+   },
+   "recon_err": 0.0,
+   "cpu_min": 48.3
+  },
+  {
+   "scenario": "bootstrap",
+   "seed": 4,
+   "block_days": 5,
+   "drift_ann": 0.0,
+   "source": "backtests/data/*_665d+40w.pkl before 2025-12-29 (466 source days)",
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.3,
+     "VR_1h": 0.95,
+     "VR_4h": 0.91,
+     "VR_8h": 0.93,
+     "VR_1d": 0.99,
+     "VR_5d": 1.12,
+     "hurst_mean": 0.651,
+     "range_over_co": 1.98,
+     "total_ret_pct": -47.1
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.137,
+     "VR_1h": 0.98,
+     "VR_4h": 0.96,
+     "VR_8h": 0.94,
+     "VR_1d": 0.91,
+     "VR_5d": 0.99,
+     "hurst_mean": 0.652,
+     "range_over_co": 1.89,
+     "total_ret_pct": -7.9
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 1049.09,
+   "total_return": 4.91,
+   "max_dd": -9.88,
+   "halted": false,
+   "n_halts": 0,
+   "days_run": 240.0,
+   "n_positions": 841,
+   "win_rate": 37.1,
+   "payoff": 2.07,
+   "expectancy": 0.15,
+   "expectancy_r": 0.015,
+   "profit_factor": 1.22,
+   "entry_fees": -74.97,
+   "allin": {
+    "MOMENTUM": {
+     "n": 117,
+     "allin_r": 0.062,
+     "pnl": 72.54
+    }
+   },
+   "tally": {
+    "probe": 724,
+    "full": 117,
+    "confirm_ok": 128,
+    "confirm_fail": 531,
+    "maxopen_block": 31,
+    "probe_cost": -21.85,
+    "TP1": 0,
+    "TP2": 29,
+    "SL": 54,
+    "TRAIL": 31,
+    "TIMEOUT": 3,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 105234,
+    "NEUTRAL": 51448,
+    "BEAR": 184752
+   },
+   "per_symbol": {
+    "INJUSDT": 27.87,
+    "NEARUSDT": 97.98,
+    "ADAUSDT": 59.84,
+    "UNIUSDT": -63.47,
+    "POLUSDT": 1.95
+   },
+   "recon_err": -0.0,
+   "cpu_min": 47.5
+  },
+  {
+   "scenario": "bootstrap",
+   "seed": 5,
+   "block_days": 5,
+   "drift_ann": 0.0,
+   "source": "backtests/data/*_665d+40w.pkl before 2025-12-29 (466 source days)",
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.307,
+     "VR_1h": 0.93,
+     "VR_4h": 0.87,
+     "VR_8h": 0.86,
+     "VR_1d": 0.85,
+     "VR_5d": 0.99,
+     "hurst_mean": 0.655,
+     "range_over_co": 1.98,
+     "total_ret_pct": -47.1
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.145,
+     "VR_1h": 0.95,
+     "VR_4h": 0.89,
+     "VR_8h": 0.86,
+     "VR_1d": 0.81,
+     "VR_5d": 0.89,
+     "hurst_mean": 0.653,
+     "range_over_co": 1.9,
+     "total_ret_pct": 14.4
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 912.49,
+   "total_return": -8.75,
+   "max_dd": -13.18,
+   "halted": false,
+   "n_halts": 0,
+   "days_run": 240.0,
+   "n_positions": 886,
+   "win_rate": 37.8,
+   "payoff": 1.59,
+   "expectancy": -0.02,
+   "expectancy_r": -0.002,
+   "profit_factor": 0.97,
+   "entry_fees": -68.54,
+   "allin": {
+    "MOMENTUM": {
+     "n": 140,
+     "allin_r": -0.047,
+     "pnl": -65.5
+    }
+   },
+   "tally": {
+    "probe": 746,
+    "full": 140,
+    "confirm_ok": 155,
+    "confirm_fail": 517,
+    "maxopen_block": 36,
+    "probe_cost": -21.56,
+    "TP1": 0,
+    "TP2": 28,
+    "SL": 75,
+    "TRAIL": 27,
+    "TIMEOUT": 10,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 110214,
+    "NEUTRAL": 80440,
+    "BEAR": 149472
+   },
+   "per_symbol": {
+    "ADAUSDT": -54.53,
+    "POLUSDT": -21.13,
+    "UNIUSDT": 45.39,
+    "INJUSDT": 12.0,
+    "NEARUSDT": -0.76
+   },
+   "recon_err": 0.0,
+   "cpu_min": 47.6
+  },
+  {
+   "scenario": "bootstrap",
+   "seed": 6,
+   "block_days": 5,
+   "drift_ann": 0.0,
+   "source": "backtests/data/*_665d+40w.pkl before 2025-12-29 (466 source days)",
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.402,
+     "VR_1h": 0.68,
+     "VR_4h": 0.55,
+     "VR_8h": 0.55,
+     "VR_1d": 0.56,
+     "VR_5d": 0.64,
+     "hurst_mean": 0.654,
+     "range_over_co": 1.97,
+     "total_ret_pct": -28.8
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.145,
+     "VR_1h": 0.91,
+     "VR_4h": 0.87,
+     "VR_8h": 0.87,
+     "VR_1d": 0.81,
+     "VR_5d": 0.79,
+     "hurst_mean": 0.651,
+     "range_over_co": 1.9,
+     "total_ret_pct": 19.6
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 866.23,
+   "total_return": -13.38,
+   "max_dd": -15.11,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 175.8,
+   "n_positions": 365,
+   "win_rate": 38.9,
+   "payoff": 0.97,
+   "expectancy": -0.29,
+   "expectancy_r": -0.028,
+   "profit_factor": 0.62,
+   "entry_fees": -28.94,
+   "allin": {
+    "MOMENTUM": {
+     "n": 49,
+     "allin_r": -0.251,
+     "pnl": -122.87
+    }
+   },
+   "tally": {
+    "probe": 316,
+    "full": 49,
+    "confirm_ok": 52,
+    "confirm_fail": 218,
+    "maxopen_block": 6,
+    "probe_cost": -9.15,
+    "TP1": 0,
+    "TP2": 7,
+    "SL": 32,
+    "TRAIL": 10,
+    "TIMEOUT": 0,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 43151,
+    "NEUTRAL": 48815,
+    "BEAR": 159744
+   },
+   "per_symbol": {
+    "UNIUSDT": 21.78,
+    "INJUSDT": 6.58,
+    "ADAUSDT": -59.41,
+    "POLUSDT": 3.32,
+    "NEARUSDT": -77.12
+   },
+   "recon_err": 0.0,
+   "cpu_min": 37.1
+  }
+ ]
+}

@@ -1,0 +1,559 @@
+{
+ "scenario": "chop",
+ "days": 240,
+ "restarts": false,
+ "rows": [
+  {
+   "scenario": "chop",
+   "seed": 1,
+   "law": {
+    "name": "chop",
+    "drift_ann": 0.0,
+    "trend_k": 0.0,
+    "trend_hl_d": 2.0,
+    "mr_hl_d": 1.0,
+    "vol_mult": 1.0,
+    "garch": [
+     0.08,
+     0.9
+    ]
+   },
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.243,
+     "VR_1h": 0.96,
+     "VR_4h": 0.91,
+     "VR_8h": 0.85,
+     "VR_1d": 0.68,
+     "VR_5d": 0.24,
+     "hurst_mean": 0.657,
+     "range_over_co": 2.01,
+     "total_ret_pct": 12.9
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.146,
+     "VR_1h": 0.99,
+     "VR_4h": 1.0,
+     "VR_8h": 0.99,
+     "VR_1d": 0.81,
+     "VR_5d": 0.29,
+     "hurst_mean": 0.657,
+     "range_over_co": 2.0,
+     "total_ret_pct": 13.1
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 849.99,
+   "total_return": -15.0,
+   "max_dd": -15.0,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 97.7,
+   "n_positions": 606,
+   "win_rate": 37.1,
+   "payoff": 1.01,
+   "expectancy": -0.19,
+   "expectancy_r": -0.018,
+   "profit_factor": 0.6,
+   "entry_fees": -35.49,
+   "allin": {
+    "MOMENTUM": {
+     "n": 72,
+     "allin_r": -0.182,
+     "pnl": -130.75
+    }
+   },
+   "tally": {
+    "probe": 535,
+    "full": 73,
+    "confirm_ok": 76,
+    "confirm_fail": 382,
+    "maxopen_block": 5,
+    "probe_cost": -17.06,
+    "TP1": 0,
+    "TP2": 8,
+    "SL": 38,
+    "TRAIL": 21,
+    "TIMEOUT": 5,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 70666,
+    "NEUTRAL": 35260,
+    "BEAR": 31811
+   },
+   "per_symbol": {
+    "NEARUSDT": -46.48,
+    "POLUSDT": -53.41,
+    "ADAUSDT": 18.45,
+    "UNIUSDT": -30.34,
+    "INJUSDT": -2.68
+   },
+   "recon_err": 0.0,
+   "cpu_min": 21.0
+  },
+  {
+   "scenario": "chop",
+   "seed": 2,
+   "law": {
+    "name": "chop",
+    "drift_ann": 0.0,
+    "trend_k": 0.0,
+    "trend_hl_d": 2.0,
+    "mr_hl_d": 1.0,
+    "vol_mult": 1.0,
+    "garch": [
+     0.08,
+     0.9
+    ]
+   },
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.243,
+     "VR_1h": 0.99,
+     "VR_4h": 0.94,
+     "VR_8h": 0.87,
+     "VR_1d": 0.69,
+     "VR_5d": 0.26,
+     "hurst_mean": 0.652,
+     "range_over_co": 2.01,
+     "total_ret_pct": -3.8
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.146,
+     "VR_1h": 0.97,
+     "VR_4h": 0.94,
+     "VR_8h": 0.89,
+     "VR_1d": 0.72,
+     "VR_5d": 0.28,
+     "hurst_mean": 0.651,
+     "range_over_co": 2.01,
+     "total_ret_pct": 1.9
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 889.83,
+   "total_return": -11.02,
+   "max_dd": -15.41,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 120.6,
+   "n_positions": 528,
+   "win_rate": 39.6,
+   "payoff": 1.24,
+   "expectancy": -0.13,
+   "expectancy_r": -0.012,
+   "profit_factor": 0.81,
+   "entry_fees": -41.09,
+   "allin": {
+    "MOMENTUM": {
+     "n": 77,
+     "allin_r": -0.123,
+     "pnl": -94.33
+    }
+   },
+   "tally": {
+    "probe": 451,
+    "full": 77,
+    "confirm_ok": 80,
+    "confirm_fail": 306,
+    "maxopen_block": 8,
+    "probe_cost": -14.53,
+    "TP1": 0,
+    "TP2": 12,
+    "SL": 43,
+    "TRAIL": 19,
+    "TIMEOUT": 3,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 62161,
+    "NEUTRAL": 47267,
+    "BEAR": 61727
+   },
+   "per_symbol": {
+    "NEARUSDT": -2.29,
+    "UNIUSDT": 8.39,
+    "POLUSDT": -33.71,
+    "INJUSDT": 1.67,
+    "ADAUSDT": -43.13
+   },
+   "recon_err": 0.0,
+   "cpu_min": 22.4
+  },
+  {
+   "scenario": "chop",
+   "seed": 3,
+   "law": {
+    "name": "chop",
+    "drift_ann": 0.0,
+    "trend_k": 0.0,
+    "trend_hl_d": 2.0,
+    "mr_hl_d": 1.0,
+    "vol_mult": 1.0,
+    "garch": [
+     0.08,
+     0.9
+    ]
+   },
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.242,
+     "VR_1h": 0.95,
+     "VR_4h": 0.89,
+     "VR_8h": 0.82,
+     "VR_1d": 0.65,
+     "VR_5d": 0.3,
+     "hurst_mean": 0.655,
+     "range_over_co": 2.01,
+     "total_ret_pct": -1.3
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.145,
+     "VR_1h": 0.97,
+     "VR_4h": 0.88,
+     "VR_8h": 0.82,
+     "VR_1d": 0.63,
+     "VR_5d": 0.24,
+     "hurst_mean": 0.656,
+     "range_over_co": 2.0,
+     "total_ret_pct": 6.8
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 934.88,
+   "total_return": -6.51,
+   "max_dd": -15.2,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 94.6,
+   "n_positions": 323,
+   "win_rate": 39.9,
+   "payoff": 1.27,
+   "expectancy": -0.12,
+   "expectancy_r": -0.011,
+   "profit_factor": 0.84,
+   "entry_fees": -27.53,
+   "allin": {
+    "MOMENTUM": {
+     "n": 52,
+     "allin_r": -0.113,
+     "pnl": -58.92
+    }
+   },
+   "tally": {
+    "probe": 271,
+    "full": 52,
+    "confirm_ok": 52,
+    "confirm_fail": 192,
+    "maxopen_block": 1,
+    "probe_cost": -6.12,
+    "TP1": 0,
+    "TP2": 7,
+    "SL": 29,
+    "TRAIL": 10,
+    "TIMEOUT": 6,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 40971,
+    "NEUTRAL": 38390,
+    "BEAR": 54528
+   },
+   "per_symbol": {
+    "INJUSDT": -9.39,
+    "UNIUSDT": -40.5,
+    "POLUSDT": 19.59,
+    "NEARUSDT": 11.85,
+    "ADAUSDT": -19.22
+   },
+   "recon_err": -0.0,
+   "cpu_min": 20.1
+  },
+  {
+   "scenario": "chop",
+   "seed": 4,
+   "law": {
+    "name": "chop",
+    "drift_ann": 0.0,
+    "trend_k": 0.0,
+    "trend_hl_d": 2.0,
+    "mr_hl_d": 1.0,
+    "vol_mult": 1.0,
+    "garch": [
+     0.08,
+     0.9
+    ]
+   },
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.244,
+     "VR_1h": 1.0,
+     "VR_4h": 1.0,
+     "VR_8h": 0.96,
+     "VR_1d": 0.76,
+     "VR_5d": 0.3,
+     "hurst_mean": 0.654,
+     "range_over_co": 2.01,
+     "total_ret_pct": -6.8
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.146,
+     "VR_1h": 1.0,
+     "VR_4h": 1.01,
+     "VR_8h": 0.97,
+     "VR_1d": 0.71,
+     "VR_5d": 0.24,
+     "hurst_mean": 0.655,
+     "range_over_co": 2.01,
+     "total_ret_pct": 1.9
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 856.9,
+   "total_return": -14.31,
+   "max_dd": -15.41,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 93.5,
+   "n_positions": 402,
+   "win_rate": 35.1,
+   "payoff": 0.97,
+   "expectancy": -0.29,
+   "expectancy_r": -0.028,
+   "profit_factor": 0.53,
+   "entry_fees": -25.59,
+   "allin": {
+    "MOMENTUM": {
+     "n": 54,
+     "allin_r": -0.243,
+     "pnl": -131.14
+    }
+   },
+   "tally": {
+    "probe": 348,
+    "full": 54,
+    "confirm_ok": 58,
+    "confirm_fail": 240,
+    "maxopen_block": 10,
+    "probe_cost": -10.25,
+    "TP1": 0,
+    "TP2": 7,
+    "SL": 35,
+    "TRAIL": 12,
+    "TIMEOUT": 0,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 43604,
+    "NEUTRAL": 33769,
+    "BEAR": 55497
+   },
+   "per_symbol": {
+    "INJUSDT": -26.07,
+    "POLUSDT": -26.41,
+    "UNIUSDT": -2.53,
+    "NEARUSDT": -31.67,
+    "ADAUSDT": -30.94
+   },
+   "recon_err": 0.0,
+   "cpu_min": 20.0
+  },
+  {
+   "scenario": "chop",
+   "seed": 5,
+   "law": {
+    "name": "chop",
+    "drift_ann": 0.0,
+    "trend_k": 0.0,
+    "trend_hl_d": 2.0,
+    "mr_hl_d": 1.0,
+    "vol_mult": 1.0,
+    "garch": [
+     0.08,
+     0.9
+    ]
+   },
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.244,
+     "VR_1h": 1.0,
+     "VR_4h": 0.95,
+     "VR_8h": 0.91,
+     "VR_1d": 0.7,
+     "VR_5d": 0.29,
+     "hurst_mean": 0.657,
+     "range_over_co": 2.0,
+     "total_ret_pct": 13.3
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.146,
+     "VR_1h": 0.98,
+     "VR_4h": 0.91,
+     "VR_8h": 0.86,
+     "VR_1d": 0.67,
+     "VR_5d": 0.31,
+     "hurst_mean": 0.656,
+     "range_over_co": 2.0,
+     "total_ret_pct": 0.7
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 872.9,
+   "total_return": -12.71,
+   "max_dd": -15.34,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 90.6,
+   "n_positions": 437,
+   "win_rate": 35.7,
+   "payoff": 1.11,
+   "expectancy": -0.23,
+   "expectancy_r": -0.022,
+   "profit_factor": 0.62,
+   "entry_fees": -27.01,
+   "allin": {
+    "MOMENTUM": {
+     "n": 52,
+     "allin_r": -0.214,
+     "pnl": -111.14
+    }
+   },
+   "tally": {
+    "probe": 385,
+    "full": 53,
+    "confirm_ok": 53,
+    "confirm_fail": 265,
+    "maxopen_block": 5,
+    "probe_cost": -13.8,
+    "TP1": 0,
+    "TP2": 7,
+    "SL": 34,
+    "TRAIL": 10,
+    "TIMEOUT": 1,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 49614,
+    "NEUTRAL": 30661,
+    "BEAR": 48720
+   },
+   "per_symbol": {
+    "UNIUSDT": -1.64,
+    "NEARUSDT": -55.04,
+    "INJUSDT": -14.69,
+    "POLUSDT": -5.37,
+    "ADAUSDT": -23.44
+   },
+   "recon_err": 0.0,
+   "cpu_min": 19.4
+  },
+  {
+   "scenario": "chop",
+   "seed": 6,
+   "law": {
+    "name": "chop",
+    "drift_ann": 0.0,
+    "trend_k": 0.0,
+    "trend_hl_d": 2.0,
+    "mr_hl_d": 1.0,
+    "vol_mult": 1.0,
+    "garch": [
+     0.08,
+     0.9
+    ]
+   },
+   "market": {
+    "ADAUSDT": {
+     "sd5m_pct": 0.243,
+     "VR_1h": 0.99,
+     "VR_4h": 0.91,
+     "VR_8h": 0.88,
+     "VR_1d": 0.72,
+     "VR_5d": 0.34,
+     "hurst_mean": 0.657,
+     "range_over_co": 2.02,
+     "total_ret_pct": -4.0
+    },
+    "BTCUSDT": {
+     "sd5m_pct": 0.146,
+     "VR_1h": 1.0,
+     "VR_4h": 0.87,
+     "VR_8h": 0.81,
+     "VR_1d": 0.66,
+     "VR_5d": 0.29,
+     "hurst_mean": 0.657,
+     "range_over_co": 2.01,
+     "total_ret_pct": 10.3
+    }
+   },
+   "days": 240,
+   "restarts": false,
+   "final_balance": 845.57,
+   "total_return": -15.44,
+   "max_dd": -15.44,
+   "halted": true,
+   "n_halts": 1,
+   "days_run": 32.2,
+   "n_positions": 169,
+   "win_rate": 38.5,
+   "payoff": 0.31,
+   "expectancy": -0.82,
+   "expectancy_r": -0.082,
+   "profit_factor": 0.2,
+   "entry_fees": -15.15,
+   "allin": {
+    "MOMENTUM": {
+     "n": 29,
+     "allin_r": -0.518,
+     "pnl": -150.21
+    }
+   },
+   "tally": {
+    "probe": 140,
+    "full": 29,
+    "confirm_ok": 29,
+    "confirm_fail": 96,
+    "maxopen_block": 2,
+    "probe_cost": -3.43,
+    "TP1": 0,
+    "TP2": 1,
+    "SL": 21,
+    "TRAIL": 6,
+    "TIMEOUT": 1,
+    "MR_TP": 0,
+    "MR_SL": 0,
+    "MR_TIMEOUT": 0
+   },
+   "regime_counts": {
+    "BULL": 20841,
+    "NEUTRAL": 11444,
+    "BEAR": 13248
+   },
+   "per_symbol": {
+    "ADAUSDT": -37.59,
+    "POLUSDT": 10.97,
+    "UNIUSDT": -46.28,
+    "INJUSDT": -33.95,
+    "NEARUSDT": -32.44
+   },
+   "recon_err": 0.0,
+   "cpu_min": 7.9
+  }
+ ]
+}

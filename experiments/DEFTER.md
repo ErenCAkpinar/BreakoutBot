@@ -1106,6 +1106,554 @@ değil. Çalışan simülasyon botuna değişiklik veya deploy yok.
 
 ---
 
+## Tur 9 — Sentetik piyasa: "bug mu, edge yokluğu mu?" · 13 Eyl 2026
+
+**Soru (kullanıcı):** Proje hep aynı yerde sayıyor — bir ileri, bir geri. Bu bir
+sorundan mı kaynaklanıyor? Gelecek (2027–2030) fiyat verisiyle test edelim.
+
+**Canlı durum (breakoutbot.dev, 46 gün):** $1000 → $990.63, 84 işlem, işlem başına
+beklenti **−$0.11**, haftalık PnL +19/+39/−17/−15/−39/+81/−23 — ortalaması sıfır,
+SD ≈ $40/hafta. Gerçek veride aynı geometri: 240g **+0.396R** (n=114), 665g
+**+0.039R** (n=396). Pencere uzadıkça R sıfıra iniyor.
+
+**Neden sentetik veri:** Bu repodaki her backtest tarihin aldığı TEK yolu tekrar
+oynatır; o yolda "makine bozuk" ile "piyasada hasat edilecek şey yok" aynı görünür.
+Kontrol ettiğimiz bir piyasada ikisi ayrışır. "2027–2030 tahmini fiyat verisi"
+diye bir şey yoktur — fiyat tahmin edilemez; var olan tek dürüst karşılığı
+**varsayımları açık yazılmış senaryolar**dır. Düzenek: `experiments/synth/`.
+
+| dosya | ne |
+|---|---|
+| `synth/gen.py` | Kalibre üreteç: 5 coin + BTC, 5m OHLCV, tek-faktör korelasyon (β 1.0–1.3), GARCH(1,1) oynaklık kümelenmesi, gün-içi profil (13–17 UTC ×1.6), 20 alt-adımdan mum + fitil kalibrasyonu (range/gövde 2.01, gerçek 2.09) |
+| `synth/run.py` | Her tohum = `backtest.run_portfolio` (canlı-parite motoru, dokunulmadı); paralel tohumlar; piyasanın ölçülen VR'ı sonucun yanına yazılır |
+| `synth/report.py` | Senaryolar × gerçek referanslar tablosu |
+| `tests/test_synth.py` | 12 mekanizma testi: ızgara, OHLC geçerliliği, determinizm, β, fitil, her yasanın iddia ettiği VR'ı ekip ekmediği, Markov karışımı, bootstrap'ın gerçek gün şekillerini ve eş-zamanlı blokları koruduğu |
+
+**Senaryolar ve ektikleri (ADAUSDT, 3×400g ölçüm; VR = varyans oranı, 1 = rastgele yürüyüş):**
+
+| senaryo | VR 4h | VR 8h | VR 1g | VR 5g | anlamı |
+|---|--:|--:|--:|--:|---|
+| `null` | 1.01 | 1.01 | 1.02 | 1.02 | sürüklenmesiz rastgele yürüyüş — **hiçbir strateji edge'e sahip olamaz** |
+| `trend` | 1.22 | 1.39 | 1.76 | 2.07 | botun 1h–8h tutma ufkuna ekilmiş momentum — breakout'un hasat etmek için yapıldığı şey |
+| `trend_slow` | 1.04 | 1.08 | 1.17 | 1.48 | çok-günlük momentum; 8h'lik tutuşun içinde görünmez, 4h rejim kapısına görünür |
+| `chop` | 0.95 | — | 0.72 | 0.30 | ortalamaya dönüş — breakout burada kaybetmeli |
+| `bootstrap` | gerçek | gerçek | gerçek | ~0.7 | GERÇEK günler (5 günlük bloklar, tüm coinlerde aynı bloklar) yeniden sıralanıp zincirlenir |
+| `2027`–`2030` | — | — | — | — | Markov rejim yılları (UP/DOWN/CHOP karışımı yıl başına verilmiş: 2027 %55/15/30 genişleme, 2028 %15/45/40 düşüş, 2029 %20/20/60 yatay, 2030 %40/20/40 toparlanma); ortalama rejim süresi ≈15/(1−p) gün |
+| GERÇEK 240g | 0.93 | — | 0.97 | 0.98 | referans: gerçek 5m kripto 4h ufkunda hafif **ortalamaya dönen** |
+
+### Hipotezler (ölçümden önce yazıldı)
+
+| # | Hipotez | Öngörü eğer DOĞRU | Öngörü eğer YANLIŞ |
+|---|---|---|---|
+| H9.1 | Motorda lookahead/muhasebe hatası yok | `null`'da all-in momR ≈ −(giriş+çıkış ücreti) ≈ **−0.14R**, SE içinde | momR > 0 → sızıntı (lookahead); momR ≪ −0.14R → çıkış geometrisinde yapısal maliyet |
+| H9.2 | Makine, VAR OLAN bir edge'i hasat edebiliyor | `trend`'de momR belirgin **pozitif** (≥ +0.3R) ve P(kâr) ≈ 100% | `trend`'de bile sıfır/negatif → giriş-çıkış mekanizması kırık; sorun piyasada değil |
+| H9.3 | Canlı sıfır, edge yokluğundandır | `null` ≈ canlı ≈ 665g (hepsi ~0/−0.1R); `trend` ≫ hepsi | `null` ≪ canlı → canlıda görünmeyen bir kaçak var |
+| H9.4 | 240g'deki +0.396R bir şanslı pencere | `bootstrap` (aynı günler, farklı sıra) dağılımında 240g sonucu üst kuyrukta; `bootstrap` ortalaması ≈ 0 | bootstrap ortalaması da +0.3R → gün-içi yapıda gerçek bir şey var, sıralama değil |
+| H9.5 | Rejim kapısı işe yarıyor | `2028`/`chop`'ta kayıp `bear`/`null`'a göre sınırlı (kapı pozisyon almıyor) | düşüş yıllarında hard stop'lar |
+
+**Yan bulgu (ölçümden önce, kalibrasyon sırasında):** `indicators.hurst_exponent`
+saf beyaz gürültüde **0.655 ± 0.028** veriyor (R/S küçük-örnek yanlılığı, Anis-Lloyd
+düzeltmesi yok). Gerçek veride 0.645 (pencerelerin %99'u ≥0.58), GBM'de %100.
+`HURST_LONG_MIN=0.58` kapısı **hiçbir şeyi filtrelemiyor**; yalnızca güçlü
+ortalamaya dönen serileri (AR −0.3 → H 0.57) keser. "Trend rejimi şartı"
+diye belgelenen şey fiilen kapalı bir kapı değil, açık bir kapı.
+
+**Yan bulgu — gerçek veri, sentetik koşu beklenmeden (13 Eyl):** 665g koşusu
+(`R1-sl225t96_665d`) 240g penceresini (`N1-control_240d`, 2025-12-29 → 2026-08-24)
+**içeriyor**. Aynı koşunun legs'i pencere sınırında ikiye bölündü:
+
+| parça | pozisyon | net (all-in) | momR |
+|---|--:|--:|--:|
+| 240g İÇİ (Faz 8 geometrisinin seçildiği pencere) | 114 | **+$444.54** | **+0.390** |
+| 240g DIŞI — 2024-10-28 → 2025-12-28 (425g) | 282 | **−$290.98** | **−0.103** |
+| canlı, pencere SONRASI (2026-07-29 → 09-13) | 71 | ≈ $0 | ≈ 0.00 |
+
+2026 öncesi 15 ayın 13'ü negatif (ay bazı tablo `experiments/synth/`
+raporunda). Edge, yalnızca çıkış geometrisinin üzerinde seçildiği pencerede var;
+öncesinde de sonrasında da yok. "Bir ileri bir geri" tam olarak buna benzer:
+in-sample +0.39R'nin dışarıdaki karşılığı ≈ 0.
+
+Koşum:
+
+```sh
+./experiments/synth/run_all.sh            # ~3.5 saat, 6 paralel iş
+python3.12 experiments/synth/report.py    # tablo
+python3.12 experiments/synth/report.py --md
+```
+
+**Durum: tamamlandı** (13 Eyl 11:00 → 14 Eyl 04:50 UTC). Sonuçlar sırayla aşağıda.
+
+### Sonuç 1 — `null` 240g (6 tohum, 702 momentum pozisyonu)
+
+| tohum | bakiye | DD | gün | halt | mom n | momR all-in | exit-only | PF | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $859.53 | −15.2% | 107 | 1 | 61 | −0.213 | −0.026 | 0.57 | 4/34/14/9 |
+| 2 | $946.00 | −15.1% | 128 | 1 | 152 | −0.021 | +0.004 | 1.05 | 31/82/30/9 |
+| 3 | $1080.09 | −13.0% | 240 | 0 | 135 | +0.084 | +0.016 | 1.26 | 30/71/26/8 |
+| 4 | $1005.02 | −9.2% | 240 | 0 | 110 | +0.026 | +0.010 | 1.13 | 27/56/18/9 |
+| 5 | $919.38 | −15.4% | 102 | 1 | 75 | −0.088 | −0.007 | 0.87 | 13/43/18/1 |
+| 6 | $948.32 | −15.2% | 152 | 1 | 169 | −0.014 | +0.004 | 1.06 | 33/88/37/11 |
+| **havuz** | **$960 ± 76** | −13.8% | | **4/6** | 117 | **−0.016** (±0.042 SE) | ≈0.00 | | |
+
+Ücret tabanı: giriş $0.58/poz = 0.058R, gidiş-dönüş ≈ **−0.115R**.
+
+- **H9.1 TUTUYOR.** momR > 0 değil → lookahead yok. Ücret tabanının ~0.1R üstünde
+  ama 1.5 SE (pozisyon bazlı SE 1.7/√702 = 0.064R) — gürültü. Daha fazla tohumla
+  bakılabilir; şu an bir sızıntı iddiası için kanıt yok.
+- **H9.3 TUTUYOR.** `null` −0.016R ≈ canlı ≈0.00R ≈ gerçek pencere-dışı −0.103R ≈
+  665g +0.039R. Dördü de aynı dağılımdan; canlıda görünmeyen bir kaçak yok.
+- **Kill-switch dinamiği:** edge'siz piyasada geometri 4/6 tohumda 102–152. günde
+  −15% hard stop'a çarpıyor. Canlının 46 günde −13.5% DD görmesi ve 14 DD-devre
+  olayı bunun beklenen görüntüsü. Rastgele bir 240g penceresinde bakiye
+  $860–$1080; gerçek 240g'nin +$435'i bu dağılımın 5+ SD dışında — ama o pencere
+  rastgele değil, geometrinin seçildiği pencere (bkz. yan bulgu yukarıda).
+- Huni: tohum başına 360–1006 probe → 61–170 tam pozisyon (onay oranı ~%15).
+
+### Sonuç 2 — `trend` 240g (6 tohum, 805 momentum pozisyonu) — **H9.2 RED**
+
+Botun kendi tutma ufkuna (1h–8h) ekilmiş momentum: ölçülen VR 4h 1.19 · 1g 1.69 ·
+5g 1.79. Seed 2'de ADA pencerede **+%439**, rejim %72 BULL.
+
+| tohum | bakiye | DD | gün | halt | mom n | momR all-in | WR | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $1049.23 | -14.9% | 240 | 0 | 237 | +0.037 | 40.9% | 58/122/46/11 |
+| 2 | $888.05 | -15.1% | 124 | 1 | 132 | -0.064 | 38.1% | 26/76/23/7 |
+| 3 | $879.27 | -15.1% | 143 | 1 | 111 | -0.087 | 38.7% | 18/61/22/10 |
+| 4 | $872.39 | -15.4% | 146 | 1 | 113 | -0.094 | 39.2% | 21/62/26/4 |
+| 5 | $919.84 | -15.1% | 172 | 1 | 88 | -0.065 | 34.0% | 13/47/23/5 |
+| 6 | $911.09 | -15.4% | 135 | 1 | 124 | -0.055 | 42.9% | 25/68/25/6 |
+| **havuz** | **$920 ± 66** | −15.2% | | **5/6** | 134 | **−0.040** (±0.019 SE) | 39.0% | |
+
+**Kâhin kontrolü (aynı piyasa, aynı sürtünme 0.15% gidiş-dönüş):** "4h getirisi > 0
+→ al, 8h tut" üç satırlık kural seed 2'de ADA **+%104**, NEAR **+%225**, INJ
+**+%95**; null'da aynı kural −%8/+%17/+%31 ve −%160/−%61/−%117 (gürültü). Edge
+oradaydı, hasat edilebilirdi; deployed makine −$112 yapıp hard stop'a çarptı.
+
+**Asıl bulgu — çıkış dağılımı piyasadan bağımsız:**
+
+| piyasa | momR | WR | payoff | TP2 | SL | TRAIL | TMO |
+|---|--:|--:|--:|--:|--:|--:|--:|
+| `null` — rastgele yürüyüş | −0.016 | 40.5% | 1.47 | 20% | 53% | 20% | 7% |
+| `trend` — VR 4h 1.19 / 1g 1.69 | −0.040 | 39.0% | 1.49 | 20% | 54% | 20% | 5% |
+| GERÇEK 665g | +0.039 | | | 21% | 51% | 25% | 3% |
+| GERÇEK 240g (in-sample) | +0.396 | | | 31% | 39% | 24% | 2% |
+
+Sistemin sonucu piyasanın trend olup olmamasına bağlı değil; kendi geometrisi
+belirliyor. Neden (trend seed 2, ADA): ATR/fiyat medyanı 0.337% → **SL 0.76%**,
+TP2 2.02%; **8 saatlik getiri SD'si 2.79% = SL'nin 3.7 katı**; ekilen edge 8h'te
++0.17%/işlem = **SL'nin 1/4.5'i**. Stop, sürüklenmenin etkisi birikemeden
+gürültüyle vuruluyor — pozisyonların %53'ü SL'de bitiyor, piyasa ne olursa
+olsun. Bu, `DEFTER` Tur 4'teki "sürtünme kimliği 5m stop mesafelerini eziyor"
+bulgusunun mekanik karşılığı: 5m'de 2.25×ATR stop, 8 saatlik tutuşun gürültüsü
+içinde bir zar.
+
+Gerçek 665g'nin çıkış dağılımı (21/51/25/3) sentetik null'la (20/53/20/7)
+birebir; tek sapan, geometrinin üzerinde seçildiği 240g penceresi (31/39).
+**Cevap: "bir ileri bir geri" bir bug değil, bu geometrinin edge'li piyasada
+bile üretebildiği tek şey.** Kod doğru çalışıyor (H9.1); tasarım, sinyalin
+işleyebileceği ufuktan çok daha kısa bir stop mesafesiyle kuruluyor (H9.2 RED).
+
+### Sonuç 3 — `chop` 240g (6 tohum, 336 momentum pozisyonu) — H9.5 kısmen
+
+Ortalamaya dönen piyasa (VR 1g 0.72, 5g 0.30). **6/6 hard stop**, 35–120. günde.
+
+| tohum | bakiye | DD | gün | halt | mom n | momR all-in | WR | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $849.99 | -15.0% | 98 | 1 | 72 | -0.182 | 37.1% | 8/38/21/5 |
+| 2 | $889.83 | -15.4% | 121 | 1 | 77 | -0.123 | 39.6% | 12/43/19/3 |
+| 3 | $934.88 | -15.2% | 95 | 1 | 52 | -0.113 | 39.9% | 7/29/10/6 |
+| 4 | $856.90 | -15.4% | 94 | 1 | 54 | -0.243 | 35.1% | 7/35/12/0 |
+| 5 | $872.90 | -15.3% | 91 | 1 | 52 | -0.214 | 35.7% | 7/34/10/1 |
+| 6 | $845.57 | -15.4% | 32 | 1 | 29 | -0.518 | 38.5% | 1/21/6/1 |
+| **havuz** | **$875 ± 34** | −15.3% | | **6/6** | 56 | **-0.202** (±0.061 SE) | 37.6% | 12%/60%/23%/5% |
+
+Breakout, ortalamaya dönüşte beklendiği gibi kaybediyor: null'dan ~0.19R daha
+kötü, çıkış dağılımı **kayıyor** (TP2 %20→%12, SL %53→%60, payoff 1.47→0.98).
+Asimetri dikkat çekici: sistem piyasanın rastgeleden *kötü* olmasına tepki
+veriyor, *iyi* olmasına (trend) vermiyor. Stop gürültünün içinde olduğu için
+ortalamaya dönüş fiyatı stop'a geri çekiyor; trend ise stop'un hayatta kalma
+süresi içinde sonucu değiştirecek kadar uzağa gidemiyor. Rejim kapısı
+(H9.5) pozisyon almayı durdurmuyor: chop'ta tohum başına 56 pozisyon açıldı
+(null'da 117). Kapının "BULL" etiketi bir trend teşhisi değil; VR<1 piyasada da
+açılıyor.
+
+**Üç yasanın özeti:** chop −0.202R · null −0.016R · trend −0.040R. Piyasanın
+öngörülebilirliği VR 1g 0.68 → 1.05 → 1.69 arasında değişirken sistem
+"rastgeleden kötü"yü cezalandırılarak görüyor, "rastgeleden iyi"yi hiç görmüyor.
+Bir breakout sistemi için bu, yukarı yönlü kuyruğun tamamen kapalı olması demek.
+
+### Harness kusuru — yıl senaryoları v1 çöpe (13 Eyl, ~17:30)
+
+`2027`–`2030` v1 koşuları (12 tohum, ~14 saat CPU) **geçersiz**: CHOP rejiminin
+ortalamaya dönüş çapası fiyatı takip etmiyor, başlangıç fiyatına demirli
+kalıyordu. Boğa koşusunu izleyen ilk CHOP günü fiyatı 1 günlük yarı-ömürle
+başlangıca geri çekiyordu — 10 tohumun 6'sında BTC yıl sonu ≈ +0%, VR 5g 3.9
+(gerçek 0.98). Fark ediliş: yıl özet tablosunda BTC getirisi sütunu. Düzeltme:
+çapa, ortalamaya dönüş olmayan günlerde fiyatı izler (`gen.py`, `simulate`).
+Regresyon testi `test_chop_anchor_follows_the_price_after_a_trend`. v1 sonuçları
+`synth/results/discarded_v1/` altında, karşılaştırma dışı. `null`/`trend`/`chop`
+etkilenmedi (çapa ya yok ya da fiyat başlangıçtan ayrılmıyor); Sonuç 1–3 geçerli.
+Kayıt için v1'in söylediği: 12 tohumun 11'i zarar, havuz momR ≈ −0.08R — yani
+kusur sonucu sistemin lehine çevirmemişti, ama sayılar rapor edilmez.
+
+### Sonuç 4 — `bootstrap` 240g (6 tohum, 502 momentum pozisyonu) — H9.4 beklenmedik
+
+Kaynak: 240g+40w cache'inin GERÇEK günleri (2025-11 → 2026-08), 5 günlük bloklar
+halinde, tüm coinlerde aynı bloklar, rastgele sırayla zincirlenmiş. Her mumun
+şekli, hacmi, gün-içi profili ve coinler arası korelasyon gerçek; yalnızca
+çok-günlük sıralama rastgele.
+
+| tohum | bakiye | DD | mom n | momR all-in | WR | TP2/SL/TRL/TMO | ADA getiri |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $1240.20 | -5.7% | 78 | +0.323 | 40.5% | 22/37/17/2 | -50% |
+| 2 | $919.49 | -13.4% | 93 | -0.069 | 38.3% | 19/54/18/2 | -19% |
+| 3 | $1157.16 | -4.7% | 68 | +0.253 | 36.8% | 16/27/24/1 | -57% |
+| 4 | $906.33 | -10.7% | 59 | -0.146 | 39.0% | 8/31/17/3 | -63% |
+| 5 | $1313.51 | -4.0% | 82 | +0.397 | 42.3% | 25/33/20/4 | -70% |
+| 6 | $1651.46 | -5.0% | 122 | +0.553 | 39.4% | 43/45/32/2 | -69% |
+| **havuz** | **$1198 ± 278** | −7.2% | 83 | **+0.254** (±0.111 SE) | 39.4% | 26/45/25/3 | |
+
+Halt 0/6. Gün sırası karıştırılınca edge **kaybolmuyor**: çıkış dağılımı
+(26/45/25) gerçek 240g'ye (31/39/24) benziyor, sentetiklere (20/53/20) değil.
+Payoff 2.40 (null 1.47) — kazananlar daha büyük; kaynak dönem ayı (ADA −19…−70%)
+olduğu hâlde.
+
+**Yorum:** 240g'deki +0.39R günlerin sıralamasında değil, **o günlerin gün-içi
+yapısında**. Bootstrap aynı günlerden örneklediği için iki açıklamayı ayıramaz:
+(a) o dönemin günlerinde geometrinin yakaladığı gerçek bir gün-içi yapı vardı ve
+canlıda kayboldu (rejim değişimi); (b) geometri (E1–E8 seçimi) tam o günlerin
+gün-içi yapısına uyduruldu. Sentetik üreteç gün-içi *oynaklık* profilini taşıyor
+ama gün-içi *yönlü* yapıyı (ör. ABD seansı açılış kırılmaları) taşımıyor — null
+ile bootstrap arasındaki farkın kaynağı bu olabilir.
+
+**Ayırt edici test (önceden kaydedildi, koşuyor):** aynı bootstrap, kaynak =
+665g cache'inin **2025-12-29 öncesi** 466 günü (geometrinin görmediği dönem).
+Öngörü: (b) doğruysa ≈ −0.1R (gerçek pencere-dışı koşuyla uyumlu), (a) doğruysa
+pozitif. `bootstrap_240d_oos.json`.
+
+### Sonuç 5 — `bootstrap` OOS 240g (6 tohum, 571 momentum pozisyonu) — **H9.4 kapandı: (b), seçim yanlılığı**
+
+Kaynak: 665g cache'inin **2025-12-29 öncesi** 466 günü; aynı makine, aynı
+bootstrap, aynı 5 günlük bloklar.
+
+| tohum | bakiye | DD | halt | mom n | momR all-in | payoff | TP2/SL/TRL/TMO | ADA getiri |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $849.92 | -15.0% | 1 | 76 | -0.182 | 0.95 | 9/40/24/3 | -35% |
+| 2 | $978.17 | -12.2% | 0 | 71 | -0.011 | 1.72 | 16/38/13/4 | -69% |
+| 3 | $908.98 | -15.0% | 1 | 118 | -0.058 | 1.4 | 20/57/35/6 | -41% |
+| 4 | $1049.09 | -9.9% | 0 | 117 | +0.062 | 2.07 | 29/54/31/3 | -47% |
+| 5 | $912.49 | -13.2% | 0 | 140 | -0.047 | 1.59 | 28/75/27/10 | -47% |
+| 6 | $866.23 | -15.1% | 1 | 49 | -0.251 | 0.97 | 7/32/10/0 | -29% |
+| **havuz** | **$927 ± 74** | −13.4% | **3** | 95 | **−0.058** (±0.047 SE) | 1.45 | 19/52/25/5 | |
+
+| bootstrap kaynağı | momR | P(kâr) | payoff | TP2/SL/TRL |
+|---|--:|--:|--:|--:|
+| in-sample günler (2025-11 → 2026-08) | **+0.254** | 4/6 | 2.40 | 26/45/25 |
+| OOS günler (2024-09 → 2025-12) | **−0.058** | 1/6 | 1.45 | 19/52/25 |
+
+Fark **+0.300R, SE 0.121, t = 2.48**. OOS bootstrap'ın çıkış dağılımı null
+(20/53/20) ve gerçek 665g (21/51/25) ile birebir. Değişen tek şey hangi
+günlerden örneklendiği: geometrinin (E1–E8, Faz 8) üzerinde seçildiği günlerde
++0.25R, onun dışında ücret tabanı. Açıklama (a) — "o dönemde gerçek bir gün-içi
+yapı vardı" — dışlanmadı ama gereksiz: o yapı her hâlükârda yalnızca seçim
+penceresinde var, öncesinde yok (bu test), sonrasında yok (canlı 46g ≈ 0).
+
+**Tur 9'un birleşik tablosu (momentum all-in R):**
+
+| edge YOK | | edge VAR | |
+|---|--:|---|--:|
+| `null` sentetik | −0.016 | in-sample bootstrap | +0.254 |
+| `trend` sentetik (VR 4h 1.19) | −0.040 | GERÇEK 240g | +0.396 |
+| OOS bootstrap (gerçek günler) | −0.058 | | |
+| GERÇEK pencere-dışı 425g | −0.103 | | |
+| canlı 46g | ≈ 0.00 | | |
+| `2027` / `2028` rejim yılları | −0.012 / −0.057 | | |
+
+Sağ sütundaki iki sayı aynı 280 günün üzerinde. Sol sütundaki yedi sayı, o
+günlerin dışındaki her şey — sentetik, gerçek, canlı — ve hepsi ücret tabanının
+±0.1R'si içinde.
+
+**Karar:** "Bir ileri bir geri" bir bug değil (H9.1 ✓), piyasa şansızlığı değil
+(H9.2 RED: ekilen trendi de alamıyor), kürasyon/deploy sorunu değil (Tur 0–3
+zaten elemişti). Faz 8 geometrisi 2025-12 → 2026-08 günlerinin gün-içi yapısına
+uydurulmuş; o yapının dışında sistemin beklentisi ≈ −ücret. Canlı hesap tam
+olarak bunu yaşıyor. Parametre ayarı bunu düzeltmez — sekiz kol denenmiş, en
+iyisi seçilmiş ve seçim yanlılığı tam da bu tabloyu üretmiş. Sırada olması
+gereken: geometriyi değil **ufku** değiştiren bir tasarım (stop mesafesi ≥
+tutma ufkunun gürültüsü; ör. 4h barlarda ATR, 1–5 günlük tutuş) ve onu
+`synth/trend` üzerinde önce **hasat edebildiğini** kanıtlamak — gerçek veriye
+gitmeden. Düzenek buna hazır (`X_*` env'leri sentetik koşuya geçer).
+
+### Sonuç 6 — `2027`–`2030` rejim yılları v2 (12 tohum × 365g, restart)
+
+Yıl etiketleri **beklenen** karışımdır; gerçekleşen karışım ve BTC yıl getirisi
+tohum başına verilir (yıllık gürültü SD ≈ %50; "genişleme yılı" etiketi bile
+BTC −%58 üretebiliyor).
+
+| yıl | tohum | gerçekleşen UP/DOWN/CHOP | BTC yıl | BULL bar | bakiye | DD | halt | mom n | momR | TP2/SL/TRL/TMO |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2027 | 1 | 42%/29%/29% | +195% | 48% | $1154.41 | -18.3% | 1 | 305 | +0.068 | 63/159/65/18 |
+| 2027 | 2 | 59%/9%/32% | +251% | 47% | $808.72 | -23.4% | 2 | 270 | -0.052 | 56/158/44/12 |
+| 2027 | 3 | 47%/29%/24% | -58% | 26% | $808.57 | -24.4% | 1 | 177 | -0.087 | 29/93/47/8 |
+| 2028 | 1 | 9%/37%/54% | +137% | 47% | $824.12 | -29.9% | 4 | 313 | -0.037 | 56/166/70/21 |
+| 2028 | 2 | 22%/37%/41% | +134% | 38% | $716.30 | -34.1% | 3 | 249 | -0.095 | 47/148/41/13 |
+| 2028 | 3 | 4%/44%/52% | -67% | 14% | $953.58 | -13.1% | 0 | 95 | -0.023 | 20/51/22/2 |
+| 2029 | 1 | 9%/23%/68% | +164% | 54% | $713.56 | -29.0% | 3 | 335 | -0.065 | 60/179/81/15 |
+| 2029 | 2 | 25%/28%/46% | +83% | 37% | $772.74 | -29.7% | 2 | 214 | -0.085 | 40/126/37/11 |
+| 2029 | 3 | 5%/35%/60% | -56% | 16% | $980.16 | -12.7% | 0 | 102 | +0.004 | 20/50/28/4 |
+| 2030 | 1 | 32%/14%/54% | +318% | 53% | $1045.89 | -19.9% | 1 | 326 | +0.032 | 74/175/59/18 |
+| 2030 | 2 | 54%/5%/41% | +420% | 54% | $846.84 | -31.7% | 3 | 317 | -0.031 | 66/180/55/16 |
+| 2030 | 3 | 40%/8%/52% | -9% | 24% | $848.16 | -20.7% | 1 | 137 | -0.086 | 23/73/38/3 |
+
+**12 yıl-tohumu havuzu:** momR **-0.034** (tohum -0.038 ± 0.015), n=2840,
+bakiye $873 ± 135, **P(kâr) 2/12**, DD ort -23.9% (en kötü -34.1%),
+**hard stop toplam 21 = yıl başına 1.8**, çıkış 20%/55%/21%/5%.
+Sonucun gerçekleşen UP payıyla korelasyonu -0.03, BTC yıl getirisiyle +0.30
+(BTC -67% … +420% aralığında) — boğa yılı da ayı yılı da aynı makineyi
+üretiyor. "2027–2030'da ne olur" sorusunun bu geometri için cevabı: rejimden
+bağımsız, yılda ~2 kill-switch, beklenti ≈ −ücret.
+
+### Sonuç 7 — `trend_slow` 240g (6 tohum, 518 momentum pozisyonu)
+
+Çok-günlük momentum (VR 4h 1.02 · 1g 1.15 · 5g 1.28): 8 saatlik tutuşun içinde
+görünmez, 4h rejim kapısına görünür. **6/6 hard stop**, 59–141. günde, havuz
+**−0.125R**.
+
+| tohum | bakiye | DD | gün | BULL bar | ADA getiri | mom n | momR | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $870.97 | -15.3% | 89 | 40% | +75% | 70 | -0.167 | 10/40/14/6 |
+| 2 | $849.26 | -15.2% | 59 | 95% | +366% | 91 | -0.149 | 14/52/20/5 |
+| 3 | $936.51 | -15.1% | 141 | 48% | -68% | 126 | -0.032 | 25/62/28/11 |
+| 4 | $851.40 | -15.2% | 123 | 30% | +219% | 77 | -0.177 | 9/43/21/4 |
+| 5 | $849.38 | -15.1% | 99 | 50% | +4% | 79 | -0.164 | 12/47/18/2 |
+| 6 | $897.90 | -15.0% | 63 | 59% | +5% | 75 | -0.121 | 13/40/18/4 |
+
+Seed 2: rejim barların **%95'inde BULL**, ADA pencerede **+%366** — bot 59. günde
+−15%'e çarptı. Rejim kapısı doğru şeyi görüyor (BULL), sizing'i açıyor, ve
+geometri bunu yine 5m gürültüsüne veriyor. `trend`'den kötü olması (−0.04 →
+−0.125) tutarlı: burada 8h ufkunda ekilmiş bir şey yok, yalnızca daha fazla
+BULL etiketi = daha fazla tam boy pozisyon = daha fazla stop.
+
+### Kapanış tablosu (`python3.12 experiments/synth/report.py --md`)
+
+| senaryo | tohum | gün | bakiye μ ± sd | min / max | P(kâr) | DD μ / en kötü | halt | mom n | momR all-in | TP2/SL/TRL/TMO | VR 4h/1d/5d |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| null 240g | 6 | 240 | $960 ± 76 | 860 / 1080 | 33% | -13.8% / -15.4% | 4 | 117 | **-0.016** ± 0.042 | 23/62/24/8 | 1.02/1.05/0.89 |
+| trend 240g | 6 | 240 | $920 ± 66 | 872 / 1049 | 17% | -15.2% / -15.4% | 5 | 134 | **-0.040** ± 0.019 | 27/73/28/7 | 1.19/1.69/1.79 |
+| trend_slow 240g | 6 | 240 | $876 ± 35 | 849 / 937 | 0% | -15.2% / -15.3% | 6 | 86 | **-0.125** ± 0.022 | 14/47/20/5 | 1.02/1.15/1.28 |
+| chop 240g | 6 | 240 | $875 ± 34 | 846 / 935 | 0% | -15.3% / -15.4% | 6 | 56 | **-0.202** ± 0.061 | 7/33/13/3 | 0.91/0.68/0.24 |
+| bootstrap 240g | 6 | 240 | $1198 ± 278 | 906 / 1651 | 67% | -7.2% / -13.4% | 0 | 83 | **+0.254** ± 0.111 | 22/38/21/2 | 0.94/0.93/0.77 |
+| bootstrap 240g [oos] | 6 | 240 | $927 ± 74 | 850 / 1049 | 17% | -13.4% / -15.1% | 3 | 95 | **-0.058** ± 0.047 | 18/49/23/4 | 0.59/0.56/0.52 |
+| 2027 365g (restart) | 3 | 365 | $924 ± 200 | 809 / 1154 | 33% | -22.0% / -24.4% | 4 | 250 | **-0.012** ± 0.047 | 49/137/52/13 | 1.07/1.23/1.56 |
+| 2028 365g (restart) | 3 | 365 | $831 ± 119 | 716 / 954 | 0% | -25.7% / -34.1% | 7 | 219 | **-0.057** ± 0.022 | 41/122/44/12 | 1.06/1.21/1.35 |
+| 2029 365g (restart) | 3 | 365 | $822 ± 140 | 714 / 980 | 0% | -23.8% / -29.7% | 5 | 217 | **-0.061** ± 0.027 | 40/118/49/10 | 1.04/1.05/0.94 |
+| 2030 365g (restart) | 3 | 365 | $914 ± 115 | 847 / 1046 | 33% | -24.1% / -31.7% | 5 | 260 | **-0.014** ± 0.034 | 54/143/51/12 | 1.05/1.21/1.47 |
+| GERÇEK 240g (mevcut geometri) | 1 | 240 | $1435 | 1435 / 1435 | 100% | -6.1% / -6.1% | 0 | 114 | **+0.396** | 35/45/31/3 |  |
+| GERÇEK 665g (mevcut geometri, restart) | 1 | 665 | $1085 | 1085 / 1085 | 100% | -37.6% / -37.6% | 3 | 396 | **+0.039** | 83/203/99/11 |  |
+
+
+**Toplam:** 60 tohum-koşu (48 × 240g + 12 × 365g), ~40 saat CPU, 12 senaryo
+dosyası `experiments/synth/results/`. Tüm hipotezler yukarıda ölçümden önce
+yazıldı; H9.1 ✓, H9.2 RED, H9.3 ✓, H9.4 → seçim yanlılığı, H9.5 kısmen (kapı
+pozisyon almayı durdurmuyor).
+
+**Durum: tamamlandı — 14 Eyl 2026 04:50 UTC.** Çalışan bota değişiklik veya
+deploy yok. Sıradaki hipotez için yukarıdaki "Karar" bölümüne bak.
+
+
+---
+
+## Tur 10 — Stop mesafesini ufkun gürültüsüne ölçeklemek · 14 Eyl 2026
+
+**Kullanıcı isteği:** Tur 9'un önerdiği kolu dene — "stop mesafesini gürültüye
+ölçekleyen bir kol". Ve bir soru: "ne kadar mükemmeliyeti ararsan o kadar
+kusurlu olursun; bazen basitlik mükemmelliktir" — ne düşünüyorsun?
+
+**Mekanizma (Tur 9'dan):** SL 2.25×ATR = 0.76%; 8 saatlik tutuşun gürültü SD'si
+2.79% ≈ 8.3×ATR; ekilen edge 8h'te +0.17%. Stop, gürültünün 1/3.7'sinde —
+sürüklenme birikemeden vuruluyor. Çıkış dağılımı bu yüzden piyasadan bağımsız.
+
+**Hipotez H10.1:** Geometri (SL/TP1/TP2/TRAIL) tutma ufkunun gürültüsüne
+ölçeklenir ve timeout buna göre uzatılırsa, **aynı giriş sinyaliyle** makine
+`synth/trend`'de ekilen edge'i hasat eder.
+- Öngörü DOĞRU ise: `trend`'de momR belirgin pozitif (≥ +0.10R, 6 tohum havuzu),
+  `null`'da ≈ −ücret. Çıkış dağılımı `trend` ile `null` arasında **farklılaşır**
+  (Tur 9'da farklılaşmıyordu) — bu, sonucun artık piyasaya bağlı olduğunun
+  işareti.
+- Öngörü YANLIŞ ise: `trend`'de de ≈ 0 → giriş sinyalinin kendisi (5m breakout
+  puanı) latent sürüklenmeyle ilişkisiz; çıkış geometrisi değil, giriş bilgisiz.
+  O zaman makinenin kurtarılacak parçası kalmaz.
+
+**Kollar (yalnız `X_*` env; kod değişmedi):**
+
+| kol | SL | TP1 | TP2 | TRAIL | TIMEOUT | anlamı |
+|---|--:|--:|--:|--:|--:|---|
+| baseline | 2.25 | 3 | 6 | 3.75 | 96 (8h) | Tur 9'da ölçüldü |
+| `wide3` | 6.75 | 9 | 18 | 11.25 | 288 (24h) | geometri ×3, SL ≈ 0.8× 8h gürültüsü |
+| `wide4` | 9 | 12 | 24 | 15 | 576 (48h) | geometri ×4, SL ≈ 1.1× 8h gürültüsü |
+
+Sıra: `wide3`×`trend` → `wide3`×`null` → `wide4`×`trend` (→ `wide4`×`null`
+yalnız wide4 trend'de bir şey gösterirse). 6 tohum, aynı tohumlar (1–6), aynı
+piyasalar — fark yalnız geometri. Not: ×4'te notional $10/3% = $278 →
+MIN_NOTIONAL $300'a kelepçelenir, gerçek risk ~$10.8; R yine $10 üzerinden.
+
+```sh
+X_SL_FULL_ATR=6.75 X_TP1_ATR=9 X_TP2_ATR=18 X_TRAIL_ATR=11.25 X_TIMEOUT_BARS=288 \
+  python3.12 experiments/synth/run.py --scenario trend --days 240 --seeds 6 --tag wide3
+```
+
+**Karar kuralı (ölçümden önce):** `wide*` × `trend` havuz momR ≥ +0.10R VE
+`wide*` × `null` ≤ +0.05R ise H10.1 kabul; ardından gerçek OOS bootstrap
+(2024-09→2025-12) — orada da ≥ 0 değilse gerçek piyasada hasat edecek şey yok
+demektir ve kol yine alınmaz. Gerçek 240g'ye **bakılmaz** (seçim penceresi).
+
+**Hipotez H10.2 — naif kural (kullanıcı isteği, ölçümden önce):** Tur 9'un
+kâhin kuralı ("4h getirisi > 0 → al, 8h tut", uzun-yalnız, aynı sürtünme
+0.075%/taraf) `synth/trend`'de kazandı çünkü trend oraya ekilmişti. Gerçek 5m
+kripto 4h ufkunda hafif **ortalamaya dönen** (VR 4h 0.93, 240g; OOS bootstrap
+kaynağında 0.59). Öngörü: naif kural gerçek OOS günlerde (2024-09 → 2025-12,
+gerçek sırayla, bootstrap'sız) **≤ 0** — ücret tabanı ya da altı. `null`'da ≈
+−ücret, `chop`'ta negatif, `trend`'de pozitif (kalibrasyon). In-sample 240g'de
+ne çıkarsa çıksın karar için kullanılmaz.
+- Öngörü DOĞRU ise: bu ufukta gerçek veride ne makine ne basit kural hasat
+  edecek bir şey bulmuyor → sorun ufuk/piyasa; Tur 4 ile tutarlı.
+- Öngörü YANLIŞ ise (OOS'ta anlamlı pozitif): basit kural makineyi gerçek veride
+  de yeniyor → makinenin giriş katmanı değil, çıkış geometrisi tek suçlu; Tur 10.1
+  ile birlikte okunur.
+
+Kural iki varyantla ölçülür: stopsuz (saf ufuk sinyali) ve **gürültü-ölçekli
+stop** (SL = 1× 8h getiri SD'si, ≈ 2.8%) — ikincisi R cinsinden botla
+karşılaştırılabilir. Parametre taraması yok: look=48, hold=96 (Tur 9'da
+kullanılan), seans filtresi yok. Araç: `experiments/synth/naive.py`.
+
+### Sonuç H10.2 — naif kural, 17 piyasa (`python3.12 experiments/synth/naive.py --md`)
+
+| piyasa | n | stopsuz: ort %/işlem | WR | coin-ort toplam % | +coin | stop 1×SD: R | SL payı | toplam % |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| synth null s1 | 3100 | +0.053 | 50% | +33% | 4/5 | **+0.014** | 26% | +26% |
+| synth null s2 | 3094 | -0.003 | 50% | -2% | 2/5 | **-0.008** | 28% | -11% |
+| synth null s3 | 3100 | -0.117 | 47% | -73% | 0/5 | **-0.053** | 30% | -91% |
+| synth trend s1 | 3020 | +0.189 | 52% | +114% | 5/5 | **+0.073** | 22% | +145% |
+| synth trend s2 | 3051 | +0.255 | 52% | +155% | 5/5 | **+0.086** | 23% | +171% |
+| synth trend s3 | 2973 | -0.076 | 50% | -45% | 1/5 | **-0.006** | 26% | -15% |
+| synth chop s1 | 3094 | -0.119 | 47% | -73% | 0/5 | **-0.077** | 31% | -128% |
+| synth chop s2 | 3096 | -0.189 | 45% | -117% | 0/5 | **-0.099** | 34% | -166% |
+| synth chop s3 | 3108 | -0.175 | 46% | -109% | 0/5 | **-0.092** | 33% | -150% |
+| bootstrap in-sample s1 | 3062 | -0.157 | 43% | -96% | 0/5 | **-0.093** | 26% | -145% |
+| bootstrap OOS s1 | 3092 | -0.145 | 48% | -90% | 1/5 | **-0.045** | 21% | -95% |
+| bootstrap in-sample s2 | 3113 | -0.122 | 43% | -76% | 1/5 | **-0.084** | 25% | -131% |
+| bootstrap OOS s2 | 3083 | -0.212 | 47% | -131% | 0/5 | **-0.076** | 27% | -140% |
+| bootstrap in-sample s3 | 3088 | -0.153 | 43% | -94% | 0/5 | **-0.093** | 25% | -146% |
+| bootstrap OOS s3 | 3121 | -0.213 | 45% | -133% | 0/5 | **-0.065** | 24% | -131% |
+| GERÇEK 240g in-sample (2025-11→2026-08) | 3080 | -0.112 | 43% | -69% | 0/5 | **-0.073** | 25% | -114% |
+| GERÇEK OOS (2024-09→2025-12, gerçek sıra) | 5516 | -0.119 | 47% | -131% | 0/5 | **-0.041** | 23% | -151% |
+
+  Σ synth null                                  9294      -0.023                      |   -0.017
+  Σ synth trend                                 9044      +0.124                      |   +0.053
+  Σ synth chop                                  9298      -0.161                      |   -0.095
+  Σ bootstrap in-sample                         9263      -0.144                      |   -0.096
+  Σ bootstrap OOS                               9296      -0.190                      |   -0.066
+
+(n = 5 coinin toplam işlem sayısı; R = stoplu varyantta işlem başına net getiri /
+stop mesafesi; "SL payı" = stopla biten işlemlerin oranı.)
+
+- **Öngörü TUTTU.** Gerçek OOS (466 gün, gerçek sıra): stopsuz −0.119%/işlem,
+  5/5 coin negatif; stoplu **−0.041R**. Ücret tabanı (0.15% / 2.8% ≈ 0.054R)
+  civarı — hasat edilen şey yok.
+- Kalibrasyon: `trend`'de +0.124% / **+0.053R** (3 tohumdan 2'si güçlü pozitif),
+  `chop`'ta −0.095R, `null`'da −0.017R. Kural ekilen edge'i görüyor; gerçek
+  veride görecek şey bulamıyor.
+- **In-sample 240g'de de −0.112% / −0.073R, 0/5 coin.** Makinenin +0.39R yaptığı
+  günlerde genel bir 4h-momentum özelliği YOK. Makinenin in-sample sayısı o
+  günlerin ufuk özelliği değil, geometrinin o günlere özgü uyumu — Tur 9'un
+  seçim-yanlılığı hükmünü bağımsız bir yoldan doğruluyor.
+- `null`'ın ücret tabanının biraz üstünde çıkması (−0.023 vs −0.15%) log-drift 0
+  iken aritmetik getirinin Jensen terimi (+0.04%/8h) ve 3 tohumluk yol
+  varyansı; lookahead değil (kural yapısal olarak göremez).
+
+**Okuma:** bu ufukta gerçek piyasada ne makine ne basit kural bir şey buluyor.
+Sorun giriş sinyalinin karmaşıklığı ya da çıkışın ölçeği değil; **ufkun
+kendisi boş** (VR 4h 0.93 — hafif ortalamaya dönen). Tur 4 (357 konfig, 4h/1g/1h
+dahil, hiçbiri buy&hold'u geçemedi) ile tutarlı.
+
+### Sonuç H10.1a — `wide3` × `trend` (6 tohum, aynı piyasalar, aynı giriş)
+
+| tohum | baseline bakiye | n | momR | TP2/SL/TRL/TMO | wide3 bakiye | DD | halt | n | momR | payoff | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $1049.23 | 237 | +0.037 | 58/122/46/11 | $1843.48 | -7.8% | 0 | 171 | **+0.513** | 2.82 | 41/56/23/51 |
+| 2 | $888.05 | 132 | -0.064 | 26/76/23/7 | $1276.40 | -12.1% | 0 | 192 | **+0.168** | 1.99 | 37/74/23/58 |
+| 3 | $879.27 | 111 | -0.087 | 18/61/22/10 | $914.64 | -15.2% | 1 | 67 | **-0.102** | 1.39 | 6/33/9/19 |
+| 4 | $872.39 | 113 | -0.094 | 21/62/26/4 | $971.47 | -12.1% | 0 | 121 | **-0.001** | 1.47 | 21/52/18/30 |
+| 5 | $919.84 | 88 | -0.065 | 13/47/23/5 | $1383.65 | -5.8% | 0 | 115 | **+0.361** | 2.77 | 22/45/13/35 |
+| 6 | $911.09 | 124 | -0.055 | 25/68/25/6 | $1157.59 | -11.0% | 0 | 176 | **+0.110** | 1.66 | 30/75/20/51 |
+
+| | havuz momR | tohum ort | P(kâr) | bakiye | halt | WR | payoff | TP2/SL/TRL/TMO |
+|---|--:|--:|--:|--:|--:|--:|--:|--:|
+| baseline (SL 2.25, TMO 96) | −0.040 | −0.055 ± 0.019 | 1/6 | $920 ± 66 | 5 | 39.0% | 1.49 | 20/54/20/5 |
+| **wide3** (SL 6.75, TMO 288) | **+0.207** | +0.175 ± 0.093 | 4/6 | $1258 ± 337 | 1 | 40.4% | 2.02 | 19/40/13/**29** |
+
+Eşleştirilmiş fark wide3 − baseline: **+0.230R ± 0.078, t = 2.95**, 5/6 tohumda
+iyileşme. Çıkış dağılımı ilk kez piyasaya tepki veriyor: SL %54 → %40, TIMEOUT
+%5 → %29 — 24 saat sınırı bağlıyor; pozisyonlar artık stopla değil zamanla
+çözülüyor, ve zaman sürüklenmenin lehine. **Giriş sinyali latent sürüklenmeyle
+ilişkili**: aynı 5m breakout puanı, çıkış ufka ölçeklenince +0.2R hasat ediyor.
+H10.1'in "YANLIŞ ise" dalı ("giriş bilgisiz") dışlandı.
+
+Not: bu, sentetik `trend` üzerinde bir **mekanizma** kanıtıdır — geometri ufka
+ölçeklenirse makine var olan edge'i alabiliyor. Gerçek veride o edge'in
+olmadığını H10.2 zaten ölçtü (naif kural OOS'ta −0.04R). Sonraki adım geometri
+değil ufuk/sinyal: hangi ufukta gerçek veride VR > 1 var?
+
+### Sonuç H10.1b — `wide3` × `null` (6 tohum, sızıntı kontrolü)
+
+| tohum | baseline bakiye | momR | wide3 bakiye | DD | n | momR | TP2/SL/TRL/TMO |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | $859.53 | -0.213 | $1039.57 | -12.4% | 152 | **+0.050** | 19/51/19/63 |
+| 2 | $946.00 | -0.021 | $1004.33 | -12.3% | 209 | **+0.022** | 18/76/37/78 |
+| 3 | $1080.09 | +0.084 | $949.20 | -13.7% | 106 | **-0.023** | 9/42/12/43 |
+| 4 | $1005.02 | +0.026 | $1104.57 | -7.4% | 85 | **+0.148** | 10/32/14/29 |
+| 5 | $919.38 | -0.088 | $917.29 | -13.9% | 154 | **-0.030** | 13/61/19/61 |
+| 6 | $948.32 | -0.014 | $1218.10 | -13.7% | 179 | **+0.143** | 19/55/27/78 |
+
+| geometri | `null` momR | `trend` momR | trend − null | halt (null/trend) |
+|---|--:|--:|--:|--:|
+| baseline (SL 2.25, TMO 96) | −0.016 | −0.040 | −0.017 (t −0.37) | 4 / 5 |
+| **wide3** (SL 6.75, TMO 288) | **+0.049** (±0.032) | **+0.207** (±0.093) | **+0.123** (t 1.25) | 0 / 1 |
+
+Karar kuralı "null ≤ +0.05R": havuz +0.049 geçiyor, tohum ortalaması +0.052
+geçmiyor — **sınırda**. Kaynağı biliniyor ve sızıntı değil: `null` **log**
+fiyatta martingale (log drift 0), dolayısıyla aritmetik getiri +σ²/2 per bar.
+Uzun-yalnız bir sistem bundan tutma süresiyle orantılı yararlanır: 8h'te
+≈ +0.04%/0.76% SL ≈ +0.05R (baseline'ın ücret tabanı −0.115'in üstünde
+−0.016'da çıkmasını açıklar), 24h'te ≈ +0.08%/2.3% ≈ +0.03R (wide3'ün TIMEOUT
+%40'ı tam süre tutuyor). Harness kusuru olarak kaydedildi: uzun-yalnız sistem
+için doğru null **fiyatta** martingale (`drift = −σ²/2`). Eklenecek ve
+`null_mart` × baseline / wide3 koşulacak; o zamana kadar temiz metrik
+**trend − null** farkı: baseline −0.02 (piyasayı görmüyor), wide3 +0.12
+(görüyor; 6 tohumla t=1.25 — yönü kesin, büyüklüğü gürültülü).
+
+**H10.1 kararı: KABUL — mekanizma düzeyinde.** Aynı giriş sinyali, çıkış
+geometrisi tutma ufkunun gürültüsüne ölçeklenince (SL ≈ 0.8× 8h SD, timeout
+24h) sentetik trendi hasat ediyor (+0.21R, eşleştirilmiş +0.23R t=2.95) ve
+sonucu ilk kez piyasaya bağlı hale geliyor (çıkış dağılımı null ile trend
+arasında ayrışıyor). Tur 9'un teşhisi doğrulandı: kod değil, ölçek.
+
+**Bu bir deploy kararı DEĞİL.** H10.2 aynı gün ölçtü: gerçek veride bu ufukta
+(4h → 8–24h) hasat edilecek şey yok — naif kural OOS'ta −0.04R, in-sample'da
+−0.07R. Makineyi wide3 ile gerçek veriye koşmak, boş bir tarlada daha iyi bir
+orakla dolaşmak olur. Sıradaki soru geometri değil: **gerçek veride hangi
+ufukta VR > 1 var?** (Tur 4'ün 4h/1g/1h taramasında hiçbiri buy&hold'u
+geçmemişti; funding/basis tarafı Tur 6–8'de kapanmıştı.) Cevap "hiçbirinde"
+ise, doğru sonuç "daha iyi bot" değil "bu piyasada yönlü bot yok"tur.
+
+`wide4` × `trend` (×4 geometri, 48h) arka planda koşuyor; sonucu ek olarak
+işlenecek, kararı değiştirmez.
+
+**Durum: H10.1 ve H10.2 tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik
+veya deploy yok.
+
+---
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
