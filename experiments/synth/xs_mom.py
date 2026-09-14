@@ -1,13 +1,14 @@
 """Cross-sectional long-short momentum, 4h → 1d, measured everywhere (DEFTER Tur 12).
 
-    python3.12 experiments/synth/xs_mom.py            # table
-    python3.12 experiments/synth/xs_mom.py --md
+    python3.12 experiments/synth/xs_mom.py                     # 1-day hold
+    python3.12 experiments/synth/xs_mom.py --hold=1 --hold=3 --hold=5 --md
 
 Arm (fixed before measurement, no search): at every 00:00 UTC close rank the
 universe by the trailing 4h log return; long the top 5, short the bottom 5,
-equal weight, dollar-neutral, gross 100%. Positions open at that close and are
-rebalanced 288 bars later. Cost on turnover only: EXEC_COST_PER_SIDE × Σ|Δw|.
-Funding is not modelled.
+equal weight, dollar-neutral, gross 100%. With --hold=N the book is N daily
+tranches each held N days (Jegadeesh–Titman), marked daily, so turnover — and
+its cost — falls by N while the number of daily observations does not. Cost
+on turnover only: EXEC_COST_PER_SIDE × Σ|Δw|. Funding is not modelled.
 
 Context rows: top-5 long-only, equal-weight everything (buy & hold), and a
 RANDOM ranking with the same book — the same turnover and no information, so
@@ -52,46 +53,64 @@ def panel(frames: dict[str, pd.DataFrame], symbols: list[str]) -> tuple[np.ndarr
     return np.column_stack(cols), ts_arr
 
 
-def rebalance_points(ts: np.ndarray, start: int) -> np.ndarray:
-    """Indices of 00:00 UTC bars from `start` on, spaced ≥ HOLD apart."""
+def daily_points(ts: np.ndarray, start: int) -> np.ndarray:
+    """Indices of the 00:00 UTC bars from `start` on (one per day)."""
     hours = (ts // 3_600_000) % 24
     mins = (ts // 60_000) % 60
     cand = np.nonzero((hours == 0) & (mins == 0))[0]
-    return cand[(cand >= max(start, LOOK)) & (cand + HOLD < len(ts))]
+    return cand[cand >= max(start, LOOK)]
+
+
+def target_weights(lc: np.ndarray, i: int, mode: str, rng: np.random.Generator | None) -> np.ndarray:
+    n_s = lc.shape[1]
+    sig = lc[i] - lc[i - LOOK]
+    if mode == "rand":
+        sig = rng.standard_normal(n_s)  # type: ignore[union-attr]
+    order = np.argsort(sig)
+    w = np.zeros(n_s)
+    if mode == "ew":
+        w[:] = 1.0 / n_s
+    elif mode == "long":
+        w[order[-K:]] = 1.0 / K
+    else:
+        w[order[-K:]] = 0.5 / K
+        w[order[:K]] = -0.5 / K
+    return w
 
 
 def run_book(lc: np.ndarray, pts: np.ndarray, mode: str, rng: np.random.Generator | None = None,
-             cost: float = EXEC_COST_PER_SIDE) -> dict:
-    """mode: 'ls' long-short top/bottom K · 'long' top-K only · 'ew' equal weight ·
-    'rand' random ranking long-short. Returns per-period net returns and legs."""
+             cost: float = EXEC_COST_PER_SIDE, hold_days: int = 1) -> dict:
+    """Daily-marked book of `hold_days` overlapping tranches (Jegadeesh–Titman).
+
+    pts are the daily 00:00 UTC bar indices. Tranche j (= day index mod
+    hold_days) is re-ranked on its day and held hold_days days; the book weight
+    is the tranche average, so gross stays 100% and daily turnover is one
+    tranche's rebalance. Cost is charged on the book's daily turnover only.
+    mode: 'ls' long-short top/bottom K · 'long' top-K · 'ew' equal weight ·
+    'rand' random ranking long-short.
+    """
     n_s = lc.shape[1]
-    w_prev = np.zeros(n_s)
+    tr = np.zeros((hold_days, n_s))          # current weights per tranche
+    w_book = np.zeros(n_s)
     rets, longs, shorts, costs = [], [], [], []
-    for i in pts:
-        sig = lc[i] - lc[i - LOOK]
-        if mode == "rand":
-            sig = rng.standard_normal(n_s)  # type: ignore[union-attr]
-        order = np.argsort(sig)
-        w = np.zeros(n_s)
-        if mode == "ew":
-            w[:] = 1.0 / n_s
-        elif mode == "long":
-            w[order[-K:]] = 1.0 / K
-        else:
-            w[order[-K:]] = 0.5 / K
-            w[order[:K]] = -0.5 / K
-        turnover = float(np.abs(w - w_prev).sum())
-        r = np.exp(lc[i + HOLD] - lc[i]) - 1.0            # simple returns over the hold
-        gross_long = float(np.sum(np.clip(w, 0, None) * r))
-        gross_short = float(np.sum(np.clip(w, None, 0) * r))
+    for d in range(len(pts) - 1):
+        i, nxt = pts[d], pts[d + 1]
+        tr[d % hold_days] = target_weights(lc, i, mode, rng)
+        w_new = tr.mean(axis=0)
+        turnover = float(np.abs(w_new - w_book).sum())
+        r = np.exp(lc[nxt] - lc[i]) - 1.0                  # next day's simple return
+        gross_long = float(np.sum(np.clip(w_new, 0, None) * r))
+        gross_short = float(np.sum(np.clip(w_new, None, 0) * r))
         c = cost * turnover
         rets.append(gross_long + gross_short - c)
         longs.append(gross_long)
         shorts.append(gross_short)
         costs.append(c)
-        w_prev = w * (1 + r) / max(float(np.sum(np.abs(w * (1 + r)))), 1e-12) * float(np.sum(np.abs(w)))
-    r = np.array(rets)
-    return {"r": r, "long": np.array(longs), "short": np.array(shorts), "cost": np.array(costs)}
+        # weights drift with the day's returns before the next rebalance
+        tr = tr * (1 + r)
+        w_book = w_new * (1 + r)
+    r_arr = np.array(rets)
+    return {"r": r_arr, "long": np.array(longs), "short": np.array(shorts), "cost": np.array(costs)}
 
 
 def stats(b: dict) -> dict:
@@ -108,14 +127,15 @@ def stats(b: dict) -> dict:
             "maliyet_%/g": b["cost"].mean() * 100}
 
 
-def evaluate(frames: dict[str, pd.DataFrame], start: int, seed: int = 0) -> dict[str, dict]:
+def evaluate(frames: dict[str, pd.DataFrame], start: int, seed: int = 0,
+             hold_days: int = 1) -> dict[str, dict]:
     lc, ts = panel(frames, UNIVERSE)
-    pts = rebalance_points(ts, start)
+    pts = daily_points(ts, start)
     rng = np.random.default_rng(seed)
-    return {"ls": stats(run_book(lc, pts, "ls")),
-            "rand": stats(run_book(lc, pts, "rand", rng)),
-            "long": stats(run_book(lc, pts, "long")),
-            "ew": stats(run_book(lc, pts, "ew"))}
+    return {"ls": stats(run_book(lc, pts, "ls", hold_days=hold_days)),
+            "rand": stats(run_book(lc, pts, "rand", rng, hold_days=hold_days)),
+            "long": stats(run_book(lc, pts, "long", hold_days=hold_days)),
+            "ew": stats(run_book(lc, pts, "ew", hold_days=hold_days))}
 
 
 def markets() -> list[tuple[str, dict, int]]:
@@ -142,17 +162,20 @@ def markets() -> list[tuple[str, dict, int]]:
 
 def main() -> None:
     md = "--md" in sys.argv
+    holds = [int(a.split("=", 1)[1]) for a in sys.argv if a.startswith("--hold=")] or [1]
     rows = []
-    for label, fr, start in markets():
-        ev = evaluate(fr, start)
-        rows.append({"piyasa": label, "n_gün": ev["ls"]["n_gün"],
+    mk = markets()
+    for hold in holds:
+      for label, fr, start in mk:
+        ev = evaluate(fr, start, hold_days=hold)
+        rows.append({"piyasa": label, "tutuş_g": hold, "n_gün": ev["ls"]["n_gün"],
                      "LS net %/g": ev["ls"]["net_%/gün"], "t": ev["ls"]["t"], "Sharpe": ev["ls"]["Sharpe"],
                      "toplam %": ev["ls"]["toplam_%"], "maxDD %": ev["ls"]["maxDD_%"],
                      "uzun %/g": ev["ls"]["uzun_bacak_%/g"], "kısa %/g": ev["ls"]["kısa_bacak_%/g"],
                      "maliyet %/g": ev["ls"]["maliyet_%/g"],
                      "RASTGELE net %/g": ev["rand"]["net_%/gün"],
                      "top5-uzun %/g": ev["long"]["net_%/gün"], "EW %/g": ev["ew"]["net_%/gün"]})
-        print(f"  {label:44s} LS {ev['ls']['net_%/gün']:+.3f}%/g t {ev['ls']['t']:+.2f}  rand {ev['rand']['net_%/gün']:+.3f}  long {ev['long']['net_%/gün']:+.3f}  ew {ev['ew']['net_%/gün']:+.3f}", file=sys.stderr, flush=True)
+        print(f"  h={hold} {label:44s} LS {ev['ls']['net_%/gün']:+.3f}%/g t {ev['ls']['t']:+.2f}  rand {ev['rand']['net_%/gün']:+.3f}  long {ev['long']['net_%/gün']:+.3f}  ew {ev['ew']['net_%/gün']:+.3f}", file=sys.stderr, flush=True)
     df = pd.DataFrame(rows)
     if md:
         cols = list(df.columns)

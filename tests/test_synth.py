@@ -191,7 +191,7 @@ def test_xs_book_accounting_on_a_known_panel():
     lc = np.zeros((xs_mom.LOOK + xs_mom.HOLD + 1, n_s))
     lc[xs_mom.LOOK] = np.arange(n_s) * 0.001            # signal: coin j moved j·0.1%
     lc[xs_mom.LOOK + xs_mom.HOLD] = lc[xs_mom.LOOK] + np.arange(n_s) * 0.01
-    pts = np.array([xs_mom.LOOK])
+    pts = np.array([xs_mom.LOOK, xs_mom.LOOK + xs_mom.HOLD])
     b = xs_mom.run_book(lc, pts, "ls", cost=0.001)
     r = np.exp(np.arange(n_s) * 0.01) - 1
     expect = 0.1 * r[-5:].sum() - 0.1 * r[:5].sum() - 0.001 * 1.0   # gross 100% turnover
@@ -211,3 +211,17 @@ def test_xs_random_ranking_is_information_free():
     pts = np.arange(xs_mom.LOOK, n_t - xs_mom.HOLD, xs_mom.HOLD)
     b = xs_mom.run_book(lc, pts, "rand", np.random.default_rng(1), cost=0.0)
     assert abs(b["r"].mean()) < 4 * b["r"].std(ddof=1) / np.sqrt(len(pts))
+
+
+def test_xs_tranches_cut_turnover_by_hold_days():
+    """5 daily tranches held 5 days: daily book turnover ≈ 1/5 of a full
+    rebalance, and gross stays 100%."""
+    from experiments.synth import xs_mom
+    rng = np.random.default_rng(0)
+    n_t, n_s = 30_000, 12
+    lc = np.cumsum(rng.normal(0, 0.01, (n_t, n_s)), axis=0)
+    pts = np.arange(xs_mom.LOOK, n_t - xs_mom.HOLD, xs_mom.HOLD)
+    b1 = xs_mom.run_book(lc, pts, "ls", cost=0.001, hold_days=1)
+    b5 = xs_mom.run_book(lc, pts, "ls", cost=0.001, hold_days=5)
+    ratio = b5["cost"][10:].mean() / b1["cost"][10:].mean()
+    assert 0.15 < ratio < 0.3, ratio

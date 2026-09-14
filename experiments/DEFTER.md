@@ -2091,6 +2091,79 @@ zaman-serisi, kesitsel, her ufuk — yok ya da sürtünmenin altında.
 
 **Durum: tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya deploy yok.
 
+### H12.2 — tutuşu 5 güne uzatan TEK varyant (14 Eyl, ölçümden önce)
+
+**Kullanıcı isteği:** "tutuşu 3–5 güne uzatan tek varyantı da dene."
+
+**Varyant (karar için tek):** aynı sinyal (4h), aynı defter (top5/bottom5,
+dolar-nötr, brüt %100), **tutuş 5 gün, 5 günlük dilim**: her gün 00:00 UTC'de
+sermayenin 1/5'i (o günün dilimi) yeniden sıralanır ve 5 gün tutulur; defter
+günlük işaretlenir, devir maliyeti yalnız o günün diliminden — beklenen maliyet
+≈ 0.113/5 ≈ 0.023%/gün. 3 günlük tutuş **bağlam** satırı (tutuş-uzunluğu
+eğrisi), karar satırı değil. Rastgele-sıralama kontrolü aynı dilim yapısıyla.
+
+**Öngörü:** Tur 11 B'de 4h→5g uzun-kısa brüt +0.37%/5g ≈ +0.07%/gün (t 1.86,
+anlamsız). Maliyet 0.023 düşülünce net ≈ +0.03–0.05%/gün; 464 günde günlük
+LS SD ≈ 1% → SE ≈ 0.05 → **t ≈ 1, anlamsız**. Sentetik `trend`'de tutuş
+uzadıkça hasat düşmeli (OU yarı-ömrü 6h; 5 günde sinyal sönmüş) ama maliyet de
+düştüğü için net pozitif kalır. Karar kuralı değişmedi: OOS net t > 2 VE
+rastgele kontrolün üstünde.
+
+### Sonuç H12.2 (14 Eyl 2026; `xs_mom.py --hold=1 --hold=3 --hold=5`)
+
+Sentetik satırlar 3 tohumun ortalaması; bootstrap satırları 3 tohum ortalaması.
+
+| tutuş | piyasa | n_gün | LS net %/g | t | Sharpe | toplam % | maxDD % | uzun %/g | kısa %/g | maliyet %/g | RASTGELE net | top5-uzun | EW |
+|--:|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1 | synth null_mart (ort 3 tohum) | 239 | -0.104 | -0.890 | -1.100 | -23.244 | -36.499 | 0.161 | -0.150 | 0.115 | -0.078 | 0.208 | 0.268 |
+| 1 | synth trend (ort 3 tohum) | 239 | 1.145 | 8.080 | 9.985 | 1437.110 | -7.576 | 0.958 | 0.302 | 0.115 | -0.011 | 1.801 | 0.645 |
+| 1 | synth chop (ort 3 tohum) | 239 | -0.230 | -2.381 | -2.942 | -43.025 | -45.683 | 0.047 | -0.163 | 0.114 | -0.082 | -0.020 | 0.141 |
+| 1 | bootstrap in-sample (ort 3 tohum) | 239 | 0.067 | 0.859 | 1.063 | 15.224 | -10.467 | 0.068 | 0.112 | 0.114 | -0.126 | 0.022 | -0.117 |
+| 1 | bootstrap OOS (ort 3 tohum) | 239 | -0.019 | -0.271 | -0.335 | -5.752 | -18.861 | -0.028 | 0.123 | 0.113 | -0.109 | -0.171 | -0.167 |
+| 1 | GERÇEK in-sample (2025-12-29→2026-08, 665g cache) | 237 | 0.070 | 0.824 | 1.022 | 15.695 | -13.952 | 0.135 | 0.049 | 0.114 | -0.200 | 0.156 | 0.002 |
+| 1 | GERÇEK OOS (2024-09→2025-12, gerçek sıra) | 464 | 0.017 | 0.283 | 0.251 | 4.110 | -34.950 | 0.054 | 0.077 | 0.114 | -0.072 | -0.007 | -0.002 |
+| 1 | GERÇEK tümü (2024-09→2026-08) | 703 | 0.031 | 0.649 | 0.468 | 17.693 | -34.950 | 0.077 | 0.068 | 0.114 | -0.086 | 0.041 | -0.005 |
+| 3 | synth null_mart (ort 3 tohum) | 239 | -0.074 | -1.137 | -1.404 | -16.850 | -24.130 | 0.073 | -0.108 | 0.038 | -0.029 | 0.234 | 0.286 |
+| 3 | synth trend (ort 3 tohum) | 239 | 0.303 | 3.472 | 4.291 | 104.291 | -9.589 | 0.413 | -0.072 | 0.039 | 0.036 | 1.010 | 0.684 |
+| 3 | synth chop (ort 3 tohum) | 239 | -0.142 | -2.560 | -3.164 | -28.827 | -29.954 | -0.018 | -0.086 | 0.038 | -0.028 | -0.047 | 0.092 |
+| 3 | bootstrap in-sample (ort 3 tohum) | 239 | 0.030 | 0.844 | 1.043 | 7.302 | -6.067 | -0.001 | 0.070 | 0.038 | 0.021 | -0.070 | -0.115 |
+| 3 | bootstrap OOS (ort 3 tohum) | 239 | -0.007 | -0.204 | -0.252 | -2.035 | -12.227 | -0.029 | 0.060 | 0.039 | -0.026 | -0.154 | -0.167 |
+| 3 | GERÇEK in-sample (2025-12-29→2026-08, 665g cache) | 237 | 0.058 | 1.486 | 1.844 | 14.368 | -5.831 | 0.070 | 0.026 | 0.038 | -0.109 | 0.102 | 0.010 |
+| 3 | GERÇEK OOS (2024-09→2025-12, gerçek sıra) | 464 | -0.009 | -0.241 | -0.214 | -5.264 | -25.018 | 0.019 | 0.011 | 0.039 | 0.000 | -0.031 | -0.008 |
+| 3 | GERÇEK tümü (2024-09→2026-08) | 703 | 0.012 | 0.457 | 0.330 | 7.190 | -25.676 | 0.034 | 0.017 | 0.039 | -0.025 | 0.008 | -0.007 |
+| 5 | synth null_mart (ort 3 tohum) | 239 | -0.046 | -0.874 | -1.080 | -11.082 | -16.963 | 0.059 | -0.083 | 0.023 | -0.011 | 0.282 | 0.290 |
+| 5 | synth trend (ort 3 tohum) | 239 | 0.166 | 2.381 | 2.943 | 46.778 | -9.414 | 0.291 | -0.101 | 0.024 | 0.045 | 0.927 | 0.693 |
+| 5 | synth chop (ort 3 tohum) | 239 | -0.085 | -2.065 | -2.551 | -18.663 | -20.041 | -0.011 | -0.051 | 0.023 | -0.016 | -0.005 | 0.064 |
+| 5 | bootstrap in-sample (ort 3 tohum) | 239 | 0.026 | 0.940 | 1.161 | 6.339 | -5.394 | -0.004 | 0.053 | 0.023 | 0.013 | -0.078 | -0.111 |
+| 5 | bootstrap OOS (ort 3 tohum) | 239 | -0.020 | -0.649 | -0.802 | -4.520 | -11.629 | -0.036 | 0.040 | 0.023 | -0.017 | -0.186 | -0.173 |
+| 5 | GERÇEK in-sample (2025-12-29→2026-08, 665g cache) | 237 | 0.008 | 0.165 | 0.205 | 1.247 | -13.445 | 0.045 | -0.013 | 0.023 | -0.035 | 0.069 | -0.003 |
+| 5 | GERÇEK OOS (2024-09→2025-12, gerçek sıra) | 464 | -0.015 | -0.546 | -0.485 | -7.619 | -18.119 | 0.001 | 0.007 | 0.023 | 0.033 | -0.040 | -0.019 |
+| 5 | GERÇEK tümü (2024-09→2026-08) | 703 | -0.007 | -0.278 | -0.200 | -6.337 | -18.119 | 0.015 | 0.001 | 0.023 | 0.007 | -0.004 | -0.015 |
+
+**Okuma:**
+- **Karar satırı (5g tutuş, gerçek OOS): net −0.015%/gün, t −0.55**; rastgele
+  kontrol +0.033. Maliyet 0.113 → 0.023'e düştü (mekanizma ✓, test
+  `test_xs_tranches_cut_turnover_by_hold_days`), ama brüt sinyal daha hızlı
+  söndü: uzun+kısa bacak 1g'de +0.13, 5g'de ≈ 0. Tutuş eğrisi OOS: +0.017 →
+  −0.009 → −0.015. In-sample'da da +0.070 → +0.058 → +0.008.
+- **Sentetik `trend` eğrisi aynı şekli veriyor:** LS 1g +1.27 → 3g +0.26 → 5g
+  +0.16 ≈ rastgele +0.16. Ekilen OU sürüklenmenin yarı-ömrü 6h; 5 günlük
+  tutuşta sinyal yok, kalan pozitif sayı yalnız-uzun sürüklenmeden (piyasa
+  yükseliyor, rastgele defter de kazanıyor). Gerçek veride 4h sinyalin
+  ömrü de bir günden kısa görünüyor.
+- Tur 11 B'deki "4h→5g +0.37% (t 1.86)" hücresi, 5 dilimle 5× gözlemde sıfıra
+  indi — **gürültüydü**.
+- Öngörü: "anlamsız" tuttu, "hafif pozitif" tutmadı — işaret eksi.
+
+**Karar: alınmadı.** Devir kaldıracı çalışmıyor çünkü sinyalin ömrü, devri
+ucuzlatan tutuştan kısa; 1g'de sinyal var maliyet yiyor, 5g'de maliyet ucuz
+sinyal yok. Arada bir nokta (3g) ikisinin de kötüsü. Kesitsel 4h momentum
+kolu kapandı. Hysteresis (sınırda tutma) aynı sinyal ömrü kısıtına tabi;
+denenmedi ve bu defterde hipotez olarak açılmadı.
+
+**Durum: Tur 12 tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya
+deploy yok.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
