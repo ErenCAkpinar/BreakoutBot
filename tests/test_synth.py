@@ -3,6 +3,7 @@ what it claims, and are the frames shaped like the ones the simulator reads?"""
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from experiments.synth import gen
@@ -154,18 +155,25 @@ def test_chop_anchor_follows_the_price_after_a_trend():
 
 
 def test_martingale_null_has_zero_arithmetic_drift():
-    """The plain null is a log-martingale (+σ²/2 arithmetic drift per bar); the
-    martingale null must have ~zero arithmetic drift so a long-only system
-    cannot earn from holding alone."""
-    plain = gen.simulate(gen.Scenario("p", garch=(0, 0)), 300, seed=7)["ADAUSDT"]
-    mart  = gen.simulate(gen.Scenario("m", garch=(0, 0), martingale=True), 300, seed=7)["ADAUSDT"]
-    rp = plain["close"].pct_change().dropna()
-    rm = mart["close"].pct_change().dropna()
-    se = float(rp.std() / np.sqrt(len(rp)))
-    sigma2_half = 0.5 * gen.DEFAULT_COINS[3].sigma ** 2        # ADA is index 3
-    # same shocks (same seed): the difference in mean return is the removed drift
-    assert abs((rp.mean() - rm.mean()) - sigma2_half) < 0.2 * sigma2_half
-    assert abs(rm.mean()) < 3 * se
+    """Price-martingale null: E[exp(r_substep)] = 1 conditionally, so the
+    removed drift equals half the realised conditional variance exactly —
+    with GARCH and the intraday profile ON (review 2026-09-14, finding 5)."""
+    # BTC: tick 0.1 on ~110 000 makes price rounding negligible (ADA's 0.0001
+    # tick would bury a per-bar drift of ~3e-6 under ±1e-4 of rounding).
+    plain = gen.simulate(gen.Scenario("p"), 200, seed=7)["BTCUSDT"]
+    mart  = gen.simulate(gen.Scenario("m", martingale=True), 200, seed=7)["BTCUSDT"]
+    lp = np.log(plain["close"].to_numpy())
+    lm = np.log(mart["close"].to_numpy())
+    # same shocks: the log-path difference is the summed −½·conditional var,
+    # which tracks the plain path's realised variance (ratio ≈ 1)
+    d = (lp - lm)[1:] - (lp - lm)[:-1]
+    rp = np.diff(lp)
+    ratio = d.sum() / (0.5 * np.sum(rp ** 2))
+    assert 0.9 < ratio < 1.1, ratio
+    assert (d[288:] > 0).mean() > 0.85            # per-bar sign; 0.1 tick ≈ the drift itself, so not 100%
+    # arithmetic mean return of the martingale path is zero within noise
+    ra = np.exp(np.diff(lm)) - 1
+    assert abs(ra.mean()) < 3 * ra.std() / np.sqrt(len(ra))
 
 
 def test_random_entry_state_is_a_coin_flip_that_always_confirms():
@@ -225,3 +233,35 @@ def test_xs_tranches_cut_turnover_by_hold_days():
     b5 = xs_mom.run_book(lc, pts, "ls", cost=0.001, hold_days=5)
     ratio = b5["cost"][10:].mean() / b1["cost"][10:].mean()
     assert 0.15 < ratio < 0.3, ratio
+
+
+
+def test_naive_stop_is_causal():
+    """Changing FUTURE closes must not change a stop set in the past (review
+    2026-09-14, finding 2)."""
+    from experiments.synth import naive
+    rng = np.random.default_rng(3)
+    n = naive.VOL_WINDOW + naive.LOOK + 5 * naive.HOLD
+    c = 100 * np.exp(np.cumsum(rng.normal(0, 0.003, n)))
+    df = pd.DataFrame({"close": c, "low": c * 0.999})
+    a = naive.run_rule(df, sl_sd=1.0, start=naive.VOL_WINDOW)
+    c2 = c.copy()
+    c2[-naive.HOLD:] *= np.linspace(1.0, 3.0, naive.HOLD)     # blow up the tail only
+    b = naive.run_rule(pd.DataFrame({"close": c2, "low": c2 * 0.999}), sl_sd=1.0, start=naive.VOL_WINDOW)
+    assert a["n"] >= 2 and b["n"] == a["n"]
+    # every trade's entry is before the tail, so every stop is identical
+    assert abs(a["sl_pct"] - b["sl_pct"]) < 1e-12
+    assert a["exits"] == b["exits"]
+
+
+def test_xs_tranche_weights_are_shares_of_equity():
+    """Single coin, 3 tranches filling in over the first 3 days (1/3, 2/3, 3/3
+    exposure), price ×1.1 daily. The reviewer's independent quantity-and-cash
+    ledger gives 1.219481; the unnormalised code gave 1.227659 (review
+    2026-09-14, finding 4)."""
+    from experiments.synth import xs_mom
+    lc = np.log(np.array([100.0, 110.0, 121.0, 133.1]))
+    L = np.concatenate([np.full(xs_mom.LOOK, lc[0]), lc]).reshape(-1, 1)
+    pts = np.arange(xs_mom.LOOK, xs_mom.LOOK + len(lc))
+    b = xs_mom.run_book(L, pts, "ew", cost=0.0, hold_days=3)
+    assert abs(float(np.prod(1 + b["r"])) - 1.219481) < 1e-6

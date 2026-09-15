@@ -106,9 +106,12 @@ def run_book(lc: np.ndarray, pts: np.ndarray, mode: str, rng: np.random.Generato
         longs.append(gross_long)
         shorts.append(gross_short)
         costs.append(c)
-        # weights drift with the day's returns before the next rebalance
-        tr = tr * (1 + r)
-        w_book = w_new * (1 + r)
+        # weights drift with the day's returns AND are re-expressed as a share
+        # of the new equity (review 2026-09-14, finding 4: without the
+        # division the book's gross exposure crept with every up day).
+        r_p = gross_long + gross_short
+        tr = tr * (1 + r) / (1 + r_p)
+        w_book = w_new * (1 + r) / (1 + r_p)
     r_arr = np.array(rets)
     return {"r": r_arr, "long": np.array(longs), "short": np.array(shorts), "cost": np.array(costs)}
 

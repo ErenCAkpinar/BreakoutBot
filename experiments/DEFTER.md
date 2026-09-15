@@ -2280,6 +2280,143 @@ Not: "USDT borç verme ~%4–8" Tur 8'in varsayımı; bu turda yeniden ölçülm
 
 **Durum: tamamlandı — 14 Eyl 2026.** Çalışan bota değişiklik veya deploy yok.
 
+## Tur 14 — Dış inceleme (ChatGPT, 14 Eyl) ve düzeltmeler · 15 Eyl 2026
+
+Kullanıcı `d4cecc1` sürümünü bağımsız bir incelemeye verdi
+(`~/Downloads/BreakoutBot-review-2026-09-14.md`, 11 bulgu). Her bulgu koda
+karşı doğrulandı; doğru olanlar düzeltildi ve etkilenen ölçümler aynı
+hipotezlerle yeniden koşuldu. Aşağıda bulgu → karar → düzeltme → yeniden ölçüm.
+
+| # | bulgu | karar | düzeltme | etki (önce → sonra) |
+|---|---|---|---|---|
+| 1 P1 | Kapanmamış son mum basis'e giriyor; spot/perp farklı dakikada çekilmiş | **DOĞRU** | `fetch_spot/perp`: yalnız kapanmış mumlar (`closed_only`); cache'teki anlık-görüntü mum gerçek kapanışla değiştirildi (BTC 78848 → 78982, %0.17) | zaman-OOS BTC basis kayması **+2.72 → +0.02 %/yıl**; funding etkilenmedi (6.53) |
+| 2 P1 | Naif stopun genişliği tüm test döneminden (gelecek dahil) | **DOĞRU** | `naive.py`: giriş anında dondurulan 30 günlük geriye dönük SD; test `test_naive_stop_is_causal` | gerçek OOS R −0.041 → **−0.041**; in-sample −0.073 → −0.071; trend +0.053 → +0.054 |
+| 3 P1 | Basis muhasebesi sabit-dolar/sabit-miktar karışımı | **DOĞRU** (örnek +0.739% birebir; gerçek BTC'de fark 0.06 %/yıl) | `lab/basis_ledger.py`: miktar defteri — q sabit, funding perp notional'ı üzerinden, |Δq|×2 bacak maliyet; hep-açık kontroller **aylık** dolar dengeleme (dengelemesiz defterde notional fiyatla 7.8× büyüyüp funding'i 13.4 %/yıl gösterdi — doğru ama planlanamaz) | BTC+ETH 6.45 → **6.67**, likit-6 6.57 → 7.01, walk-forward 3.69 → 4.15, in-sample 6.62 → 8.27 |
+| 4 P1 | Dilimli tutuşta ağırlıklar özkaynağa normalize edilmiyor | **DOĞRU** (örnek 1.227659 birebir) | `xs_mom.py`: `tr·(1+r)/(1+r_p)`; test inceleyicinin bağımsız 1.219481'ini sabitler | OOS 1g/3g/5g +0.017/−0.009/−0.015 → **+0.017/−0.008/−0.015** |
+| 5 P1 | `null_mart` düzeltmesi koşullu varyansla uyuşmuyor (E[intra²]=1.059) | **DOĞRU** | `gen.py`: alt-adım başına −½·koşullu varyans (GARCH, gün-içi, vol_mult dahil); test: kaldırılan sürüklenme / gerçekleşen varyans oranı 0.9998 | analitik artık ≤ +0.002R/pozisyon; ampirik: `null_mart × wide3` 6 tohum yeniden koşuluyor (aşağıda) |
+| 6 P2 | Zaman-OOS başlangıcı 08-24 yerine 08-28 olmalı | **DOĞRU** | `basis_oos.py`: `PREV_SEEN = 2026-08-28 16:00` (funding/spot'un görülen son barı), OOS ondan sonraki ilk kapanmış bar | 21.7 gün → **17.5 gün**; BTC funding 7.23 → 6.53 %/yıl |
+| 7 P2 | Walk-forward yıl geçişleri dilim eklemesi, geçiş maliyeti yok | **DOĞRU** | tek kesintisiz ağırlık yolu, defter geçişi ücretlendiriyor | 3.69 → 4.15 (3 ve 7 birlikte) |
+| 8 P2 | Havuz t coinleri bağımsız sayıyor (≈√23 şişme) | **DOĞRU** | `vr_scan.py`: t, coin-ortalaması portföy serisi üzerinden | 4h→1h/8h/1g **t 3.3/2.3/2.7 → 1.3/0.8/1.0** — Tur 11'de "anlamlı ama sürtünme altı" denen hücreler anlamlı değilmiş; Tur 12'nin gerekçesi bu hücreydi |
+| 9 P2 | TP1 sonrası başabaş stop atanıyor ama TRAILING'de kontrol edilmiyor | **DOĞRU**, bilinen (metrics.py notu); ölçüm hatası değil, **deploy edilen davranış** — backtest canlıyla parite | `strategy.py` docstring gerçeği yazıyor; davranış değiştirilmedi (değişiklik = yeni kol, env bayrağı, iki pencere) | ölçümlere etkisi yok; tasarım kusuru olarak açık |
+| 10 P2 | `dashboard.py` aynı entry'li iki turu tek pozisyon sayıyor | **DOĞRU** | `metrics.aggregate_positions` (kanonik) kullanıyor; inceleyicinin örneği 1 → 2 pozisyon | yerel pano; site etkilenmedi |
+| 11 P2 | Sunucudaki `paper_bb.py`'de yerel winddown düzeltmesi yok | **DOĞRU** (bilinen deploy farkı, `deploy-chain` notu) | deploy yok — kullanıcı kararı; bir sonraki yetkili deploy'da fark + resume senaryosu doğrulanmalı | işletim; ölçüm değil |
+| — | Ruff 49 | | güvenli otomatik düzeltmeler (kullanılmayan import/f-string; davranış-nötr) | **49 → 39**; kalan E701/E741/E731/E402 stil, parite dosyalarında, dokunulmadı |
+| — | mypy modül çakışmasıyla başlamıyor | **DOĞRU** | `experiments/__init__.py`, `experiments/synth/__init__.py` | mypy tamamlanıyor: 56 dosya, **7 hata** (mean_reversion ×2, paper_bb ×3, basis.py, ls_study — hepsi eski, daha önce görünmüyordu) |
+
+Testler: 135 → **139** geçiyor (naif nedensellik, dilim normalizasyonu, martingale
+koşullu varyans, defter sabit-miktar, defter funding/geçiş).
+
+### Yeniden ölçülen tablolar
+
+**Tur 11 B — portföy-serisi t ile (eski "t_havuz" sütunu geçersiz):**
+
+### B. Doğrudan hasat — sign(r_L)·r_H uzun-kısa, 23 coin, 2024-09 → 2026-08 (örtüşmeyen H; t = coin-ortalaması portföy serisi üzerinden)
+
+| L | H | ort_% | t_portföy | coin+ | n_coin | n_pencere |
+|--:|--:|--:|--:|--:|--:|--:|
+| 1h | 1h | -0.003 | -0.688 | 8 | 23 | 16918 |
+| 1h | 4h | -0.006 | -0.339 | 9 | 23 | 4229 |
+| 1h | 8h | -0.013 | -0.374 | 9 | 23 | 2114 |
+| 1h | 1d | 0.036 | 0.344 | 14 | 23 | 704 |
+| 1h | 5d | -0.238 | -0.498 | 7 | 23 | 140 |
+| 4h | 1h | 0.006 | 1.295 | 21 | 23 | 16915 |
+| 4h | 4h | 0.008 | 0.396 | 13 | 23 | 4228 |
+| 4h | 8h | 0.030 | 0.799 | 16 | 23 | 2114 |
+| 4h | 1d | 0.109 | 0.980 | 17 | 23 | 704 |
+| 4h | 5d | 0.367 | 0.671 | 16 | 23 | 140 |
+| 1d | 1h | -0.004 | -0.793 | 6 | 23 | 16895 |
+| 1d | 4h | -0.004 | -0.216 | 8 | 23 | 4223 |
+| 1d | 8h | 0.015 | 0.356 | 14 | 23 | 2111 |
+| 1d | 1d | 0.087 | 0.678 | 16 | 23 | 703 |
+| 1d | 5d | -0.230 | -0.398 | 11 | 23 | 140 |
+| 5d | 1h | 0.003 | 0.567 | 15 | 23 | 16799 |
+| 5d | 4h | 0.006 | 0.281 | 12 | 23 | 4199 |
+| 5d | 8h | 0.002 | 0.051 | 12 | 23 | 2099 |
+| 5d | 1d | -0.034 | -0.258 | 8 | 23 | 699 |
+| 5d | 5d | 0.153 | 0.239 | 13 | 23 | 139 |
+
+**Tur 11 F — uzun-yalnız, maliyet sonrası, portföy-serisi t:**
+
+### F. UZUN-YALNIZ, MALİYET SONRASI — r_L>0 iken r_H − 0.15%; 23 coin, 665g (t = portföy serisi)
+
+| L | H | net_%/işlem | portföy_%/pencere | t_portföy | coin+ | n_pencere | sinyal_oranı |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 1h | 1h | -0.158 | -0.078 | -24.193 | 0 | 16918 | 0.491 |
+| 1h | 4h | -0.177 | -0.087 | -6.124 | 0 | 4229 | 0.493 |
+| 1h | 8h | -0.205 | -0.101 | -3.290 | 0 | 2114 | 0.493 |
+| 1h | 1d | -0.233 | -0.119 | -1.157 | 1 | 704 | 0.513 |
+| 1h | 5d | -1.127 | -0.584 | -1.127 | 0 | 140 | 0.523 |
+| 4h | 1h | -0.149 | -0.073 | -22.769 | 0 | 16915 | 0.491 |
+| 4h | 4h | -0.164 | -0.081 | -5.646 | 0 | 4228 | 0.493 |
+| 4h | 8h | -0.163 | -0.079 | -2.655 | 0 | 2114 | 0.486 |
+| 4h | 1d | -0.167 | -0.084 | -0.855 | 5 | 704 | 0.495 |
+| 4h | 5d | -0.562 | -0.279 | -0.568 | 5 | 140 | 0.494 |
+| 1d | 1h | -0.160 | -0.077 | -23.973 | 0 | 16895 | 0.484 |
+| 1d | 4h | -0.177 | -0.086 | -6.053 | 0 | 4223 | 0.484 |
+| 1d | 8h | -0.180 | -0.087 | -2.784 | 1 | 2111 | 0.484 |
+| 1d | 1d | -0.195 | -0.094 | -1.096 | 3 | 703 | 0.486 |
+| 1d | 5d | -1.197 | -0.568 | -1.234 | 3 | 140 | 0.470 |
+| 5d | 1h | -0.153 | -0.070 | -22.389 | 0 | 16799 | 0.457 |
+| 5d | 4h | -0.169 | -0.077 | -5.644 | 0 | 4199 | 0.456 |
+| 5d | 8h | -0.199 | -0.090 | -3.184 | 1 | 2099 | 0.455 |
+| 5d | 1d | -0.343 | -0.154 | -1.772 | 2 | 699 | 0.455 |
+| 5d | 5d | -0.817 | -0.412 | -0.999 | 4 | 139 | 0.465 |
+
+**Tur 13 — miktar defteri, aylık dengeleme, ortak OOS sınırı, kapanmış mumlar:**
+
+### A. Walk-forward: her test yılı için konfig yalnız önceki veride seçildi (en iyi Sharpe)
+
+| test yılı | seçilen (top,lb,reb,minF) | eğitim SR | eğitim yıllık % | OOS net_% | OOS funding_% | OOS basis_% | OOS cost_% | OOS ann_% | OOS vol_% | OOS DD_% | OOS SR | OOS n | BTC+ETH hep açık net % | likit-6 hep açık net % | 23 hep açık net % |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2022 | 8,180,42,0.005% | 8.81 | 39.76 | -0.25 | 0.07 | -0.01 | -0.31 | -0.25 | 0.24 | -0.14 | -1.05 | 2190 | 2.34 | 2.12 | -0.94 |
+| 2023 | 8,180,42,0.005% | 6.59 | 21.03 | 4.59 | 6.53 | 0.16 | -2.11 | 4.59 | 2.60 | -1.63 | 1.74 | 2190 | 8.56 | 9.03 | 6.62 |
+| 2024 | 8,180,180,0.005% | 5.73 | 15.02 | 13.89 | 14.88 | 0.17 | -1.16 | 13.88 | 1.14 | -0.28 | 11.41 | 2196 | 14.28 | 16.02 | 16.89 |
+| 2025 | 8,180,180,0.005% | 6.07 | 14.26 | 0.66 | 1.08 | 0.01 | -0.43 | 0.66 | 0.71 | -0.29 | 0.94 | 2190 | 5.12 | 4.95 | 2.36 |
+| 2026 | 8,42,540,0.000% | 5.58 | 14.21 | 1.74 | 2.54 | 0.07 | -0.86 | 1.74 | 1.05 | -0.34 | 1.65 | 1544 | 2.14 | 2.05 | -0.99 |
+
+### B. 2022-01 → veri sonu: birleşik OOS serisi vs parametresiz kontroller vs in-sample seçim
+
+| seri | yıllık % | vol % | DD % | SR | funding %/y | basis %/y | maliyet %/y | net %/y | cfg |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| walk-forward OOS 2022→ | 4.15 | 1.42 | -1.63 | 2.88 | 5.43 | 0.09 | -1.03 | 4.48 |  |
+| BTC+ETH hep açık 2022→ | 6.67 | 1.65 | -2.15 | 3.93 | 7.88 | -0.03 | -0.30 | 7.54 |  |
+| likit-6 hep açık 2022→ | 7.01 | 1.55 | -1.85 | 4.37 | 8.41 | -0.07 | -0.35 | 7.98 |  |
+| 23 hep açık 2022→ | 4.95 | 1.78 | -3.13 | 2.72 | 6.02 | -0.11 | -0.49 | 5.43 |  |
+| in-sample en iyi SR (tüm veri seçimi) 2022→ | 8.27 | 1.71 | -2.40 | 4.66 | 10.50 | -0.01 | -0.86 | 9.64 | (8, 42, 540, 0.0) |
+
+### C. Zaman-OOS: 2026-08-28 20:00 → 2026-09-15 04:00 (önceki turların görmediği, kapanmış mumlar), yıllıklandırılmış
+
+| set | gün | funding yıllık % | basis kayması yıllık % | brüt yıllık % | pozitif coin |
+|--:|--:|--:|--:|--:|--:|
+| BTC | 17.50 | 6.53 | 0.02 | 6.55 | 1/1 |
+| ETH | 17.50 | 4.15 | 0.15 | 4.30 | 1/1 |
+| likit-6 ort | 17.50 | 4.86 | 0.26 | 5.12 | 6/6 |
+| 23 medyan | 17.50 | 4.82 | -0.01 | 4.91 | 20/23 |
+
+### Kararlara etkisi
+
+- **Tur 9–10 (bug mu / geometri / rastgele giriş):** #5 dışında dokunulmadı;
+  #5'in analitik üst sınırı +0.002R/pozisyon (24h tutuş, 2.3% SL) — Tur 10c'nin
+  ±0.03R'lik SE'lerinin çok altında. Ampirik doğrulama koşuyor. Karar
+  değişmedi.
+- **Tur 11 (VR):** VR tablosu (A) coin-bazlı z*'lere dayanıyordu, etkilenmedi.
+  B/F'nin "anlamlı ama sürtünme altı" cümlesi **"anlamlı değil"** oldu — yön
+  aynı, ifade düzeltildi.
+- **Tur 12 (kesitsel):** gerekçesi (4h→1g t 2.7) havuz artefaktıydı; sonuç
+  (net ≈ 0, t 0.29) değişmedi. Karar aynı.
+- **Tur 13 (basis):** rakamlar küçük kaydı (BTC+ETH 6.45 → 6.67), zaman-OOS
+  basis kayması gerçekte ≈ 0 — brüt funding aynı. Karar aynı: borç verme
+  aralığının içinde.
+- **İnceleyicinin ana cümlesi** — "kodda sorun yok, piyasada avantaj yok
+  sonucu bu testlerle doğrulanamıyor" — beş P1'in dördü *araştırma araçlarında*
+  (naive/xs/gen/basis-ledger), biri veri katmanında; **canlı-parite
+  simülatöründe (backtest.py/strategy.py) ölçüm hatası bulunmadı** (#9 bir
+  tasarım gerçeği, parite korunuyor). Düzeltmeler sonrası yeniden ölçülen
+  her sayı aynı kararı veriyor. Bu, kararların doğru olduğunun değil,
+  bu düzeltmelerin onları değiştirmediğinin kanıtı.
+
+**Durum: koşuyor** (`null_mart × wide3` v2, 6 tohum). Commit sonrası eklenecek.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,

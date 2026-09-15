@@ -40,22 +40,20 @@ def _box(title: str) -> None:
 
 
 def positions_from_trades(trade_log: list[dict]) -> list[dict]:
-    """Leg'leri pozisyona grupla. Bir pozisyonun bacakları (TP1 + TP2/TRAIL/SL)
-    aynı entry fiyatını paylaşır → (symbol, direction, entry) ile grupla."""
-    groups: dict[tuple, dict] = {}
-    order: list[tuple] = []
-    for t in trade_log:
-        key = (t["symbol"], t["direction"], round(float(t["entry"]), 10))
-        if key not in groups:
-            groups[key] = {
-                "symbol": t["symbol"], "direction": t["direction"],
-                "entry": float(t["entry"]), "pnl": 0.0,
-                "legs": [], "ts": t["ts"][:16],
-            }
-            order.append(key)
-        groups[key]["pnl"] += float(t["pnl"])
-        groups[key]["legs"].append(t["exit_type"])
-    return [groups[k] for k in order]
+    """Leg'leri pozisyona grupla — kanonik kronolojik birleştiriciyle.
+
+    Eskiden (symbol, direction, entry) anahtarıyla gruplanıyordu; aynı coinde
+    farklı günlerde aynı fiyattan açılan iki tur tek pozisyon sayılıyordu
+    (inceleme 2026-09-14, madde 10). metrics.aggregate_positions bir TP1
+    bacağını bekleyen pozisyon olarak açar, sonraki sonlandırıcı bacak onu
+    kapatır; başka her kayıt tek başına bir pozisyondur — canlı defter ve
+    backtest ile aynı sayım."""
+    from metrics import aggregate_positions
+    out = []
+    for p in aggregate_positions(trade_log):
+        out.append({"symbol": p.symbol, "direction": "", "entry": 0.0,
+                    "pnl": p.pnl, "legs": list(p.legs), "ts": ""})
+    return out
 
 
 def equity_curve_from_log() -> list[float]:
@@ -129,7 +127,7 @@ def main() -> None:
 
     # ── Başlık ────────────────────────────────────────────────────────────────
     print("═" * 60)
-    print(f"  BREAKOUTBOT — GO/NO-GO PANOSU")
+    print("  BREAKOUTBOT — GO/NO-GO PANOSU")
     print(f"  Gün {day} | Bar #{bar_count:,} | Bakiye ${balance:.2f} ({ret_pct:+.2f}%)")
     print("═" * 60)
 
@@ -165,7 +163,7 @@ def main() -> None:
     print(f"  Max DD yaşanan  : {dd['max_dd']:.2f}%")
     print(f"  Şu anki DD      : {dd['cur_dd']:.2f}%")
     if dd["recovered"] is None:
-        print(f"  Toparlama       : — (henüz ciddi düşüş yaşanmadı)")
+        print("  Toparlama       : — (henüz ciddi düşüş yaşanmadı)")
     else:
         print(f"  Toparlama       : {'✅ evet (DD sonrası yeni zirve)' if dd['recovered'] else '⏳ hayır (hâlâ DD içinde)'}")
 

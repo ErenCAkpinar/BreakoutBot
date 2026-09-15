@@ -128,3 +128,43 @@ def test_book_is_normalised_so_configs_stay_comparable():
     for top in (1, 3, 5):
         w = basis.weights(bp, top=top, lookback=10, rebal=1)
         assert np.isclose(w[-1].sum(), 1.0), (top, w[-1].sum())
+
+
+
+def _mk(spot, perp, fund):
+    import basis
+    idx = pd.date_range("2024-01-01", periods=len(spot), freq="4h", tz="UTC")
+    return basis.BasisPanel([f"C{i}" for i in range(spot.shape[1])], idx, spot, perp, fund)
+
+
+def test_ledger_fixed_quantity_hedge_earns_nothing_from_price():
+    """Review 2026-09-14 finding 3: spot 100→200→100 vs perp 101→201→101 with
+    zero funding and zero cost — a fixed-quantity hedge has zero P&L; the old
+    constant-dollar model produced +0.739%."""
+    import basis
+    import basis_ledger
+    spot = np.array([[100.0], [200.0], [100.0]])
+    perp = np.array([[101.0], [201.0], [101.0]])
+    bp = _mk(spot, perp, np.zeros((3, 1)))
+    w = np.ones((3, 1))
+    led = basis_ledger.run(bp, w, cost_per_side=0.0)
+    assert abs(np.prod(1 + led["r"]) - 1.0) < 1e-12
+    old = float(np.prod(1 + basis.evaluate(bp, w, cost_per_side=0.0)[1:]) - 1)
+    assert abs(old - 0.00739) < 1e-4          # the old model's artefact, for the record
+
+
+def test_ledger_funding_accrues_on_perp_notional_and_transition_is_charged():
+    import basis_ledger
+    spot = np.full((4, 2), 100.0)
+    perp = np.full((4, 2), 100.0)
+    fund = np.zeros((4, 2))
+    fund[1:, 0] = 0.001                                   # coin 0 pays 0.1%/bar
+    bp = _mk(spot, perp, fund)
+    w = np.zeros((4, 2))
+    w[:2, 0] = 1.0
+    w[2:, 1] = 1.0                                        # switch A → B at bar 2
+    led = basis_ledger.run(bp, w, cost_per_side=0.001)
+    assert abs(led["funding"][1] - 0.001) < 1e-12        # q·P·f, q sized from pre-cost equity $1
+    assert abs(led["cost"][0] - 0.002) < 1e-9             # enter A: 2 legs × 0.001 × $1
+    assert led["cost"][2] > led["cost"][0] * 1.9          # exit A + enter B: 4 legs
+    assert led["cost"][1] == 0.0 and led["cost"][3] == 0.0

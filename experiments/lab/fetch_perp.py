@@ -47,6 +47,13 @@ def fetch_one(ex, sym: str, tf: str, since_ms: int) -> list[list]:
     return out
 
 
+def closed_only(bars: list[list], tf: str) -> list[list]:
+    """Keep bars whose interval has fully elapsed (ts + tf ≤ now)."""
+    step = panel_mod.TF_MINUTES[tf] * 60_000
+    now_ms = int(time.time() * 1000)
+    return [b for b in bars if b[0] + step <= now_ms]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tf", default="4h")
@@ -60,6 +67,11 @@ def main() -> None:
     print(f"  {len(syms)} sembol · perp {args.tf} · {args.since}'den\n")
     for i, sym in enumerate(syms, 1):
         bars = fetch_one(ex, sym, args.tf, since_ms)
+        # Only CLOSED candles: the exchange returns the current bar while it is
+        # still forming, and a bar stamped 16:00 fetched at 16:57 is a snapshot,
+        # not a close — spot and perp fetched minutes apart would then disagree
+        # on the "same" bar (review 2026-09-14, finding 1).
+        bars = closed_only(bars, args.tf)
         path = f"{OUT}/{sym}_{args.tf}.json"
         if os.path.exists(path):
             try:

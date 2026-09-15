@@ -32,7 +32,6 @@ import time
 from datetime import datetime, timezone
 
 import ccxt
-import numpy as np
 import pandas as pd
 import requests as _requests
 
@@ -40,8 +39,8 @@ from config import (
     TOKENS, TIMEFRAME, INITIAL_BALANCE,
     DAILY_DD_LIMIT, EQUITY_THROTTLE_DD, PEAK_DD_LIMIT, DAILY_SL_LIMIT,
     SESSION_START_UTC, SESSION_END_UTC,
-    TEST_SIZE_USD, FULL_SIZE_USD, LEVERAGE, MAX_OPEN, RISK_PER_TRADE_USD,
-    BTC_GATE_ENABLED, BTC_GATE_RETURN, BTC_BETA_WINDOW,
+    TEST_SIZE_USD, LEVERAGE, MAX_OPEN, RISK_PER_TRADE_USD,
+    BTC_BETA_WINDOW,
 )
 from indicators import build_snapshot, hurst_exponent, precompute_indicators
 from strategy import SymbolState, IDLE, SCALE_OPEN, TRAILING, TEST_OPEN
@@ -1011,7 +1010,7 @@ def print_saved_status() -> None:
                             risk_per_trade=RISK_PER_TRADE_USD)
 
     print("=" * 60)
-    print(f"  BreakoutBot Paper Status")
+    print("  BreakoutBot Paper Status")
     print(f"  Day: {daily_day} | Bar: #{bar_count:,} | Freeze: {daily_freeze}")
     print(f"  Balance: ${balance:.2f} ({ret_pct:+.2f}%) | PeakDD: {peak_dd:.1f}%")
     print(f"  Positions: {ps['n_positions']} ({ps['n_wins']}W/{ps['n_losses']}L) | "

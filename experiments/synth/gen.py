@@ -253,8 +253,8 @@ def simulate(scn: Scenario | list[Scenario], days: int, seed: int,
 
     # Common factor shock (BTC), sub-step resolution
     f_vol = _garch_path(rng, n_bars, g_a, g_b)
-    zF    = rng.standard_normal(n_sub) * np.repeat(f_vol * volm, SUBSTEPS) * intra
-    zF   *= FACTOR_SIGMA / np.sqrt(SUBSTEPS)
+    sF    = np.repeat(f_vol * volm, SUBSTEPS) * intra * (FACTOR_SIGMA / np.sqrt(SUBSTEPS))
+    zF    = rng.standard_normal(n_sub) * sF          # conditional sd of the factor shock is sF
 
     # Latent trend on the factor (shared) — computed at bar resolution
     daily_sd_F = FACTOR_SIGMA * np.sqrt(BARS_PER_DAY)
@@ -265,18 +265,23 @@ def simulate(scn: Scenario | list[Scenario], days: int, seed: int,
     for c in coins:
         idio = float(np.sqrt(max(c.sigma ** 2 - (c.beta * FACTOR_SIGMA) ** 2, 1e-12)))
         i_vol = _garch_path(rng, n_bars, g_a, g_b)
-        zI = rng.standard_normal(n_sub) * np.repeat(i_vol * volm, SUBSTEPS) * intra
-        zI *= idio / np.sqrt(SUBSTEPS)
+        sI = np.repeat(i_vol * volm, SUBSTEPS) * intra * (idio / np.sqrt(SUBSTEPS))
+        zI = rng.standard_normal(n_sub) * sI
         daily_sd_i = c.sigma * np.sqrt(BARS_PER_DAY)
         mI = _latent_drift(rng, n_bars, float(k_arr.max()), float(hl_arr.mean()), daily_sd_i)
         mI = mI * (k_arr / max(k_arr.max(), 1e-12))
 
         mu_bar = drift + c.beta * mF + mI                # per-bar expected log return
-        # Price-martingale null: cancel the +σ²/2 arithmetic drift of a
-        # log-martingale (unconditional per-bar variance ≈ σ_i² · vol_mult²).
-        mu_bar = mu_bar - np.where(mart, 0.5 * (c.sigma * volm) ** 2, 0.0)
         shock  = c.beta * zF + zI                        # per sub-step
         r_sub  = shock + np.repeat(mu_bar / SUBSTEPS, SUBSTEPS)
+        # Price-martingale null: subtract half the CONDITIONAL variance of each
+        # sub-step's shock, so E[exp(r)] = 1 sub-step by sub-step — through
+        # GARCH, the intraday profile and vol_mult alike. (The first version
+        # subtracted ½·σ²·vol_mult² per bar, which left E[intra²]−1 ≈ +6% of the
+        # variance uncancelled: ≈ +0.6–1.8 %/yr of arithmetic drift; review
+        # 2026-09-14, finding 5.)
+        cond_var = (c.beta * sF) ** 2 + sI ** 2
+        r_sub = r_sub - np.where(np.repeat(mart, SUBSTEPS), 0.5 * cond_var, 0.0)
 
         # Mean reversion: pull log price toward a slow anchor (random walk with
         # 1/10 of the vol). Done sequentially at bar resolution. On days whose

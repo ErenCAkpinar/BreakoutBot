@@ -120,16 +120,27 @@ def pooled_vr(frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _portfolio_t(cols: list[np.ndarray]) -> tuple[float, float, int]:
+    """Mean and t of the cross-coin AVERAGE per time window (a portfolio
+    series), so coins that move together are not counted as independent
+    draws (review 2026-09-14, finding 8: pooling all coins' windows inflated
+    t by ~√23 when the series were the same)."""
+    m = min(len(c) for c in cols)
+    port = np.mean(np.column_stack([c[:m] for c in cols]), axis=1)
+    return float(port.mean()), float(port.mean() / (port.std(ddof=1) / np.sqrt(m))), m
+
+
 def pooled_momentum(frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
     mats = {s: momentum_matrix(f) for s, f in frames.items()}
     rows = []
     for lname, _ in MOM_L:
         for hname, _ in MOM_H:
-            allv = np.concatenate([mats[s][(lname, hname)] for s in mats])
-            per_coin = np.array([mats[s][(lname, hname)].mean() for s in mats])
-            rows.append({"L": lname, "H": hname, "ort_%": allv.mean() * 100,
-                         "t_havuz": allv.mean() / (allv.std(ddof=1) / np.sqrt(len(allv))),
-                         "coin+": int((per_coin > 0).sum()), "n_coin": len(per_coin), "n": len(allv)})
+            cols = [mats[s][(lname, hname)] for s in mats]
+            per_coin = np.array([c.mean() for c in cols])
+            mean, t, m = _portfolio_t(cols)
+            rows.append({"L": lname, "H": hname, "ort_%": mean * 100,
+                         "t_portföy": t, "coin+": int((per_coin > 0).sum()), "n_coin": len(per_coin),
+                         "n_pencere": m})
     return pd.DataFrame(rows)
 
 
@@ -189,7 +200,7 @@ def main() -> None:
     print()
     print(fmt(a, md))
 
-    print(h("B. Doğrudan hasat — sign(r_L)·r_H uzun-kısa, 23 coin, 2024-09 → 2026-08 (örtüşmeyen H)"))
+    print(h("B. Doğrudan hasat — sign(r_L)·r_H uzun-kısa, 23 coin, 2024-09 → 2026-08 (örtüşmeyen H; t = coin-ortalaması portföy serisi üzerinden)"))
     print(fmt(pooled_momentum(uni), md))
 
     print(h("C. Çeyrek bazında — 23 coin, 665g"))
@@ -202,11 +213,11 @@ def main() -> None:
     rows = []
     for s, f in live.items():
         for pk, g in split_periods(f, "Y").items():
-            m = momentum_matrix(g)
+            mm = momentum_matrix(g)
             rows.append({"yıl": pk, "coin": s,
-                         "4h→8h %": m[("4h", "8h")].mean() * 100,
-                         "1d→1d %": m[("1d", "1d")].mean() * 100,
-                         "5d→5d %": m[("5d", "5d")].mean() * 100})
+                         "4h→8h %": mm[("4h", "8h")].mean() * 100,
+                         "1d→1d %": mm[("1d", "1d")].mean() * 100,
+                         "5d→5d %": mm[("5d", "5d")].mean() * 100})
     e = pd.DataFrame(rows)
     g = e.groupby("yıl")
     out = pd.DataFrame({"n_coin": g["coin"].count()})
@@ -215,24 +226,27 @@ def main() -> None:
         out[f"{c} coin+"] = g[c].apply(lambda x: int((x > 0).sum()))
     print(fmt(out.reset_index(), md))
 
-    print(h("F. UZUN-YALNIZ, MALİYET SONRASI — r_L>0 iken r_H ortalaması − 0.15% gidiş-dönüş; 23 coin, 665g"))
+    print(h("F. UZUN-YALNIZ, MALİYET SONRASI — r_L>0 iken r_H − 0.15%; 23 coin, 665g (t = portföy serisi)"))
     rows = []
     for lname, L in MOM_L:
         for hname, H in MOM_H:
-            allv, per = [], []
+            cols, per = [], []
             for s_, f in uni.items():
                 lc = np.log(f["close"].to_numpy(float))
                 idx = np.arange(L, len(lc) - H, H)
                 rL = lc[idx] - lc[idx - L]
                 rH = lc[idx + H] - lc[idx]
-                v = rH[rL > 0] - 2 * COST
-                allv.append(v)
-                per.append(v.mean())
-            v = np.concatenate(allv)
+                # long-only: each window contributes r_H − cost if the signal
+                # fired, else 0 — a per-window portfolio value, t over windows
+                v = np.where(rL > 0, rH - 2 * COST, 0.0)
+                cols.append(v)
+                per.append(v[rL > 0].mean() if (rL > 0).any() else np.nan)
             per_arr = np.array(per)
-            rows.append({"L": lname, "H": hname, "net_%/işlem": v.mean() * 100,
-                         "t": v.mean() / (v.std(ddof=1) / np.sqrt(len(v))),
-                         "coin+": int((per_arr > 0).sum()), "n": len(v)})
+            mean, t, m = _portfolio_t(cols)
+            fired = np.mean([np.mean(c != 0) for c in cols])
+            rows.append({"L": lname, "H": hname, "net_%/işlem": float(np.nanmean(per_arr)) * 100,
+                         "portföy_%/pencere": mean * 100, "t_portföy": t,
+                         "coin+": int((per_arr > 0).sum()), "n_pencere": m, "sinyal_oranı": fired})
     print(fmt(pd.DataFrame(rows), md))
 
 

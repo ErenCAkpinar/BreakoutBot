@@ -61,5 +61,5 @@ class RandomEntryState(SymbolState):
 def install(p_entry: float, seed: int) -> None:
     """Register the variant for this replay process only."""
     RandomEntryState(symbol="VALIDATE", p_entry=p_entry, seed=seed)
-    backtest.SymbolState = partial(RandomEntryState, p_entry=p_entry, seed=seed)  # type: ignore[attr-defined]
-    backtest._NO_REGIME = True
+    setattr(backtest, "SymbolState", partial(RandomEntryState, p_entry=p_entry, seed=seed))
+    setattr(backtest, "_NO_REGIME", True)

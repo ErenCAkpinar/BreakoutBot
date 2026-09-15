@@ -10,10 +10,16 @@ State transitions per symbol:
       → (SL hit or confirmation failed) → IDLE + cooldown
 
     SCALE_OPEN  [$300×3x full position, TP1/TP2/SL]
-      → (TP1 hit) → TRAILING  [50% closed, SL → breakeven]
+      → (TP1 hit) → TRAILING  [TP1_CLOSE_FRAC closed (0.0 since Faz 8: nothing);
+                               full_sl is set to breakeven but NOT checked in
+                               TRAILING — the only stop there is the trail,
+                               trail_best − TRAIL_ATR×ATR, which right after TP1
+                               sits BELOW entry (e.g. 103 − 3.75 → 99.25 on a
+                               100 entry). Deployed behaviour; see metrics.py
+                               aggregate_positions note and DEFTER Tur 14.]
       → (SL hit) → IDLE + cooldown
 
-    TRAILING  [remaining 50%, trailing SL active]
+    TRAILING  [remaining position, trailing SL active; no breakeven floor]
       → (TP2 hit) → IDLE
       → (trailing SL hit) → IDLE
       → (timeout 48 bars) → IDLE
@@ -22,7 +28,6 @@ State transitions per symbol:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from math_engine import MathEngine
 from config import (

@@ -10,9 +10,10 @@ every coin its own equal notional, no portfolio cap, no gates. Costs: the
 repo's EXEC_COST_PER_SIDE on both sides. Two variants:
 
   nostop   pure horizon signal — is there anything to harvest at `hold` bars?
-  sl       the noise-scaled stop: SL at `sl_sd` × the `hold`-bar return SD,
+  sl       the noise-scaled stop: SL at `sl_sd` × the trailing 30-day SD of
+           `hold`-bar returns as of the entry bar (causal, frozen at entry),
            adverse fill (bar low ≤ stop ⇒ filled at the stop, clamped into the
-           bar's range). Lets the result be read in R like the machine's.
+           bar's range). R = net return / that trade's stop distance.
 
 Markets: synthetic null / trend / chop (seeds 1–3), bootstrap in-sample / OOS
 (seeds 1–3), and REAL frames in real order — the 240d in-sample window and the
@@ -35,6 +36,7 @@ from config import EXEC_COST_PER_SIDE, REGIME_WARMUP_BARS, TOKENS  # noqa: E402
 from experiments.synth import gen  # noqa: E402
 
 LOOK, HOLD = 48, 96
+VOL_WINDOW = 30 * 288       # trailing 30 days for the causal stop width
 
 
 def run_rule(df: pd.DataFrame, look: int = LOOK, hold: int = HOLD,
@@ -45,17 +47,37 @@ def run_rule(df: pd.DataFrame, look: int = LOOK, hold: int = HOLD,
     c = df["close"].to_numpy(float)
     lo = df["low"].to_numpy(float)
     n = len(c)
-    lc = np.log(c[start:])
-    sd_hold = float(np.nanstd(lc[hold:] - lc[:-hold])) if n > start + hold else float("nan")
-    sl = (sl_sd * sd_hold) if sl_sd else None
+    # Stop width is CAUSAL: the trailing SD of hold-horizon returns over the
+    # VOL_WINDOW bars before the entry bar, frozen at entry. (Before the review
+    # of 2026-09-14 it was the SD over the whole test period — a scale that
+    # future bars could change; finding 2.)
+    lc_all = np.log(c)
+    rh = np.full(n, np.nan)
+    rh[hold:] = lc_all[hold:] - lc_all[:-hold]          # return ending at bar t
+    csum = np.nancumsum(rh ** 2)
+    cnt = np.cumsum(~np.isnan(rh))
+
+    def sd_at(i: int) -> float:
+        a, b = max(0, i - VOL_WINDOW), i
+        k = cnt[b - 1] - (cnt[a - 1] if a > 0 else 0)
+        ss = csum[b - 1] - (csum[a - 1] if a > 0 else 0.0)
+        return float(np.sqrt(ss / k)) if k >= 20 else float("nan")
+
+    sd_hold = float(np.nanstd(rh[start:]))               # reported only, never used for a stop
     rets: list[float] = []
+    r_over_sl: list[float] = []
+    sls: list[float] = []
     exits = {"HOLD": 0, "SL": 0}
-    i = max(start, look)
+    i = max(start, look, VOL_WINDOW)
     while i + hold < n:
         if c[i] > c[i - look]:
             entry = c[i]
             exit_p = c[i + hold]
             kind = "HOLD"
+            sl = (sl_sd * sd_at(i)) if sl_sd else None    # only bars < i
+            if sl is not None and np.isnan(sl):
+                i += 1
+                continue
             if sl is not None:
                 stop = entry * (1.0 - sl)
                 seg = lo[i + 1:i + hold + 1]
@@ -65,7 +87,11 @@ def run_rule(df: pd.DataFrame, look: int = LOOK, hold: int = HOLD,
                     exit_p = max(stop, lo[j])          # gap-through clamp
                     kind = "SL"
                     i = j
-            rets.append(exit_p / entry - 1.0 - 2 * cost)
+            net = exit_p / entry - 1.0 - 2 * cost
+            rets.append(net)
+            if sl is not None:
+                r_over_sl.append(net / sl)
+                sls.append(sl)
             exits[kind] += 1
             i += hold if kind == "HOLD" else 1
         else:
@@ -75,9 +101,10 @@ def run_rule(df: pd.DataFrame, look: int = LOOK, hold: int = HOLD,
            "wr": float((r > 0).mean() * 100) if len(r) else float("nan"),
            "total_pct": float(r.sum() * 100), "sd_hold_pct": sd_hold * 100,
            "exits": exits}
-    if sl is not None:
-        out["R"] = float(r.mean() / sl) if len(r) else float("nan")
-        out["sl_pct"] = sl * 100
+    if sl_sd:
+        # R per trade = net return / that trade's own stop distance
+        out["R"] = float(np.mean(r_over_sl)) if len(r_over_sl) else float("nan")
+        out["sl_pct"] = float(np.mean(sls) * 100) if sls else float("nan")
     return out
 
 
