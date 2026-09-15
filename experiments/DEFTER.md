@@ -2415,7 +2415,28 @@ koşullu varyans, defter sabit-miktar, defter funding/geçiş).
   her sayı aynı kararı veriyor. Bu, kararların doğru olduğunun değil,
   bu düzeltmelerin onları değiştirmediğinin kanıtı.
 
-**Durum: koşuyor** (`null_mart × wide3` v2, 6 tohum). Commit sonrası eklenecek.
+### #5'in ampirik doğrulaması — `null_mart × wide3` v2 (düzeltilmiş üreteç, aynı 6 tohum)
+
+| tohum | v1 momR | v2 momR | fark | bakiye v1 → v2 |
+|--:|--:|--:|--:|--:|
+| 1 | +0.150 | +0.124 | −0.026 | $1178 → $1137 |
+| 2 | −0.021 | −0.013 | +0.008 | $951 → $955 |
+| 3 | −0.056 | −0.054 | +0.002 | $925 → $927 |
+| 4 | +0.170 | +0.194 | +0.024 | $1115 → $1146 |
+| 5 | −0.022 | −0.081 | −0.059 | $935 → $889 |
+| 6 | +0.111 | +0.101 | −0.010 | $1146 → $1136 |
+| **havuz** | +0.056 (±0.041) | **+0.048 (±0.045)** | **−0.010 ± 0.012** | |
+
+Eşleştirilmiş fark −0.010 ± 0.012R; analitik öngörü ≈ −0.002R. Düzeltme,
+Tur 10c'nin SE'lerinin (±0.03–0.045) içinde kalıyor; 12-tohum sonucu (−0.013)
+ve rastgele-giriş kontrolleri için yeniden koşum gerekmiyor — yön ve büyüklük
+aynı. Tohumlar arası ±0.06R'lik dalgalanma, aynı tohumla bile düzeltmenin
+şok dizisini küçük ölçüde kaydırmasından (koşullu varyans terimi alt-adım
+bazında; fiyat yuvarlaması) — yol gürültüsü, sistematik değil.
+
+**Durum: Tur 14 tamamlandı — 15 Eyl 2026.** Çalışan bota değişiklik veya
+deploy yok (#11 açık: sunucu `paper_bb.py` yerelden geride; deploy kararı
+kullanıcının).
 
 ## Sıradaki fikirler (henüz hipotez değil)
 
