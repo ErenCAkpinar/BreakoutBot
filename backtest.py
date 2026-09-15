@@ -104,7 +104,7 @@ def print_beta_ranking(tokens: list[str], days: int, btc_df: pd.DataFrame,
     """
     print(f"\n{'═'*56}")
     print(f"  TOKEN BETA vs BTC  ({days}d, {BTC_BETA_WINDOW}-bar rolling)")
-    print(f"  β>2 = amplifies BTC 2×   β<0 = moves opposite to BTC")
+    print("  β>2 = amplifies BTC 2×   β<0 = moves opposite to BTC")
     print(f"{'─'*56}")
     print(f"  {'Token':<18} {'Beta':>6}  {'Interpretation'}")
     print(f"{'─'*56}")

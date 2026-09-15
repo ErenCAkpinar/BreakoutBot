@@ -95,7 +95,7 @@ def main() -> None:
     print(f"  Worst MaxDD   : {worst_dd:+.2f}%")
     print(f"  Monthly est ($): ${monthly:+.2f}  (on ${INITIAL_BALANCE:.0f} each — implies ${INITIAL_BALANCE*len(results):.0f} total)")
     print(f"{'─'*56}")
-    print(f"  POOLED (position-based — compare arms on these)")
+    print("  POOLED (position-based — compare arms on these)")
     print(f"  Positions     : {pooled['n_positions']}  ({pooled['n_wins']}W / {pooled['n_losses']}L)")
     print(f"  Win Rate      : {pooled['win_rate']}%   break-even {pooled['breakeven_wr']}%   "
           f"{'✅' if (pooled['breakeven_wr'] is not None and pooled['win_rate'] > pooled['breakeven_wr']) else '❌'}")
