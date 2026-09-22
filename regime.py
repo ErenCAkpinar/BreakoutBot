@@ -117,7 +117,6 @@ def classify(btc_score: float, coin_score: float) -> str:
 
 # ── Behaviour map (FAZ 1: long throttling only; short comes in FAZ 3) ─────────
 # size multiplier applied to RISK_PER_TRADE_USD for LONG entries per regime.
-import os
 # FAZ 4c (baked in): momentum longs ONLY in BULL. Validated best in BOTH windows —
 #   90d 23-coin: −$152 (0.35/0.35) → −$75 (BULL-only)
 #   240d bear:   −$37  → −$20, MaxDD −20.5% → −15.3% (avoids hard stop)

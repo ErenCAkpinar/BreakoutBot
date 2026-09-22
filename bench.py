@@ -21,7 +21,9 @@ import sys
 import pandas as pd
 
 import config
-from backtest import fetch_history, run_symbol, print_report
+from backtest import run_symbol
+from backtest_data import fetch_history
+from backtest_report import print_report
 from config import (INITIAL_BALANCE, RISK_PER_TRADE_USD, RISK_BY_SLEEVE,
                     REGIME_WARMUP_DAYS, REGIME_WARMUP_BARS)
 from metrics import position_stats

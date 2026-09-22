@@ -32,11 +32,13 @@ _ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _ROOT)
 os.chdir(_ROOT)
 
-import config
-from backtest import fetch_history, run_symbol
-from config import (INITIAL_BALANCE, RISK_PER_TRADE_USD, RISK_BY_SLEEVE,
+# E402 below is deliberate: the sys.path/chdir above has to run first.
+import config  # noqa: E402
+from backtest import run_symbol  # noqa: E402
+from backtest_data import fetch_history  # noqa: E402
+from config import (INITIAL_BALANCE, RISK_PER_TRADE_USD, RISK_BY_SLEEVE,  # noqa: E402
                     REGIME_WARMUP_DAYS, REGIME_WARMUP_BARS)
-from metrics import position_stats
+from metrics import position_stats  # noqa: E402
 
 PINNED = "backtests/data"
 FRESH = "backtests/data_curation"

@@ -23,262 +23,52 @@ Exit with Ctrl-C; state is saved automatically to state_paper.json.
 from __future__ import annotations
 
 import argparse
-import hashlib
-import hmac
 import json
 import os
 import sys
 import time
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING, NamedTuple
 
-import ccxt
-import pandas as pd
-import requests as _requests
-
+import regime
 from config import (
-    TOKENS, TIMEFRAME, INITIAL_BALANCE,
+    TOKENS, INITIAL_BALANCE, MR_ENABLED,
     DAILY_DD_LIMIT, EQUITY_THROTTLE_DD, PEAK_DD_LIMIT, DAILY_SL_LIMIT,
     SESSION_START_UTC, SESSION_END_UTC,
-    TEST_SIZE_USD, LEVERAGE, MAX_OPEN, RISK_PER_TRADE_USD,
-    BTC_BETA_WINDOW,
+    TEST_SIZE_USD, MAX_OPEN, RISK_PER_TRADE_USD,
 )
 from indicators import build_snapshot, hurst_exponent, precompute_indicators
 from strategy import SymbolState, IDLE, SCALE_OPEN, TRAILING, TEST_OPEN
 from mean_reversion import MRState
-import regime
-from config import MR_ENABLED
 from metrics import aggregate_positions, position_stats
+# Market data and the retired testnet executor used to live in this file. They
+# are imported BY NAME so a test or replay harness can still patch
+# `paper_bb.fetch_recent` exactly the way it always could.
+from market_data import FETCH_BARS, fetch_4h, fetch_recent, wait_for_bar_close
+from testnet_orders import TestnetOrderManager
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 STATE_FILE = "state_paper.json"
 LOG_FILE   = "paper_bb.log"
 
-FETCH_BARS = 200   # rolling history window per symbol (enough for all indicators)
 BARS_WARM  = 80    # skip first 80 bars (indicator warmup)
 
 
-# ── Testnet order manager ─────────────────────────────────────────────────────
-
-def _ccxt_sym(symbol: str) -> str:
-    """Convert config-style symbol (BTCUSDT) to ccxt unified (BTC/USDT:USDT)."""
-    if symbol.endswith("USDT"):
-        base = symbol[:-4]
-        return f"{base}/USDT:USDT"
-    return symbol
-
-
-class TestnetOrderManager:
-    """
-    Places and manages REAL orders on Binance Futures Testnet via direct HTTP.
-
-    ccxt's set_sandbox_mode(True) is deprecated for binanceusdm (ccxt v4.5+).
-    We bypass it entirely and sign requests manually — confirmed working 2026-05.
-
-    SL/TP timing is handled by the local state machine; this class only executes.
-    """
-
-    BASE = "https://testnet.binancefuture.com"
-
-    def __init__(self, api_key: str, secret: str):
-        self.api_key = api_key
-        self.secret  = secret
-        # Cache exchange info (symbol precision) — fetched once at init
-        self._step_sizes: dict[str, float] = {}
-        self._load_exchange_info()
-
-    # ── Signing helpers ───────────────────────────────────────────────────────
-
-    def _sign(self, params: dict) -> dict:
-        """Add timestamp + HMAC-SHA256 signature to params."""
-        params["timestamp"] = int(time.time() * 1000)
-        qs  = "&".join(f"{k}={v}" for k, v in params.items())
-        sig = hmac.new(self.secret.encode(), qs.encode(), hashlib.sha256).hexdigest()
-        params["signature"] = sig
-        return params
-
-    def _hdr(self) -> dict:
-        return {"X-MBX-APIKEY": self.api_key}
-
-    def _get(self, path: str, params: dict | None = None) -> dict | list:
-        p = self._sign(params or {})
-        r = _requests.get(f"{self.BASE}{path}", params=p,
-                          headers=self._hdr(), timeout=8)
-        return r.json()
-
-    def _post(self, path: str, params: dict) -> dict:
-        p = self._sign(params)
-        r = _requests.post(f"{self.BASE}{path}",
-                           data=p, headers=self._hdr(), timeout=8)
-        return r.json()
-
-    # ── Exchange info + precision ─────────────────────────────────────────────
-
-    def _load_exchange_info(self) -> None:
-        """Cache LOT_SIZE stepSize for each symbol."""
-        try:
-            info = _requests.get(f"{self.BASE}/fapi/v1/exchangeInfo",
-                                 timeout=8).json()
-            for s in info.get("symbols", []):
-                sym = s["symbol"]
-                for f in s.get("filters", []):
-                    if f["filterType"] == "LOT_SIZE":
-                        self._step_sizes[sym] = float(f["stepSize"])
-        except Exception as e:
-            print(f"  ⚠️  Exchange info load: {e}")
-
-    def _round_qty(self, symbol: str, qty: float) -> float:
-        """Round quantity to valid stepSize."""
-        step = self._step_sizes.get(symbol, 0.001)
-        if step > 0:
-            qty = round(round(qty / step) * step, 8)
-        return max(qty, step)   # never go below minimum
-
-    # ── Setup ────────────────────────────────────────────────────────────────
-
-    def setup_symbols(self, symbols: list[str]) -> None:
-        """Set isolated margin + 3× leverage for each symbol at startup."""
-        print(f"  Setting up {len(symbols)} symbols (isolated, {LEVERAGE}× leverage)…")
-        for sym in symbols:
-            # Set ISOLATED margin mode (ignore "already set" error)
-            r = self._post("/fapi/v1/marginType",
-                           {"symbol": sym, "marginType": "ISOLATED"})
-            if r.get("code") not in (200, None, -4059, -4046):  # -4046/-4059 = already isolated
-                print(f"  ⚠️  Margin {sym}: {r}")
-            # Set leverage
-            r = self._post("/fapi/v1/leverage",
-                           {"symbol": sym, "leverage": LEVERAGE})
-            if "code" in r and r["code"] != 200:
-                print(f"  ⚠️  Leverage {sym}: {r}")
-        print("  ✅ Symbol setup complete")
-
-    def get_balance(self) -> float:
-        """Fetch available USDT balance from testnet."""
-        try:
-            items = self._get("/fapi/v2/balance")
-            if isinstance(items, list):
-                for item in items:
-                    if item.get("asset") == "USDT":
-                        return float(item.get("availableBalance", 0))
-        except Exception as e:
-            print(f"  ⚠️  Balance fetch: {e}")
-        return 0.0
-
-    # ── Order placement ───────────────────────────────────────────────────────
-
-    def open_market(self, symbol: str, direction: str,
-                    notional_usd: float, price: float) -> float:
-        """
-        Open a market order.
-        notional_usd = total exposure USD (TEST_SIZE_USD or FULL_SIZE_USD×LEVERAGE).
-        Returns avg fill price (or `price` on error).
-        """
-        qty  = self._round_qty(symbol, notional_usd / price)
-        side = "BUY" if direction == "LONG" else "SELL"
-        result = self._post("/fapi/v1/order", {
-            "symbol": symbol, "side": side, "type": "MARKET", "quantity": qty,
-        })
-        if "code" in result:
-            print(f"  ⚠️  open_market {symbol}: {result}")
-            return price
-        # Testnet fills async — avgPrice may be '0.00' on initial response; re-query once
-        avg = float(result.get("avgPrice", 0))
-        if avg == 0 and "orderId" in result:
-            time.sleep(0.3)
-            status = self._get("/fapi/v1/order",
-                               {"symbol": symbol, "orderId": result["orderId"]})
-            avg = float(status.get("avgPrice", 0))
-        return avg if avg > 0 else price
-
-    def close_market(self, symbol: str, direction: str, fraction: float = 1.0) -> float:
-        """
-        Close `fraction` of open position (0.5 = half, 1.0 = all).
-        Returns fill price or 0.0 if no position.
-        """
-        try:
-            pos_list = self._get("/fapi/v2/positionRisk", {"symbol": symbol})
-            if not isinstance(pos_list, list) or not pos_list:
-                return 0.0
-            pos_qty = abs(float(pos_list[0].get("positionAmt", 0)))
-            if pos_qty <= 0:
-                return 0.0
-            qty  = self._round_qty(symbol, pos_qty * fraction)
-            side = "SELL" if direction == "LONG" else "BUY"
-            result = self._post("/fapi/v1/order", {
-                "symbol": symbol, "side": side, "type": "MARKET",
-                "quantity": qty, "reduceOnly": "true",
-            })
-            if "code" in result:
-                print(f"  ⚠️  close_market {symbol}: {result}")
-                return 0.0
-            avg = float(result.get("avgPrice", 0))
-            if avg == 0 and "orderId" in result:
-                time.sleep(0.3)
-                status = self._get("/fapi/v1/order",
-                                   {"symbol": symbol, "orderId": result["orderId"]})
-                avg = float(status.get("avgPrice", 0))
-            return avg if avg > 0 else 0.0
-        except Exception as e:
-            print(f"  ⚠️  close_market {symbol}: {e}")
-        return 0.0
+class _Reading(NamedTuple):
+    """One symbol's view of one closed bar, as the sleeves consume it."""
+    snap:      dict
+    high:      float
+    low:       float
+    rsi:       float
+    vol_ratio: float
 
 
-# ── Binance data helper ───────────────────────────────────────────────────────
-
-# Single shared public exchange — avoids creating 23+ instances per bar
-# (each new instance triggers an exchangeInfo call → rate-limit cascade)
-_PUBLIC_EX = ccxt.binanceusdm({"enableRateLimit": True})
-
-
-def fetch_recent(symbol: str, bars: int = FETCH_BARS) -> pd.DataFrame:
-    """Fetch the most recent `bars` 5-min candles from Binance Futures (public)."""
-    since = _PUBLIC_EX.milliseconds() - (bars + 20) * 300 * 1000
-    raw   = _PUBLIC_EX.fetch_ohlcv(symbol, TIMEFRAME, since=since, limit=bars + 20)
-    df    = pd.DataFrame(raw, columns=["ts", "open", "high", "low", "close", "volume"])
-    df    = df.astype({c: float for c in ["open", "high", "low", "close", "volume"]})
-    df["ts"] = df["ts"].astype(int)
-    df    = df.drop_duplicates("ts").sort_values("ts").reset_index(drop=True)
-    # Drop the still-forming candle: when polled at boundary+2s the last row is the
-    # CURRENT (incomplete) bar — its volume ≈ 0 corrupts volume_ratio (→ vol_ok
-    # always fails → 100% CONFIRM_FAIL) AND the composite score. Use only fully
-    # closed bars, matching the backtest which iterates closed bars exclusively.
-    cur_boundary = (_PUBLIC_EX.milliseconds() // (300 * 1000)) * (300 * 1000)
-    if len(df) and int(df["ts"].iloc[-1]) >= cur_boundary:
-        df = df.iloc[:-1]
-    return df.tail(bars).reset_index(drop=True)
-
-
-def fetch_4h(symbol: str, bars: int = 260) -> pd.DataFrame:
-    """Fetch recent 4h candles (public) for the 200-MA regime classifier."""
-    span  = 4 * 3600 * 1000
-    since = _PUBLIC_EX.milliseconds() - (bars + 5) * span
-    raw   = _PUBLIC_EX.fetch_ohlcv(symbol, "4h", since=since, limit=bars + 5)
-    df    = pd.DataFrame(raw, columns=["ts", "open", "high", "low", "close", "volume"])
-    df    = df.astype({c: float for c in ["open", "high", "low", "close", "volume"]})
-    df["ts"] = df["ts"].astype(int)
-    df = df.drop_duplicates("ts").sort_values("ts").reset_index(drop=True)
-    # Drop the still-forming 4h bar (regime must use closed bars only)
-    cur_b = (_PUBLIC_EX.milliseconds() // span) * span
-    if len(df) and int(df["ts"].iloc[-1]) >= cur_b:
-        df = df.iloc[:-1]
-    return df.reset_index(drop=True)
-
-
-def wait_for_bar_close(bar_seconds: int = 300) -> datetime:
-    """Sleep until the next 5-min bar boundary + 2-second exchange latency buffer."""
-    now      = time.time()
-    next_bar = (int(now) // bar_seconds + 1) * bar_seconds
-    sleep    = next_bar - now + 2.0
-    if sleep > 0:
-        time.sleep(sleep)
-    return datetime.fromtimestamp(next_bar, tz=timezone.utc)
-
-
-def btc_4h_return(btc_df: pd.DataFrame) -> float:
-    """Return over last 48 bars (≈ 4 h at 5-min bars)."""
-    if len(btc_df) < BTC_BETA_WINDOW + 1:
-        return 0.0
-    p_new = float(btc_df["close"].iloc[-1])
-    p_old = float(btc_df["close"].iloc[-(BTC_BETA_WINDOW + 1)])
-    return (p_new - p_old) / p_old if p_old > 0 else 0.0
+def _new_funnel() -> dict[str, int]:
+    """Per-bar signal-funnel counters (see _accumulate_funnel)."""
+    return {"scanned": 0, "regime_pass": 0, "probe": 0, "confirm_ok": 0,
+            "confirm_fail": 0, "full": 0, "blocked_max_open": 0}
 
 
 # ── Paper trader engine ───────────────────────────────────────────────────────
@@ -601,21 +391,82 @@ class PaperTrader:
                   f"(others throttle longs→0; {others})")
 
     # ── Bar processing ────────────────────────────────────────────────────────
+    #
+    # _process_bar is the reference implementation of the gate ORDER that
+    # backtest.py mirrors (see its PARITY CONTRACT). The order below is that
+    # contract, one named step per gate:
+    #
+    #   1. _roll_daily_window     — new UTC day resets the daily budget
+    #   2. _guard_peak_drawdown   — hard stop, exits the process
+    #   3. _apply_equity_throttle — halve sizing in a -7% drawdown
+    #   4. _apply_daily_freeze    — -5% intraday bars new entries
+    #   5. per symbol: _symbol_snapshot → _run_momentum_sleeve → _run_mr_sleeve
+    #   6. _log_bar_summary / _save_state
+    #
+    # Splitting a gate out of this method without mirroring it in backtest.py
+    # turns every backtest number into a fiction.
 
     def _process_bar(self, bar_dt: datetime) -> None:
         self.bar_count += 1
-        day  = bar_dt.strftime("%Y-%m-%d")
-        hour = bar_dt.hour
 
-        # ── Daily reset ───────────────────────────────────────────────────────
-        if day != self.daily_day:
-            self.daily_day       = day
-            self.daily_start     = self.balance
-            self.daily_freeze    = False
-            self.daily_sl_count  = 0
-            self._log(f"📅 New day {day} | starting balance ${self.balance:.2f}")
+        self._roll_daily_window(bar_dt.strftime("%Y-%m-%d"))
+        peak_dd = self._guard_peak_drawdown()
+        self._apply_equity_throttle(peak_dd)
+        self._apply_daily_freeze()
 
-        # ── Peak drawdown hard stop ───────────────────────────────────────────
+        in_session = SESSION_START_UTC <= bar_dt.hour < SESSION_END_UTC
+        btc_df = self._fetch_btc_reference()
+
+        self._refresh_regimes()
+        n_bull = sum(1 for r in self._regime.values() if r == "BULL")
+        gate_str = f"regime: BULL {n_bull}/{len(self.tokens)}"
+
+        funnel = _new_funnel()
+
+        # Wind-down symbols (E16) ride along until flat so their exits still fire.
+        for symbol in list(self.tokens) + sorted(self.winddown):
+            s = self.sym_states[symbol]
+            if self._release_if_wound_down(symbol, s):
+                continue
+
+            reading = self._symbol_snapshot(symbol, btc_df)
+            if reading is None:
+                continue
+
+            reg       = self._regime.get(symbol, "NEUTRAL")
+            size_mult = regime.LONG_SIZE_MULT.get(reg, 0.0) * self.size_factor
+            block_new = self._blocks_new_entries(symbol, in_session)
+
+            self._run_momentum_sleeve(symbol, s, reading, bar_dt,
+                                      size_mult, block_new, funnel)
+            self._run_mr_sleeve(symbol, s, reading, bar_dt, reg, block_new)
+
+        self._log_bar_summary(bar_dt, gate_str)
+        self._accumulate_funnel(funnel)
+        self._save_state()
+
+        # Detailed status every 12 bars (≈ 1 hour)
+        if self.bar_count % 12 == 0:
+            self._print_status()
+
+    # ── Bar processing · account-level gates ──────────────────────────────────
+
+    def _roll_daily_window(self, day: str) -> None:
+        """Reset the daily risk budget when the UTC day turns over."""
+        if day == self.daily_day:
+            return
+        self.daily_day      = day
+        self.daily_start    = self.balance
+        self.daily_freeze   = False
+        self.daily_sl_count = 0
+        self._log(f"📅 New day {day} | starting balance ${self.balance:.2f}")
+
+    def _guard_peak_drawdown(self) -> float:
+        """Update the equity peak and hard-stop the process if the guard breaks.
+
+        Live, this is where a human decides whether to restart — hence sys.exit
+        rather than a flag. backtest.py models the same decision with BT_RESTARTS.
+        """
         if self.balance > self.peak:
             self.peak = self.balance
         peak_dd = (self.balance - self.peak) / self.peak if self.peak > 0 else 0.0
@@ -627,331 +478,340 @@ class PaperTrader:
             self._save_state()
             self._print_status()
             sys.exit(1)
+        return peak_dd
 
-        # ── Equity throttle: halve sizing in a -7% peak drawdown ──────────────
+    def _apply_equity_throttle(self, peak_dd: float) -> None:
+        """Halve position sizing while the account sits in a -7% drawdown."""
         new_factor = 0.5 if peak_dd <= EQUITY_THROTTLE_DD else 1.0
-        if new_factor != self.size_factor:
-            self.size_factor = new_factor
-            if new_factor < 1.0:
-                self._log(f"🔻 THROTTLE on: peak DD {peak_dd:.1%} ≤ "
-                          f"{EQUITY_THROTTLE_DD:.0%} — position size ×0.5")
-            else:
-                self._log(f"🔺 THROTTLE off: peak DD {peak_dd:.1%} recovered — full size")
+        if new_factor == self.size_factor:
+            return
+        self.size_factor = new_factor
+        if new_factor < 1.0:
+            self._log(f"🔻 THROTTLE on: peak DD {peak_dd:.1%} ≤ "
+                      f"{EQUITY_THROTTLE_DD:.0%} — position size ×0.5")
+        else:
+            self._log(f"🔺 THROTTLE off: peak DD {peak_dd:.1%} recovered — full size")
 
-        # ── Daily DD freeze ───────────────────────────────────────────────────
+    def _apply_daily_freeze(self) -> None:
+        """Bar new entries for the rest of the day after a -5% intraday loss."""
         intraday_dd = (self.balance - self.daily_start) / self.daily_start \
                       if self.daily_start > 0 else 0.0
         if intraday_dd <= DAILY_DD_LIMIT and not self.daily_freeze:
             self.daily_freeze = True
             self._log(f"⚠️  Daily DD {intraday_dd:.1%} hit — freezing new entries today")
 
-        # ── Session check ─────────────────────────────────────────────────────
-        in_session = SESSION_START_UTC <= hour < SESSION_END_UTC
+    # ── Bar processing · market reading ───────────────────────────────────────
 
-        # ── Fetch BTC 5m reference (beta) + refresh 4h regimes (slow) ─────────
-        btc_df = None
+    def _fetch_btc_reference(self) -> "pd.DataFrame | None":
+        """BTC 5m frame used for beta. A failed fetch degrades beta, not the bar."""
         try:
-            btc_df = fetch_recent("BTCUSDT", FETCH_BARS)
-            btc_df = precompute_indicators(btc_df)
+            return precompute_indicators(fetch_recent("BTCUSDT", FETCH_BARS))
         except Exception as exc:
             self._log(f"⚠️  BTC 5m fetch failed ({exc})")
+            return None
 
-        self._refresh_regimes()
-        n_bull = sum(1 for r in self._regime.values() if r == "BULL")
-        gate_str = f"regime: BULL {n_bull}/{len(self.tokens)}"
+    def _release_if_wound_down(self, symbol: str, s: SymbolState) -> bool:
+        """Drop a wind-down symbol (E16) from the book once it reaches flat."""
+        if symbol not in self.winddown or s.state != IDLE:
+            return False
+        self.winddown.discard(symbol)
+        self.sym_states.pop(symbol, None)
+        self.mr_states.pop(symbol, None)
+        self._log(f"✅ {symbol} wind-down tamamlandı — kitaptan çıkarıldı.")
+        return True
 
-        # Signal-funnel telemetry for THIS bar. Without it a parameter sweep is a
-        # blind shot: we cannot tell whether the live bot trades less than the
-        # backtest because the regime differs or because a gate behaves
-        # differently in production. Counters are per-bar; totals accumulate.
-        funnel = {"scanned": 0, "regime_pass": 0, "probe": 0, "confirm_ok": 0,
-                  "confirm_fail": 0, "full": 0, "blocked_max_open": 0}
+    def _symbol_snapshot(self, symbol: str,
+                         btc_df: "pd.DataFrame | None") -> "_Reading | None":
+        """Fetch this symbol's frame and build the snapshot the sleeves read.
 
-        # ── Process each symbol ───────────────────────────────────────────────
-        # Wind-down symbols (E16) ride along until flat so their exits still fire.
-        for symbol in list(self.tokens) + sorted(self.winddown):
-            s = self.sym_states[symbol]
-            if symbol in self.winddown and s.state == IDLE:
-                # Reached the exit — it can leave the book now.
-                self.winddown.discard(symbol)
-                self.sym_states.pop(symbol, None)
-                self.mr_states.pop(symbol, None)
-                self._log(f"✅ {symbol} wind-down tamamlandı — kitaptan çıkarıldı.")
-                continue
+        None means the bar is skipped for this symbol — a fetch error or a frame
+        too short to have warmed the indicators. The backtest skips a symbol with
+        no row for the bar for the same reason.
+        """
+        try:
+            df = precompute_indicators(fetch_recent(symbol, FETCH_BARS))
+        except Exception as exc:
+            self._log(f"  ⚠️  {symbol} fetch failed: {exc}")
+            return None
 
-            # Fetch token data
-            try:
-                df = fetch_recent(symbol, FETCH_BARS)
-                df = precompute_indicators(df)
-            except Exception as exc:
-                self._log(f"  ⚠️  {symbol} fetch failed: {exc}")
-                continue
+        if len(df) < BARS_WARM:
+            return None                      # not enough history yet
 
-            if len(df) < BARS_WARM:
-                continue  # not enough history yet
+        idx = len(df) - 1
+        high = float(df["high"].iloc[idx])
+        low  = float(df["low"].iloc[idx])
 
-            idx = len(df) - 1
-            close = float(df["close"].iloc[idx])
-            high  = float(df["high"].iloc[idx])
-            low   = float(df["low"].iloc[idx])
+        # Hurst on last 40 bars (regime indicator)
+        hurst_val = hurst_exponent(df["close"].iloc[max(0, idx - 39): idx + 1])
 
-            # Hurst on last 40 bars (regime indicator)
-            hurst_val = hurst_exponent(df["close"].iloc[max(0, idx - 39): idx + 1])
+        # BTC row alignment (find matching timestamp for beta calc)
+        btc_row = None
+        if btc_df is not None:
+            ts_now   = int(df["ts"].iloc[idx])
+            btc_idxs = btc_df.index[btc_df["ts"] == ts_now]
+            btc_row  = int(btc_idxs[0]) if len(btc_idxs) > 0 else None
 
-            # BTC row alignment (find matching timestamp for beta calc)
-            btc_row = None
-            if btc_df is not None:
-                ts_now   = int(df["ts"].iloc[idx])
-                btc_idxs = btc_df.index[btc_df["ts"] == ts_now]
-                btc_row  = int(btc_idxs[0]) if len(btc_idxs) > 0 else None
+        snap = build_snapshot(df, idx, symbol,
+                              btc_df=btc_df,
+                              hurst_override=hurst_val,
+                              btc_row=btc_row)
+        return _Reading(snap=snap, high=high, low=low,
+                        rsi=snap["indicators"]["rsi_14"],
+                        vol_ratio=snap["volume"]["volume_ratio"])
 
-            snap = build_snapshot(df, idx, symbol,
-                                  btc_df=btc_df,
-                                  hurst_override=hurst_val,
-                                  btc_row=btc_row)
-            rsi_val   = snap["indicators"]["rsi_14"]
-            vol_ratio = snap["volume"]["volume_ratio"]
+    # ── Bar processing · momentum sleeve ──────────────────────────────────────
 
-            # ── Regime (Faz 1/4c): longs ONLY in BULL (size_mult>0) ───────────
-            reg       = self._regime.get(symbol, "NEUTRAL")
-            size_mult = regime.LONG_SIZE_MULT.get(reg, 0.0) * self.size_factor
-            block_new = self._blocks_new_entries(symbol, in_session)
+    def _run_momentum_sleeve(self, symbol: str, s: SymbolState, reading: "_Reading",
+                             bar_dt: datetime, size_mult: float, block_new: bool,
+                             funnel: dict) -> None:
+        """Step the Test-Confirm-Scale machine and book whatever it returns."""
+        funnel["scanned"] += 1
+        if size_mult > 0 and not block_new:
+            funnel["regime_pass"] += 1
 
-            # ── Momentum sleeve — runs only if not gated (BULL + open) ────────
-            funnel["scanned"] += 1
-            if size_mult > 0 and not block_new:
-                funnel["regime_pass"] += 1
+        events = []
+        if not (s.state == IDLE and (block_new or size_mult <= 0)):
+            open_full      = self._open_full_count()
+            block_new_full = (s.state == TEST_OPEN and open_full >= MAX_OPEN)
+            if block_new_full:
+                funnel["blocked_max_open"] += 1
+            events = s.process_bar(reading.snap, reading.high, reading.low,
+                                   reading.rsi, reading.vol_ratio,
+                                   block_new_full=block_new_full,
+                                   size_mult=size_mult)
 
-            events = []
-            if not (s.state == IDLE and (block_new or size_mult <= 0)):
-                open_full      = self._open_full_count()
-                block_new_full = (s.state == TEST_OPEN and open_full >= MAX_OPEN)
-                if block_new_full:
-                    funnel["blocked_max_open"] += 1
-                events = s.process_bar(snap, high, low, rsi_val, vol_ratio,
-                                       block_new_full=block_new_full,
-                                       size_mult=size_mult)
+        for ev in events:
+            self.balance += ev.pnl
+            if ev.exit_type == "OPEN":
+                self._book_open(ev, s, bar_dt, funnel)
+            elif ev.kind == "TEST":
+                self._book_probe_result(ev, bar_dt, funnel)
+            else:
+                self._book_full_close(ev, symbol, bar_dt)
 
-            for ev in events:
-                self.balance += ev.pnl
-                tn = self.testnet_om  # shorthand
+    def _book_open(self, ev, s: SymbolState, bar_dt: datetime, funnel: dict) -> None:
+        """A probe or a full position just opened. The entry fee is already paid."""
+        tn = self.testnet_om
+        if ev.kind == "TEST":
+            funnel["probe"] += 1
+            self._log(
+                f"  🔬 TEST OPEN  {ev.symbol} {ev.direction} "
+                f"@ {ev.entry:.5g} | bal=${self.balance:.2f}"
+            )
+            if tn:
+                fill = tn.open_market(ev.symbol, ev.direction,
+                                      TEST_SIZE_USD, ev.entry)
+                self._log(f"     ↳ [TESTNET] TEST order filled @ {fill:.5g}",
+                          also_print=False)
+        else:
+            funnel["full"] += 1
+            funnel["confirm_ok"] += 1
+            # FIX #1: use the strategy's dynamic, regime+throttle-aware notional
+            # (risk-based sizing) — NOT a flat FULL_SIZE_USD×LEVERAGE.
+            notional = s.full_notional
+            self._log(
+                f"  📈 FULL OPEN  {ev.symbol} {ev.direction} "
+                f"@ {ev.entry:.5g} | notional=${notional:.0f} "
+                f"| bal=${self.balance:.2f}"
+            )
+            if tn:
+                fill = tn.open_market(ev.symbol, ev.direction, notional, ev.entry)
+                self._log(f"     ↳ [TESTNET] FULL order filled @ {fill:.5g}",
+                          also_print=False)
+        # T0: the entry fee already hit self.balance — log the leg.
+        self._log_leg(ev, bar_dt, "PROBE" if ev.kind == "TEST" else "MOMENTUM")
 
-                if ev.exit_type == "OPEN":
-                    if ev.kind == "TEST":
-                        funnel["probe"] += 1
-                        self._log(
-                            f"  🔬 TEST OPEN  {ev.symbol} {ev.direction} "
-                            f"@ {ev.entry:.5g} | bal=${self.balance:.2f}"
-                        )
-                        # ── Testnet: place $20 market order ──────────────
-                        if tn:
-                            fill = tn.open_market(ev.symbol, ev.direction,
-                                                   TEST_SIZE_USD, ev.entry)
-                            self._log(
-                                f"     ↳ [TESTNET] TEST order filled @ {fill:.5g}",
-                                also_print=False)
-                    else:
-                        funnel["full"] += 1
-                        funnel["confirm_ok"] += 1
-                        # FIX #1: use the strategy's dynamic, regime+throttle-aware
-                        # notional (risk-based sizing) — NOT a flat FULL_SIZE_USD×LEVERAGE.
-                        notional = s.full_notional
-                        self._log(
-                            f"  📈 FULL OPEN  {ev.symbol} {ev.direction} "
-                            f"@ {ev.entry:.5g} | notional=${notional:.0f} "
-                            f"| bal=${self.balance:.2f}"
-                        )
-                        # ── Testnet: place risk-sized notional market order ─────
-                        if tn:
-                            fill = tn.open_market(ev.symbol, ev.direction,
-                                                   notional, ev.entry)
-                            self._log(
-                                f"     ↳ [TESTNET] FULL order filled @ {fill:.5g}",
-                                also_print=False)
-                    # T0: the entry fee already hit self.balance above — log it.
-                    self._log_leg(ev, bar_dt,
-                                  "PROBE" if ev.kind == "TEST" else "MOMENTUM")
-                    continue
+    def _book_probe_result(self, ev, bar_dt: datetime, funnel: dict) -> None:
+        """A $20 probe resolved: confirmed, failed, or stopped out.
 
-                # ── Test position result ───────────────────────────────────
-                if ev.kind == "TEST":
-                    if ev.exit_type == "CONFIRM_OK":
-                        self.run_confirm_ok += 1
-                        self._log(
-                            f"  ✅ CONFIRMED  {ev.symbol} {ev.direction} "
-                            f"pnl=${ev.pnl:+.3f} | bal=${self.balance:.2f}"
-                        )
-                        # ── Testnet: close the test position ──────────────
-                        if tn:
-                            fill = tn.close_market(ev.symbol, ev.direction, 1.0)
-                            self._log(
-                                f"     ↳ [TESTNET] TEST closed @ {fill:.5g}",
-                                also_print=False)
-                    elif ev.exit_type == "CONFIRM_FAIL":
-                        self.run_confirm_fail += 1
-                        funnel["confirm_fail"] += 1
-                        # Probes that never became positions still cost money.
-                        # On the live record this drag was ~54% of the total loss,
-                        # so it is tracked explicitly rather than inferred.
-                        self.probe_cost += ev.pnl
-                        self._log(
-                            f"  ❌ CONF FAIL  {ev.symbol} {ev.direction} "
-                            f"pnl=${ev.pnl:+.3f} | bal=${self.balance:.2f}"
-                        )
-                        # ── Testnet: close failed test ────────────────────
-                        if tn:
-                            fill = tn.close_market(ev.symbol, ev.direction, 1.0)
-                            self._log(
-                                f"     ↳ [TESTNET] TEST closed @ {fill:.5g}",
-                                also_print=False)
-                    elif ev.exit_type == "SL":
-                        # Probe stopped out before it could be confirmed — same
-                        # category of cost as a CONFIRM_FAIL: paid, never traded.
-                        self.probe_cost += ev.pnl
-                        self._log(
-                            f"  🛑 TEST SL    {ev.symbol} pnl=${ev.pnl:+.3f} "
-                            f"| bal=${self.balance:.2f}"
-                        )
-                    # T0: probe legs are real closed round-trips with real cost.
-                    # A test-SL is logged as PROBE_SL so it is never confused with
-                    # a full-position SL by the aggregator.
-                    self._log_leg(ev, bar_dt, "PROBE",
-                                  exit_type="PROBE_SL" if ev.exit_type == "SL"
-                                  else ev.exit_type)
-                    continue
+        A failed probe is money spent on a position that never existed. On the
+        live record that drag was ~54% of the total loss, so it is tracked
+        explicitly in probe_cost rather than inferred.
+        """
+        tn = self.testnet_om
+        if ev.exit_type == "CONFIRM_OK":
+            self.run_confirm_ok += 1
+            self._log(
+                f"  ✅ CONFIRMED  {ev.symbol} {ev.direction} "
+                f"pnl=${ev.pnl:+.3f} | bal=${self.balance:.2f}"
+            )
+            if tn:
+                fill = tn.close_market(ev.symbol, ev.direction, 1.0)
+                self._log(f"     ↳ [TESTNET] TEST closed @ {fill:.5g}",
+                          also_print=False)
+        elif ev.exit_type == "CONFIRM_FAIL":
+            self.run_confirm_fail += 1
+            funnel["confirm_fail"] += 1
+            self.probe_cost += ev.pnl
+            self._log(
+                f"  ❌ CONF FAIL  {ev.symbol} {ev.direction} "
+                f"pnl=${ev.pnl:+.3f} | bal=${self.balance:.2f}"
+            )
+            if tn:
+                fill = tn.close_market(ev.symbol, ev.direction, 1.0)
+                self._log(f"     ↳ [TESTNET] TEST closed @ {fill:.5g}",
+                          also_print=False)
+        elif ev.exit_type == "SL":
+            # Stopped out before it could be confirmed — same category of cost
+            # as a CONFIRM_FAIL: paid for, never traded.
+            self.probe_cost += ev.pnl
+            self._log(
+                f"  🛑 TEST SL    {ev.symbol} pnl=${ev.pnl:+.3f} "
+                f"| bal=${self.balance:.2f}"
+            )
+        # T0: probe legs are real closed round-trips with real cost. A test-SL is
+        # logged as PROBE_SL so the aggregator never reads it as a position SL.
+        self._log_leg(ev, bar_dt, "PROBE",
+                      exit_type="PROBE_SL" if ev.exit_type == "SL" else ev.exit_type)
 
-                # ── Full trade closed ─────────────────────────────────────
-                emoji = "✅" if ev.pnl > 0 else "❌"
-                self._log(
-                    f"  {emoji} CLOSE FULL  {ev.symbol} [{ev.exit_type}] "
-                    f"{ev.direction} entry={ev.entry:.5g} exit={ev.exit:.5g} "
-                    f"pnl=${ev.pnl:+.2f} | bal=${self.balance:.2f}"
-                )
+    def _book_full_close(self, ev, symbol: str, bar_dt: datetime) -> None:
+        """A full position closed at TP1/TP2/SL/TRAIL/TIMEOUT."""
+        emoji = "✅" if ev.pnl > 0 else "❌"
+        self._log(
+            f"  {emoji} CLOSE FULL  {ev.symbol} [{ev.exit_type}] "
+            f"{ev.direction} entry={ev.entry:.5g} exit={ev.exit:.5g} "
+            f"pnl=${ev.pnl:+.2f} | bal=${self.balance:.2f}"
+        )
 
-                # ── Testnet: execute the close ─────────────────────────────
+        tn = self.testnet_om
+        if tn:
+            if ev.exit_type == "TP1":
+                fill = tn.close_market(ev.symbol, ev.direction, 0.5)
+                self._log(f"     ↳ [TESTNET] TP1 half-close @ {fill:.5g}",
+                          also_print=False)
+            else:
+                # TP2/SL/TRAIL/TIMEOUT close the entire remaining position.
+                fill = tn.close_market(ev.symbol, ev.direction, 1.0)
+                self._log(f"     ↳ [TESTNET] {ev.exit_type} full-close @ {fill:.5g}",
+                          also_print=False)
+
+        if ev.exit_type == "TP1":
+            self.run_tp1 += 1
+        elif ev.exit_type == "TP2":
+            self.run_tp2 += 1
+        elif ev.exit_type == "SL":
+            self.run_sl += 1
+            self.daily_sl_count += 1
+            if self.daily_sl_count >= DAILY_SL_LIMIT:
+                self.daily_freeze = True
+                self._log(f"  ⚠️  Daily SL limit reached — freezing {symbol} entries today")
+        elif ev.exit_type == "TRAIL":
+            self.run_trail += 1
+        elif ev.exit_type == "TIMEOUT":
+            self.run_tmo += 1
+
+        self._append_trade(ev, bar_dt, ev.direction)
+
+    # ── Bar processing · mean-reversion sleeve ────────────────────────────────
+
+    def _run_mr_sleeve(self, symbol: str, s: SymbolState, reading: "_Reading",
+                       bar_dt: datetime, reg: str, block_new: bool) -> None:
+        """FAZ 2 range mean-reversion, NEUTRAL-only. Off since 2026-08-27."""
+        if not MR_ENABLED:
+            return
+
+        mr = self.mr_states[symbol]
+        # NETTING GUARD (Gemini risk-audit): don't open MR on a symbol that
+        # already has an active momentum position — the exchange would net both
+        # LONGs into one, and an MR close would shut the momentum leg.
+        mr_block = block_new or (s.state != IDLE)
+        mr_events = mr.process_bar(
+            reading.snap, reading.high, reading.low, regime=reg,
+            block_new=mr_block,
+            size_mult=self.size_factor)   # FIX #3: equity-throttle aware
+
+        tn = self.testnet_om
+        for ev in mr_events:
+            self.balance += ev.pnl
+            if ev.exit_type == "OPEN":
+                self._log(f"  🔁 MR OPEN    {ev.symbol} @ {ev.entry:.5g} "
+                          f"| notional=${mr.notional:.0f} | bal=${self.balance:.2f}")
+                # FIX #2: MR was sim-only — now mirrored to testnet (LONG-only).
+                # NETTING CAVEAT: if a momentum FULL long is already open on this
+                # symbol the exchange nets both into one position (rare: momentum
+                # fires in BULL, MR in NEUTRAL — regimes seldom overlap same-bar).
+                # Flagged for the exec-audit role before any live promotion.
                 if tn:
-                    if ev.exit_type == "TP1":
-                        # Close half position at TP1
-                        fill = tn.close_market(ev.symbol, ev.direction, 0.5)
-                        self._log(
-                            f"     ↳ [TESTNET] TP1 half-close @ {fill:.5g}",
-                            also_print=False)
-                    else:
-                        # Close entire remaining position (TP2/SL/TRAIL/TIMEOUT)
-                        fill = tn.close_market(ev.symbol, ev.direction, 1.0)
-                        self._log(
-                            f"     ↳ [TESTNET] {ev.exit_type} full-close @ {fill:.5g}",
-                            also_print=False)
+                    fill = tn.open_market(ev.symbol, "LONG", mr.notional, ev.entry)
+                    self._log(f"     ↳ [TESTNET] MR order filled @ {fill:.5g}",
+                              also_print=False)
+                self._log_leg(ev, bar_dt, "MR")   # T0: entry fee
+                continue
 
-                # Update counters
-                if ev.exit_type == "TP1":    self.run_tp1   += 1
-                elif ev.exit_type == "TP2":  self.run_tp2   += 1
-                elif ev.exit_type == "SL":
-                    self.run_sl   += 1
-                    self.daily_sl_count += 1
-                    if self.daily_sl_count >= DAILY_SL_LIMIT:
-                        self.daily_freeze = True
-                        self._log(f"  ⚠️  Daily SL limit reached — freezing {symbol} entries today")
-                elif ev.exit_type == "TRAIL":  self.run_trail += 1
-                elif ev.exit_type == "TIMEOUT":self.run_tmo   += 1
+            emoji = "✅" if ev.pnl > 0 else "❌"
+            self._log(f"  {emoji} MR {ev.exit_type:<4}  {ev.symbol} "
+                      f"entry={ev.entry:.5g} exit={ev.exit:.5g} "
+                      f"pnl=${ev.pnl:+.2f} | bal=${self.balance:.2f}")
+            if tn:   # FIX #2: close the testnet MR position (full)
+                fill = tn.close_market(ev.symbol, "LONG", 1.0)
+                self._log(f"     ↳ [TESTNET] MR {ev.exit_type} close @ {fill:.5g}",
+                          also_print=False)
 
-                # Append to trade log
-                self.trade_log.append({
-                    "ts":        bar_dt.isoformat(),
-                    "symbol":    ev.symbol,
-                    "direction": ev.direction,
-                    "exit_type": ev.exit_type,
-                    "entry":     ev.entry,
-                    "exit":      ev.exit,
-                    "pnl":       round(ev.pnl, 4),
-                    "balance":   round(self.balance, 4),
-                })
+            if ev.exit_type == "TP":
+                self.run_mr_tp += 1
+            elif ev.exit_type == "SL":
+                self.run_mr_sl += 1
+            elif ev.exit_type == "TIMEOUT":
+                self.run_mr_tmo += 1
 
-            # ── FAZ 2: range mean-reversion sleeve (NEUTRAL-only) ─────────────
-            if MR_ENABLED:
-                mr = self.mr_states[symbol]
-                # NETTING GUARD (Gemini risk-audit): don't open MR on a symbol that
-                # already has an active momentum position — the exchange would net
-                # both LONGs into one, and an MR close would shut the momentum leg.
-                mr_block = block_new or (s.state != IDLE)
-                mr_events = mr.process_bar(
-                    snap, high, low, regime=reg, block_new=mr_block,
-                    size_mult=self.size_factor)   # FIX #3: equity-throttle aware
-                tn = self.testnet_om
-                for ev in mr_events:
-                    self.balance += ev.pnl
-                    if ev.exit_type == "OPEN":
-                        self._log(f"  🔁 MR OPEN    {ev.symbol} @ {ev.entry:.5g} "
-                                  f"| notional=${mr.notional:.0f} | bal=${self.balance:.2f}")
-                        # FIX #2: MR was sim-only — now mirror to testnet (LONG-only).
-                        # NETTING CAVEAT: if a momentum FULL long is already open on this
-                        # symbol the exchange nets both into one position (rare: momentum
-                        # fires in BULL, MR in NEUTRAL — regimes seldom overlap same-bar).
-                        # Flagged for the exec-audit role before any live promotion.
-                        if tn:
-                            fill = tn.open_market(ev.symbol, "LONG",
-                                                  mr.notional, ev.entry)
-                            self._log(f"     ↳ [TESTNET] MR order filled @ {fill:.5g}",
-                                      also_print=False)
-                        self._log_leg(ev, bar_dt, "MR")   # T0: entry fee
-                        continue
-                    emoji = "✅" if ev.pnl > 0 else "❌"
-                    self._log(f"  {emoji} MR {ev.exit_type:<4}  {ev.symbol} "
-                              f"entry={ev.entry:.5g} exit={ev.exit:.5g} "
-                              f"pnl=${ev.pnl:+.2f} | bal=${self.balance:.2f}")
-                    # FIX #2: close the testnet MR position (full)
-                    if tn:
-                        fill = tn.close_market(ev.symbol, "LONG", 1.0)
-                        self._log(f"     ↳ [TESTNET] MR {ev.exit_type} close @ {fill:.5g}",
-                                  also_print=False)
-                    if   ev.exit_type == "TP":      self.run_mr_tp  += 1
-                    elif ev.exit_type == "SL":      self.run_mr_sl  += 1
-                    elif ev.exit_type == "TIMEOUT": self.run_mr_tmo += 1
-                    self.trade_log.append({
-                        "ts": bar_dt.isoformat(), "symbol": ev.symbol,
-                        "direction": "MR", "exit_type": ev.exit_type,
-                        "entry": ev.entry, "exit": ev.exit,
-                        "pnl": round(ev.pnl, 4), "balance": round(self.balance, 4),
-                    })
+            self._append_trade(ev, bar_dt, "MR")
 
-        # ── Bar summary ───────────────────────────────────────────────────────
+    def _append_trade(self, ev, bar_dt: datetime, direction: str) -> None:
+        """Record a closed round-trip. This list is what the track record reads."""
+        self.trade_log.append({
+            "ts":        bar_dt.isoformat(),
+            "symbol":    ev.symbol,
+            "direction": direction,
+            "exit_type": ev.exit_type,
+            "entry":     ev.entry,
+            "exit":      ev.exit,
+            "pnl":       round(ev.pnl, 4),
+            "balance":   round(self.balance, 4),
+        })
+
+    # ── Bar processing · telemetry ────────────────────────────────────────────
+
+    def _log_bar_summary(self, bar_dt: datetime, gate_str: str) -> None:
         ret_pct = (self.balance - INITIAL_BALANCE) / INITIAL_BALANCE * 100
         active  = [
             f"{t}:{s.state[0]}"  # T=TEST_OPEN, S=SCALE_OPEN, R=TRAILING
             for t, s in self.sym_states.items()
             if s.state != IDLE
         ]
-        active_str = " ".join(active) if active else "—"
         self._log(
             f"Bar #{self.bar_count:,} {bar_dt.strftime('%H:%M')} UTC | "
             f"${self.balance:.2f} ({ret_pct:+.2f}%) | "
-            f"open={self._open_full_count()}/{MAX_OPEN} [{active_str}] | "
+            f"open={self._open_full_count()}/{MAX_OPEN} "
+            f"[{' '.join(active) if active else '—'}] | "
             f"{gate_str}"
         )
 
+    def _accumulate_funnel(self, funnel: dict) -> None:
+        """Fold this bar's funnel into the totals and log it if anything happened.
+
+        Without this telemetry a parameter sweep is a blind shot: we could not
+        tell whether the live bot trades less than the backtest because the
+        regime differs or because a gate behaves differently in production.
+        """
         for k, v in funnel.items():
             self.funnel_totals[k] += v
-        # Only log the funnel on bars where something actually happened, so the
-        # log stays readable but every probe/confirm decision leaves a trace.
-        if any(funnel[k] for k in ("probe", "confirm_ok", "confirm_fail", "blocked_max_open")):
-            ft = self.funnel_totals
-            cr = (100 * ft["confirm_ok"] / (ft["confirm_ok"] + ft["confirm_fail"])
-                  if (ft["confirm_ok"] + ft["confirm_fail"]) else 0.0)
-            self._log(
-                f"  📊 funnel bar[scan={funnel['scanned']} regime_ok={funnel['regime_pass']} "
-                f"probe={funnel['probe']} conf_ok={funnel['confirm_ok']} "
-                f"conf_fail={funnel['confirm_fail']} full={funnel['full']} "
-                f"maxopen_block={funnel['blocked_max_open']}] | "
-                f"total[probe={ft['probe']} conf={cr:.0f}% full={ft['full']}] | "
-                f"probe_cost=${self.probe_cost:+.2f}"
-            )
 
-        # Save state every bar
-        self._save_state()
+        if not any(funnel[k] for k in ("probe", "confirm_ok",
+                                       "confirm_fail", "blocked_max_open")):
+            return                       # keep the log readable on quiet bars
 
-        # Detailed status every 12 bars (≈ 1 hour)
-        if self.bar_count % 12 == 0:
-            self._print_status()
+        ft = self.funnel_totals
+        decided = ft["confirm_ok"] + ft["confirm_fail"]
+        cr = (100 * ft["confirm_ok"] / decided) if decided else 0.0
+        self._log(
+            f"  📊 funnel bar[scan={funnel['scanned']} regime_ok={funnel['regime_pass']} "
+            f"probe={funnel['probe']} conf_ok={funnel['confirm_ok']} "
+            f"conf_fail={funnel['confirm_fail']} full={funnel['full']} "
+            f"maxopen_block={funnel['blocked_max_open']}] | "
+            f"total[probe={ft['probe']} conf={cr:.0f}% full={ft['full']}] | "
+            f"probe_cost=${self.probe_cost:+.2f}"
+        )
+
 
     # ── Main entry point ──────────────────────────────────────────────────────
 

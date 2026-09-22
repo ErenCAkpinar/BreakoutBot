@@ -78,7 +78,7 @@ def main() -> None:
 
     keys = sorted(GRID)
     rows = []
-    for vals in itertools.product(*(GRID[k] for k in keys)):
+    for vals in itertools.product(*[GRID[k] for k in keys]):  # type: ignore[call-overload]
         kw = dict(zip(keys, vals))
         w = S.xs_mom(p, longshort=True, **kw)
         d = leg_returns(w, p.ret, p.mask)

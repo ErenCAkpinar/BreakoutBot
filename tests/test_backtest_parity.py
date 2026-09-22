@@ -21,8 +21,9 @@ from __future__ import annotations
 from datetime import timezone
 
 import backtest
-from backtest import (_bar_close_dt, _mom_leg, _window_line, account_events,
-                      new_tally, print_portfolio_report, process_symbol_bar)
+from backtest import (_bar_close_dt, _mom_leg, account_events, new_tally,
+                      process_symbol_bar)
+from backtest_report import window_line, print_portfolio_report
 from config import MAX_OPEN
 from metrics import aggregate_positions
 from strategy import IDLE, SCALE_OPEN, TEST_OPEN, Trade
@@ -74,12 +75,13 @@ def _run(state=IDLE, reg="BULL", size_factor=1.0, block_new=False, open_full=0,
 # ── The regime gate: no probes outside BULL ──────────────────────────────────
 
 def test_idle_symbol_is_not_scanned_outside_bull():
-    """paper_bb.py:673 — live skips the symbol entirely when size_mult <= 0.
+    """PaperTrader._run_momentum_sleeve — live skips the symbol entirely when
+    size_mult <= 0.
 
     LONG_SIZE_MULT is {BULL: 1.0, NEUTRAL: 0.0, BEAR: 0.0}. The backtest used to
     scan anyway: it opened a $20 probe, paid both sides of the fee, sometimes ate a
     probe SL, parked the symbol in a 10-bar cooldown — and then refused the full
-    position at strategy.py:178 because size_mult was 0. Pure fabricated drag on
+    position in SymbolState.process_bar because size_mult was 0. Pure fabricated drag on
     every non-BULL bar, which is most of them.
     """
     for reg in ("NEUTRAL", "BEAR"):
@@ -101,7 +103,8 @@ def test_open_position_is_still_managed_outside_bull():
 
 
 def test_equity_throttle_halves_size(monkeypatch):
-    """paper_bb.py:594 — a -7% peak drawdown halves sizing on both sleeves."""
+    """PaperTrader._apply_equity_throttle — a -7% peak drawdown halves sizing
+    on both sleeves."""
     sym, mr = _run(reg="BULL", size_factor=0.5,
                    mr_enabled=True, monkeypatch=monkeypatch)
     assert sym.calls[0]["size_mult"] == 0.5
@@ -120,7 +123,8 @@ def test_mr_sleeve_is_not_invoked_when_disabled(monkeypatch):
 # ── The portfolio cap ────────────────────────────────────────────────────────
 
 def test_max_open_blocks_the_scale_up():
-    """paper_bb.py:675 — a confirmed probe is dropped when the book is full."""
+    """PaperTrader._run_momentum_sleeve — a confirmed probe is dropped when the
+    book is full."""
     sym, _ = _run(state=TEST_OPEN, reg="BULL", open_full=MAX_OPEN)
     assert sym.calls[0]["block_new_full"] is True
 
@@ -131,7 +135,8 @@ def test_max_open_blocks_the_scale_up():
 # ── The MR netting guard ─────────────────────────────────────────────────────
 
 def test_mr_is_blocked_while_momentum_holds_the_symbol(monkeypatch):
-    """paper_bb.py:828 — the exchange nets two longs on one symbol into a single
+    """PaperTrader._run_mr_sleeve — the exchange nets two longs on one symbol
+    into a single
     position, so an MR close would shut the momentum leg with it.
 
     Asserted with the sleeve forced ON: this is the netting contract that must
@@ -148,7 +153,7 @@ def test_mr_is_blocked_while_momentum_holds_the_symbol(monkeypatch):
 # ── Leg accounting ───────────────────────────────────────────────────────────
 
 def test_probe_stop_out_is_tagged_probe_sl():
-    """paper_bb.py:753. Left as "SL", metrics.py reads a probe stop as a MOMENTUM
+    """PaperTrader._book_probe_result. Left as "SL", metrics reads a probe stop as a MOMENTUM
     final leg — and it would close whatever TP1 was pending on that symbol."""
     ev = Trade(symbol="UNIUSDT", direction="LONG", kind="TEST",
                entry=10.0, exit=9.9, pnl=-0.22, exit_type="SL")
@@ -242,7 +247,7 @@ def _halted_r(**over):
 def test_halted_run_reports_the_window_it_actually_replayed():
     """The 2095d run replayed 87 days, hit PEAK_DD_LIMIT, and printed a monthly
     estimate for 2095 days it never saw. The requested span is not the result."""
-    line = _window_line(_halted_r())
+    line = window_line(_halted_r())
     assert "87d REPLAYED" in line
     assert "hard-stopped" in line.lower()
     assert "2008d were never traded" in line     # 2095 - 87
@@ -258,7 +263,7 @@ def test_halted_run_can_never_print_deploy(capsys):
 
 
 def test_restart_mode_is_flagged_as_not_parity():
-    line = _window_line(_halted_r(halted=False, n_halts=3, days_run=2095.0))
+    line = window_line(_halted_r(halted=False, n_halts=3, days_run=2095.0))
     assert "3 hard stop(s)" in line
     assert "not live parity" in line
 
@@ -266,10 +271,10 @@ def test_restart_mode_is_flagged_as_not_parity():
 def test_short_data_is_flagged_not_silently_scaled():
     """A coin listed mid-window replays fewer days than asked; the rate metrics
     must be scored on what was replayed, and the report must say so."""
-    line = _window_line(_halted_r(halted=False, n_halts=0, days_run=710.0))
+    line = window_line(_halted_r(halted=False, n_halts=0, days_run=710.0))
     assert "710d replayed" in line and "data starts later" in line
 
 
 def test_full_run_reports_plainly():
-    line = _window_line(_halted_r(halted=False, n_halts=0, days_run=2095.0))
+    line = window_line(_halted_r(halted=False, n_halts=0, days_run=2095.0))
     assert line == "2095d replayed"

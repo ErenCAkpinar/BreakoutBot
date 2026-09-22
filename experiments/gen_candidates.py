@@ -32,7 +32,8 @@ os.chdir(_ROOT)
 import pandas as pd  # noqa: E402
 
 import config  # noqa: E402
-from backtest import CACHE_DIR, run_symbol  # noqa: E402
+from backtest import run_symbol  # noqa: E402
+from backtest_data import CACHE_DIR  # noqa: E402
 from config import INITIAL_BALANCE, REGIME_WARMUP_BARS, REGIME_WARMUP_DAYS  # noqa: E402
 
 OUT = "experiments/candidates"

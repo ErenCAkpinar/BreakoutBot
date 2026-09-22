@@ -48,7 +48,8 @@ def test_trade_log_reconciles_with_balance():
     """THE assertion. sum(trade_log.pnl) must equal the balance change.
 
     Before T0, OPEN and probe legs debited self.balance and then hit a `continue`
-    before the trade_log append (paper_bb.py:717 preceded the append at :759), so
+    before the trade_log append (the OPEN branch of the event loop returned
+    ahead of it), so
     this identity failed by -$53.41 on the 8-coin bot and -$33.35 on the 5-coin
     one — and the published expectancy came out +$0.61/position when the
     reconciled figure was -$0.14.

@@ -100,17 +100,19 @@ class MRState:
         # ── MR_OPEN: manage the position (exits checked from the NEXT bar) ────
         if self.state == MR_OPEN:
             self.bars_in += 1
-            exit_p:   float | None = None
-            exit_type: str  | None = None
+            # Price and reason are decided together, so they travel together:
+            # narrowing on the reason alone left the price Optional.
+            exit_at: tuple[float, str] | None = None
 
             if low <= self.sl:                       # stop first (conservative)
-                exit_p, exit_type = self.sl, "SL"
+                exit_at = (self.sl, "SL")
             elif high >= self.tp:                    # reverted to the mean
-                exit_p, exit_type = self.tp, "TP"
+                exit_at = (self.tp, "TP")
             elif self.bars_in >= MR_TIMEOUT_BARS:    # no reversion → stand aside
-                exit_p, exit_type = price, "TIMEOUT"
+                exit_at = (price, "TIMEOUT")
 
-            if exit_type is not None:
+            if exit_at is not None:
+                exit_p, exit_type = exit_at
                 gross = self.notional * (exit_p - self.entry) / self.entry   # long: mult=+1
                 pnl   = gross - self.notional * EXEC_COST_PER_SIDE
                 events.append(Trade(symbol=self.symbol, direction="LONG", kind="MR",

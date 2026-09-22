@@ -45,15 +45,16 @@ def _c(code: str) -> str:
     return code if _USE_COLOR else ""
 
 
-RESET  = lambda: _c("\033[0m")
-BOLD   = lambda: _c("\033[1m")
-DIM    = lambda: _c("\033[2m")
-RED    = lambda: _c("\033[31m")
-GREEN  = lambda: _c("\033[32m")
-YELLOW = lambda: _c("\033[33m")
-BLUE   = lambda: _c("\033[34m")
-CYAN   = lambda: _c("\033[36m")
-GREY   = lambda: _c("\033[90m")
+def RESET()  -> str: return _c("\033[0m")
+def BOLD()   -> str: return _c("\033[1m")
+def DIM()    -> str: return _c("\033[2m")
+def RED()    -> str: return _c("\033[31m")
+def GREEN()  -> str: return _c("\033[32m")
+def YELLOW() -> str: return _c("\033[33m")
+def BLUE()   -> str: return _c("\033[34m")
+def CYAN()   -> str: return _c("\033[36m")
+def GREY()   -> str: return _c("\033[90m")
+
 
 W = 66  # panel genişliği
 

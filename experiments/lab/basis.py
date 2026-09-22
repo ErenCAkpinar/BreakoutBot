@@ -101,6 +101,8 @@ def load(tf: str = "4h", days: int | None = None) -> BasisPanel:
     for s in syms:
         i = spot_s[s].index.intersection(perp_s[s].index)
         idx = i if idx is None else idx.union(i)
+    if idx is None:
+        raise ValueError("no symbols: nothing to align on")
     idx = idx.sort_values()
     if days:
         idx = idx[idx >= idx[-1] - pd.Timedelta(days=days)]

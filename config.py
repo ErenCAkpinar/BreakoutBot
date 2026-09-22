@@ -3,6 +3,8 @@ BreakoutBot — Configuration
 Wave 11 signal engine + Test-Confirm-Scale execution layer
 """
 
+import os as _os
+
 # ── Token universe (23 tokens — curated after 30d backtest) ──────────────────
 #
 # Wave 12 (post-backtest) cull — 10 removed for structural failure:
@@ -166,7 +168,6 @@ MAX_OPEN        = 2       # max simultaneous FULL positions across all symbols
 #    have overridden the adopted 3.75. Verified 2026-09-22: both Environment lines
 #    are commented out in the unit and DEPLOYED_SHA is dded71b (2026-08-27) — the
 #    server runs these defaults. Keep it that way: no X_* exit override in the unit.
-import os as _os
 def _envf(name: str, default: float) -> float:
     return float(_os.getenv(name, default))
 
