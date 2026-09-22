@@ -1,0 +1,11 @@
+[Unit]
+Description=Observe BreakoutBot every 15 minutes independently of desktop
+
+[Timer]
+OnCalendar=*-*-* *:00,15,30,45:30 UTC
+AccuracySec=5s
+Persistent=true
+Unit=breakoutbot-observer.service
+
+[Install]
+WantedBy=timers.target

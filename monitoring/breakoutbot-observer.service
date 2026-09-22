@@ -1,0 +1,32 @@
+[Unit]
+Description=BreakoutBot read-only Codex observer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/var/lib/breakoutbot-observer
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/breakoutbot-observer.conf
+ExecStart=/usr/bin/python3 /opt/breakoutbot-observer/runner.py --state /root/BreakoutBot-test/state_paper.json --log /root/BreakoutBot-test/paper_bb.log --output-dir /var/lib/breakoutbot-observer --codex ${OBSERVER_CODEX_BIN} --model ${OBSERVER_MODEL} --reserve-percent 10 --timeout 180
+TimeoutStartSec=240
+KillMode=control-group
+UMask=0077
+Nice=10
+CPUQuota=50%
+MemoryMax=1G
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+PrivateTmp=true
+PrivateDevices=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/breakoutbot-observer /root/.codex
+ReadOnlyPaths=/root/BreakoutBot-test
+InaccessiblePaths=-/root/.ssh -/run/systemd/private -/run/dbus/system_bus_socket
+StandardOutput=journal
+StandardError=journal
+
