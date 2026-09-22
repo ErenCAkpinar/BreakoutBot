@@ -8,7 +8,9 @@ yüklü bile değil. "testnet" kelimesi bu projede yalnızca o emekli sürümü 
 Faz geçmişi, deney sonuçları ve kürasyon kararları `BENCHMARKS.md`'de; her karar
 orada gerekçesiyle kayıtlı.
 
-Canlı sistem sunucuda `breakoutbot-test` servisi olarak koşuyor (5 coin).
+Canlı sistem sunucuda `breakoutbot-test` servisi olarak koşuyor (4 coin:
+UNI/INJ/ADA/NEAR — POL 2026-09-22'de sahip kararıyla çıkarıldı, `config.py` TOKENS
+bloğu ve `BENCHMARKS.md` Faz 9'da gerekçesi ve karşı-kanıtı kayıtlı).
 
 ## Parametreler env'de DEĞİL, config.py'de (2026-08-27'den beri)
 
@@ -16,10 +18,10 @@ Doğrulanan çıkış seti artık `config.py` **varsayılanı** (`BENCHMARKS.md`
 `SL_FULL_ATR=2.25 · TP1=3.0 · TP2=6.0 · TRAIL=3.75 · TIMEOUT_BARS=96 ·
 TP1_CLOSE_FRAC=0.0 · MR_ENABLED=False`. Env'siz koşmak **doğru** sistemi test eder.
 
-🚨 **Sunucudaki systemd unit'i hâlâ E6'dan kalma `X_TP1_CLOSE_FRAC=0.0
-X_TRAIL_ATR=2.5` taşıyor.** `X_TRAIL_ATR=2.5` artık benimsenen 3.75'i **ezer** ve
-hiç test edilmemiş bir karışım çalıştırır. Deploy'dan önce ikisi de unit'ten
-kaldırılmalı. `python3.12 backtest.py` açılışta bu sapmayı yazdırır.
+Systemd unit'inde **X_\* override yok** (2026-09-22'de doğrulandı: E6'dan kalma
+`X_TP1_CLOSE_FRAC` / `X_TRAIL_ATR` satırları yorumlanmış, `DEPLOYED_SHA` deploy'u
+gösterir). Öyle kalmalı — bir X_* bayrağı ancak `experiments/DEFTER.md`'de onu hak
+eden bir kol varsa eklenir. `python3.12 backtest.py` açılışta env sapmasını yazdırır.
 
 ## Deney disiplini
 

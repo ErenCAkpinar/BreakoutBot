@@ -29,7 +29,7 @@ _FULL_UNIVERSE = [
     "STXUSDT", "ORDIUSDT",
 ]
 
-# ── ACTIVE universe — curated 5 (2026-08-22 re-curation) ──────────────────────
+# ── ACTIVE universe — 4 (2026-09-22: POL removed from the curated 5) ──────────
 # The previous 8 were curated 2026-07-29 under the OLD exit structure (trail
 # 1.5×ATR + 50% partial at TP1). The bot now runs E6 (X_TRAIL_ATR=2.5,
 # X_TP1_CLOSE_FRAC=0.0), and a trend-following exit ranks coins differently than a
@@ -49,11 +49,22 @@ _FULL_UNIVERSE = [
 # NOT dropped despite a weak live run: ADA (live −0.141R but p=0.36 → noise; +0.252R
 # on 240d, n=26) and NEAR (live n=1; +0.170R on 240d with n=48, the largest sample
 # in the set). Cutting those would have been fitting noise.
+# 2026-09-22 — POLUSDT removed, by owner decision AGAINST the selection rule below.
+# Live under the Faz 8 defaults (27 Aug → 22 Sep): n=11, WR 9%, −0.52R/pos, −$57
+# (t=−2.8 in isolation; one of 5 coins, picked post hoc as the worst). The same
+# geometry backtested ranks POL SECOND of the five in BOTH long windows —
+# 240d +0.51R (n=21), 665d +0.25R (n=56) — while ADA (kept) is last on 665d at
+# −0.09R. The 90d-vs-live rank correlation of −0.55 measured below is exactly this
+# pattern, and DEFTER Tur 9 later filed the 2026-08-22 cull as "a trace of the
+# selection, not an edge estimate". So this is recorded as what it is: a cut on
+# 11 live positions, not a finding. No R3-noPOL arm was run; the direction is
+# known (removing the #2 coin loses in both windows). If POL is ever re-added,
+# do it via experiments/ on 240d AND 665d, not on a live month.
 TOKENS = [
     "UNIUSDT", "INJUSDT", "ADAUSDT",      # +0.34 / +0.30 / +0.25 R on 240d (E6)
-    "POLUSDT", "NEARUSDT",                # +0.18 / +0.17 R on 240d (E6)
+    "NEARUSDT",                           # +0.17 R on 240d (E6)
 ]
-# Total: 5 curated tokens (of 23).
+# Total: 4 tokens (of 23). POLUSDT: +0.18R on 240d (E6), removed 2026-09-22 (above).
 #
 # ⚠️ Selection rule — do NOT curate on a short window. Measured 2026-08-22, per-coin
 # expectancy rank correlation: 90d vs 240d = −0.31, 90d vs live = −0.55 (sign
@@ -151,9 +162,10 @@ MAX_OPEN        = 2       # max simultaneous FULL positions across all symbols
 # the stop is wider — at SL 1.5 positions resolved long before 48 bars. The two
 # move together or not at all.
 #
-# ⚠️ DEPLOY: the systemd unit still carries `X_TRAIL_ATR=2.5` from E6. That env
-#    now OVERRIDES the adopted 3.75 and would run a mix that was never tested.
-#    Remove X_TP1_CLOSE_FRAC and X_TRAIL_ATR from the unit — both are defaults now.
+# DEPLOY: the systemd unit used to carry `X_TRAIL_ATR=2.5` from E6, which would
+#    have overridden the adopted 3.75. Verified 2026-09-22: both Environment lines
+#    are commented out in the unit and DEPLOYED_SHA is dded71b (2026-08-27) — the
+#    server runs these defaults. Keep it that way: no X_* exit override in the unit.
 import os as _os
 def _envf(name: str, default: float) -> float:
     return float(_os.getenv(name, default))

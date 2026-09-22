@@ -584,3 +584,47 @@ systemd unit'i E6'dan kalma `X_TRAIL_ATR=2.5` taşıyor. Bu env artık benimsene
 Ayrıca `deploy_test.sh` `metrics.py`'yi hiç göndermiyordu (elle tutulan liste);
 `paper_bb.py` onu import ediyor → sunucudaki kopya eski. Liste artık import
 ağacından türetiliyor, kirli ağaçtan deploy reddediliyor, SHA sunucuya yazılıyor.
+
+---
+
+## ✂️ Faz 9 — POLUSDT evrenden çıkarıldı (22 Eyl 2026) — sahip kararı, kurala AYKIRI
+
+**Bağlam:** breakoutbot.dev tablosunda POL n=20, WR %20, −$60,10 (tüm epoch);
+SOL/LDO/AVAX de kırmızıydı ama onlar zaten Faz 6'da (22 Ağu) çıkmıştı — sitede
+görünmeleri track record'un epoch'un tamamını göstermesinden. Karar yalnız POL'e dair.
+
+### Sayılar (aynı geometri: SL 2.25 · TP2 6.0 · TRAIL 3.75 · 96 bar · MR kapalı)
+| pencere | n | avg R | sıra (5 coin) |
+|---|:---:|:---:|:---:|
+| canlı, Faz 8 sonrası (27 Ağu → 22 Eyl) | 11 | **−0.52** (WR %9, −$57) | 5/5 |
+| backtest 240g (`R1-sl225t96`) | 21 | **+0.51** | **2/5** |
+| backtest 665g (`R1-sl225t96`) | 56 | **+0.25** | **2/5** (ADA −0.09 sonuncu) |
+
+Canlı t=−2.8 tek başına "anlamlı" görünür; ama 5 coin içinden sonradan seçilmiş
+en kötü ve n=11. İki uzun pencere aynı coini ikinci sıraya koyuyor — Faz 6'da
+ölçülen "kısa pencere vs canlı sıra korelasyonu −0.55" deseninin kendisi.
+Faz 6'nın LDO/SOL/AVAX kürasyonu da aynı mantıkla yapılmış ve DEFTER Tur 9
+onu "seçim izi" diye kaydetmişti.
+
+### Karar
+POL çıkarıldı (`config.py` TOKENS = UNI/INJ/ADA/NEAR), sahibin açık kararıyla,
+**n<100 ve iki-pencere kuralına aykırı olduğu söylenerek**. R3-noPOL kolu
+koşulmadı: yönü belli (iki pencerede de 2. coini çıkarmak bakiyeyi düşürür),
+ledger'a "geçemeyen kol" olarak yazmanın bilgi değeri yok. Geri eklenecekse
+`experiments/` üzerinden 240g VE 665g'de, canlı bir aya bakarak değil.
+
+### Aynı incelemeden çıkan diğer tespitler
+- **Exit-type tablosundaki "SL %0 / MR_SL %0"** tanım gereği %0 — stop çıkışı
+  zarardır; düzeltilecek bir win rate yok. MR sleeve 27 Ağu'dan beri kapalı
+  (sunucuda doğrulandı: "MR off", deploy sonrası 0 MR olayı).
+- **SL avg R −0.74 iki kümeden:** −1.05R tam boy, −0.53R throttle (peak DD ≤ −7%
+  → boyut ×0.5). Throttle 22 Eyl itibarıyla açık (DD −7.7%); Faz 8 sonrası 28
+  SL'nin 18'i yarım boy. TP2 avgR de 1.93 → 1.47 aynı sebeple.
+- **SL payı %48 geometrinin parmak izi:** canlı Faz 8 öncesi/sonrası %47/%48,
+  backtest 240g/665g %39/%51, sentetik null %53 (Tur 9). Çıkış parametresiyle
+  düzeltilemez — Tur 9–11 kapattı.
+- **Sitedeki "TOTAL PNL" exit-only:** giriş ücreti + probe sürtünmesi (epoch
+  −$67, Faz 8 sonrası −$30) hiçbir çıkış tipine yazılmıyor. Faz 8 sonrası
+  exit-only +$59, hesap **+$29** (945 → 974); epoch toplamı **−$26**.
+- **Systemd env ezmesi yok:** CLAUDE.md/config.py'deki 🚨 uyarısı eskimişti;
+  unit'te iki satır da yorumlu, `DEPLOYED_SHA dded71b` (27 Ağu). Notlar düzeltildi.

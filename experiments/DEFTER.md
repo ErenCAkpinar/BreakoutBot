@@ -2438,6 +2438,20 @@ bazında; fiyat yuvarlaması) — yol gürültüsü, sistematik değil.
 deploy yok (#11 açık: sunucu `paper_bb.py` yerelden geride; deploy kararı
 kullanıcının).
 
+## Karar kaydı — POLUSDT çıkarıldı · 22 Eyl 2026 (kol koşulmadı)
+
+Deney değil, **sahip kararı**; buraya yazılma sebebi iki-pencere kuralının
+bilerek aşılması. Canlı Faz 8 sonrası POL n=11, −0.52R (t=−2.8, 5 coinden
+sonradan seçilen en kötü). Aynı geometri `R1-sl225t96`: 240g +0.51R (n=21,
+2/5), 665g +0.25R (n=56, 2/5). Kural gereği alınmazdı; alındı, kayda
+"kurala aykırı" diye geçti. R3-noPOL kolu koşulmadı — yönü belli, ledger'a
+geçemeyen bir kol daha eklemek bilgi üretmez. Ayrıntı: `BENCHMARKS.md` Faz 9.
+
+Aynı incelemenin not değeri olan yan bulgusu: sitedeki exit-type tablosunun
+"SL %0" satırı tanım gereğidir; SL avg R'nin −0.74 olması throttle (×0.5)
+karışımı; SL payı %48 sentetik null'daki %53 ile aynı sınıfta (Tur 9) —
+"SL'yi düzelt" sorusu Tur 9–11'de zaten kapalı.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
