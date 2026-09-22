@@ -198,7 +198,9 @@ değişkeninden okunur).
 
 | Dosya | Ne |
 |---|---|
-| [paper_bb.py](paper_bb.py) | Ana döngü: execution state machine, testnet emirleri, risk limitleri, state persist |
+| [paper_bb.py](paper_bb.py) | Ana döngü: bar işleme, risk kapıları, sleeve'ler, state persist |
+| [market_data.py](market_data.py) | Binance public 5m/4h mum çekimi (yalnız kapanmış bar) |
+| [testnet_orders.py](testnet_orders.py) | **Emekli** testnet emir yürütücüsü — çalışan sistemde kullanılmıyor |
 | [strategy.py](strategy.py) | Sinyal → karar; rejim gate'leri, confirm mantığı |
 | [math_engine.py](math_engine.py) | Wave 11 composite sinyal skoru (0–100) |
 | [indicators.py](indicators.py) | RSI, Bollinger, ATR, ADX, Hurst vb. |
@@ -206,7 +208,9 @@ değişkeninden okunur).
 | [mean_reversion.py](mean_reversion.py) | Range piyasa MR sleeve (NEUTRAL rejimde) |
 | [short_sleeve.py](short_sleeve.py) | Short denemesi — backtest'te edge bulunamadı, kapalı ama belgeli |
 | [config.py](config.py) | Tüm parametreler, tek dosyada, gerekçeli yorumlarla |
-| [backtest.py](backtest.py) / [bench.py](bench.py) | Backtest motoru + sabit-veri faz kıyas harness'ı |
+| [backtest.py](backtest.py) / [bench.py](bench.py) | Backtest replay motoru + sabit-veri faz kıyas harness'ı |
+| [backtest_data.py](backtest_data.py) | Geçmiş OHLCV çekimi + pencere cache'i (deney tekrarlanabilirliği) |
+| [backtest_report.py](backtest_report.py) | Backtest çıktısı: ilerleme, raporlar, koşu dump'ları |
 | [watch.py](watch.py) | Canlı izleme ekranı — state'i okur, drawdown/pozisyon/rejim/trade'leri yeniler (read-only) |
 | [dashboard.py](dashboard.py) | Go/no-go kontrol panosu (tek seferlik checklist) |
 | [REPORT.md](REPORT.md) | **Detaylı testnet raporu + postmortem (31 May – 7 Tem 2026)** |

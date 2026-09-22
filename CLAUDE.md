@@ -37,6 +37,12 @@ kanıt değil (n≈120'de SE ≈0.16R). Her hipotez ve sonucu `experiments/DEFTE
 - test: pytest
 - deadcode: ruff check . --select F401,F841
 
+Davranış denkliği (refactor yaparken): iki replay harness'ı var, ikisi de
+byte-aynı çıktı üretmeli.
+- canlı motor: `python3.12 experiments/replay_paper.py <out.json> 3000` (~2 dk)
+- backtest: `BT_RESTARTS=1 BT_RUN_TAG=<tag> python3.12 experiments/run_backtest.py
+  --days 240 --cache` → `backtests/data/last_run_240d_<tag>.json` (~14 dk)
+
 Notlar:
 - `shellcheck` kurulu değil → shell lint atlanıyor (`deploy_test.sh` denetlenmiyor).
 - Sistem `python3` (3.14) bu projenin bağımlılıklarına sahip değil; ccxt/pandas/numpy
