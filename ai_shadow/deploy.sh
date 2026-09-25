@@ -11,8 +11,8 @@ if [ -n "$(git status --porcelain -- ai_shadow)" ] && [ "${1:-}" != "--force" ];
 fi
 SHA="$(git rev-parse --short HEAD)"
 
-# COPYFILE_DISABLE: macOS tar would otherwise ship ._ AppleDouble files.
-COPYFILE_DISABLE=1 tar --exclude '__pycache__' --exclude '*.pyc' -czf - ai_shadow |
+# COPYFILE_DISABLE / --no-xattrs: macOS tar would otherwise ship ._ files and xattr headers.
+COPYFILE_DISABLE=1 tar --no-xattrs --no-mac-metadata --exclude '__pycache__' --exclude '*.pyc' -czf - ai_shadow |
   ssh "$SERVER" "set -euo pipefail
     install -d -m 700 /opt/breakoutbot-ai /var/lib/breakoutbot-ai-shadow
     rm -rf /opt/breakoutbot-ai/ai_shadow.new

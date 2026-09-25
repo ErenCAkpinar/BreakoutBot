@@ -2606,6 +2606,32 @@ netleşti ve **karar kurallarına dokunmuyor**:
   kesim sonrası bacakların defterden dışlanması, trail/TP1 alanlarının gizlenmesi
   — bilerek bozulduğunda testler kırılıyor, kural 2).
 
+### Faz 0 başladı — 2026-09-25 10:55 UTC
+
+Sunucuda `2d487ce`, `breakoutbot-ai-shadow.timer` açık (her barın 25. sn'si),
+`SHADOW_SINCE=2026-09-25T10:55:00Z`. Faz 0 bitişi: **2026-10-02 10:55 UTC**.
+
+**Duman testi** (ayrı dizine, Faz 0 kaydına girmez) — `UNIUSDT@10:35` girişi:
+
+| | |
+|---|---|
+| sonuç | `VETO_RECOMMENDED`, confidence 0.55 |
+| gerekçe | stop son dip 9.261'in ~0.26×ATR üstünde (gürültü içinde); 1h'de 9.39–9.46 bandı 5 kez reddedilmiş, giriş bandın altında, üst fitille |
+| token | 14 182 girdi · 1 683 çıktı |
+| maliyet | **$0.090** (tahmin $0.18'di) |
+| API süresi | 21.5 s |
+| look-ahead | son mumlar 5m 10:30 · 1h 09:00 · 4h 04:00 — hepsi kesimden (10:35) önce kapanmış; oluşmakta olan 1h 10:00 ve 4h 08:00 atılmış ✅ |
+| sandbox | Binance + Anthropic erişilebilir; `/root/BreakoutBot` (eski botun anahtarları) görünmüyor ✅ |
+
+Bu tek sonuç **hiçbir şey kanıtlamaz** (UNI pozisyonu açık, sonucu bilinmiyor);
+yalnız zincirin uçtan uca çalıştığını gösterir. Maliyet tahmini: ayda ~63 tam
+giriş × ~$0.09 ≈ **~$6**.
+
+⚠️ 7 günlük test anahtarının süresi **2 Ekim sabahı** doluyor — Faz 0
+bitişinden (10:55 UTC) önce. Faz 1 anahtarı (ayrı workspace, $20 limit, 90 gün)
+2 Ekim'den önce `/etc/breakoutbot-ai/anthropic.env`'e yazılmalı; aksi halde son
+saatler `auth_401` olarak kaydedilir (sayılır, gizlenmez).
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
