@@ -2452,6 +2452,128 @@ Aynı incelemenin not değeri olan yan bulgusu: sitedeki exit-type tablosunun
 karışımı; SL payı %48 sentetik null'daki %53 ile aynı sınıfta (Tur 9) —
 "SL'yi düzelt" sorusu Tur 9–11'de zaten kapalı.
 
+## Tur 15 — AI gölge vetosu: Opus 5.5 tam girişleri yalnız kayda geçer · 25 Eyl 2026
+
+**Durum:** HİPOTEZ — ölçümden önce yazıldı. Kod yok, ölçüm yok, çalışan bota
+dokunulmadı. Kaynak: `docs/research/2026-09-16-nyse-ai-gozlem.md` ("Gölge deney
+taslağı"); bu tur o taslağı önceden kayıtlı, ölçülebilir kurallara çeviriyor.
+
+### Neden
+
+Tur 2'nin dersi: kötü görünen işlemleri elemek toplam getiriyi düşürebilir
+(`R2-coinbull` 23 kârlı girişi eledi, `R2-minsl75` ortalama R'yi yükseltip hesabı
+düşürdü). Tur 9–14 mevcut sinyallerin ek yön tahmin gücünü kanıtlamadı. Bir LLM'in
+daha iyi eleyeceği yalnız bir hipotez — bu tur onu hiçbir kararı etkilemeden ölçer.
+
+### Hipotezler
+
+| # | Hipotez | Ölçüt |
+|---|---|---|
+| H15.0 | Altyapı: her tam giriş için zamanında, geçerli, look-ahead'siz bir öneri kaydedilebilir | Faz 0 çıkış koşulları |
+| H15.1 | Opus 5.5'in `VETO_RECOMMENDED` dediği tam girişler `ALLOW` dediklerinden kötüdür ve onları elemek hesap getirisini artırır | Faz 1 karar kuralı |
+
+### Tasarım (önceden sabit)
+
+- **Tetik: her `FULL OPEN`.** Probe'lar değil — canlıda 318 probe'a karşı 61 tam
+  giriş; risk tam girişte alınıyor ve çağrı sayısı ~5× az.
+- **Bota dokunulmaz.** Ayrı, salt-okur bir işçi servis `paper_bb.log`'daki
+  `FULL OPEN` satırını yakalar. Bot kodu, env'i ve systemd unit'i değişmez; iki
+  replay harness'ının byte-aynılığı etkilenmez. API anahtarı yalnız işçinin
+  sürecinde (`/etc/breakoutbot-ai/anthropic.env`, 600, root) — bot anahtarsız kalır.
+- **Veri kesimi = girişin bar kapanışı.** İşçi mumları `endTime ≤ kesim` ile çeker,
+  son mumun kapanışı kesimden sonraysa kayıt `NO_DATA` olur. Girdiler: coin ve BTC
+  için kapanmış 5m (288), 1h (168), 4h (180) mumları + botun kendi değerleri
+  (giriş, SL/TP, ATR, rejim etiketi, throttle, açık pozisyonlar, bakiye). Haber ve
+  funding yok: state'te olmayan girdi modele tahmin ettirilmez.
+- **Model/prompt:** `claude-opus-5-5`, effort açıkça `medium`, yapılandırılmış çıktı
+  `{recommendation: ALLOW|VETO_RECOMMENDED, reasons[]}`. Güven puanı kaydedilir ama
+  olasılık sayılmaz. Faz 1 başlamadan prompt v1 repoya commit edilir ve sha256'sı
+  buraya yazılır. Model, prompt, effort veya girdi setinde herhangi bir değişiklik
+  **yeni bir koldur** (H15.1b); verisi birleştirilmez.
+- **Kayıt, sonuçtan önce:** `signal_id` (sembol + giriş barı), veri kesimi, girdi
+  hash'i, model/prompt sürümü, öneri, gerekçe, gecikme, token ve maliyet. Sonuç
+  (`CLOSE FULL` R'si) sonradan log'dan eşleştirilir.
+- **Başarısızlıkta açık kalır.** Hata, zaman aşımı, kredi bitmesi → `NO_DATA`;
+  401 (anahtar süresi) ayrı sayılır ve gözlemci uyarır. Değerlendirmede
+  `NO_DATA` = `ALLOW` (bot o işlemi zaten aldı).
+
+### Faz 0 — bağlantı ve kayıt kalitesi (7 gün, 7 günlük test anahtarı)
+
+Bu fazın verisi değerlendirmeye **girmez**. Çıkış koşulları:
+
+- tam girişlerin ≥%95'i geçerli öneri alıyor,
+- medyan gecikme < 120 s (aktif veto olsaydı sonraki bara yetişebilmesi için),
+- çağrı başına maliyet ≤ $0.30,
+- look-ahead koruması hiç tetiklenmemiş.
+
+Tutmazsa altyapı düzeltilir ve Faz 0 baştan başlar.
+
+### Faz 1 — değerlendirme (kurallar ölçümden önce)
+
+**Karşılaştırılanlar** (aynı giriş kümesi, aynı maliyet varsayımları):
+
+1. **baseline** — bütün tam girişler (canlının kendisi),
+2. **AI vetosu** — `VETO_RECOMMENDED` girişler çıkarılmış,
+3. **rastgele veto (null)** — aynı oranda rastgele çıkarma, 10.000 çekiliş: AI'ın
+   seçimi şanstan iyi mi?
+4. **basit sayısal filtre** — `X_MIN_SL_FRAC=0.0075` (`R2-minsl75`, zaten kodda).
+   Yeni filtre icat edilmez; onu şimdi seçmek bir serbestlik derecesi daha olurdu.
+
+**Ana metrik: hesap getirisi** (Tur 1 düzeltmesi), portföy replay'iyle — veto
+edilen işlemin boşalttığı yuva, sonraki girişler ve bakiye/risk kısıtları yeniden
+hesaplanır; vetolu işlemleri defterden silmek yetmez (not madde 4). Yanında: MaxDD,
+önlenen zarar, kaçırılan kazananların kârı, API maliyeti. Teşhis: vetolu/izinli
+ortalama R farkı (yuva etkisini yok sayar, tek başına karar vermez).
+Replay'in veto listesi alabilmesi için harness'a varsayılanı kapalı bir bayrak
+gerekecek — bu da Faz 1 değerlendirmesinden önce, mekanizma testiyle (kural 2).
+
+**Kontrol noktaları** — Faz 1'de *kapanmış* tam pozisyon sayısı; arada eşik oynatılmaz:
+
+- **n=100 — yalnız "boşuna mı" kontrolü:** vetolu girişlerin ortalama R'si
+  izinlilerinkinden düşük değilse (AI iyi işlemleri eliyorsa) → **RED**, deney durur.
+- **n=300 — karar:** H15.1 ancak dördü birden tutarsa **DOĞRULANDI**:
+  (a) replay'de API maliyeti düşüldükten sonra hesap getirisi baseline'dan yüksek
+  ve MaxDD daha kötü değil; (b) rastgele-veto null'ına karşı tek yönlü p < 0.05;
+  (c) sayısal filtreden iyi; (d) `NO_DATA` oranı < %5.
+- Doğrulansa bile **veto canlıya kendiliğinden alınmaz** — aktif veto ayrı bir
+  hipotez ve sahip kararıdır.
+
+### Güç — dürüst beklenti
+
+Pozisyon başına SD ≈ 1.7R (kural 1). Veto oranı %30 varsayılırsa vetolu/izinli
+ortalama farkının SE'si n=100'de ≈ 0.37R, n=300'de ≈ 0.21R. Yani bu deney ancak
+**≈0.4R'den büyük** bir seçim becerisini ayırt edebilir. "Fark bulunamadı" sonucu
+"beceri yok" değil, "bu örneklemle ölçülemeyecek kadar küçük" demektir.
+
+### İki-pencere kuralının istisnası
+
+AI kolu 240g/665g'de koşulamaz: modelin eğitim verisi o dönemlerin sonucunu
+biliyor olabilir (not madde 5). Yerine yalnız ileriye dönük, dokunulmamış veri.
+Bu bir gevşetme değil, zorunlu ikame; karar kuralı bu yüzden dört koşullu.
+
+### Takvim ve maliyet — canlı tempoyla ölçüldü
+
+Faz 8 deploy'undan (27 Ağu 15:31 UTC) 25 Eyl'e **61 tam giriş, 318 probe**
+(~2.1 tam giriş/gün; haftalık 8·18·9·17·10). 240g backtest ortalaması 0.48/gün —
+canlı tempo ~4× üstünde; rejim değişirse düşer.
+
+| | canlı tempo | backtest temposu |
+|---|---:|---:|
+| n=100 | ~7 hafta | ~7 ay |
+| n=300 | ~5 ay | ~21 ay |
+
+- Tam giriş başına ~$0.18 (≈15K girdi + 6K çıktı, $4/$20 per MTok) → **ayda ~$11**.
+  Günlük özet raporu (değerlendirmenin parçası değil) istenirse +~$7.
+- Faz 0 (7 gün): ~$3–4.
+- Sohbetteki ilk "ayda ~15 aday" tahmini 240g backtest temposuydu; canlı ölçüm
+  ~4× fazla çıktı, maliyet buna göre düzeltildi.
+
+### Yapılmayacaklar
+
+- Bot kuralları, env ve unit değişmez; AI işlem açmaz, yalnız tam girişleri
+  değerlendirir. AI gecikmesi veya yokluğu hiçbir SL/TP/trail'i bekletmez.
+- Sonuç görüldükçe eşik, prompt veya model değiştirilmez; değişiklik = yeni kol.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
