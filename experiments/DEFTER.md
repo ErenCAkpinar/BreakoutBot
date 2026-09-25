@@ -2698,6 +2698,24 @@ için hiçbir şeyi değiştirmemeli — iki harness'la ölçüldü, ikisi de **
 Bayrak kapalıyken `paper_bb` ne `ai_shadow`'u ne SDK'yı import ediyor (test).
 Veto kancası mutasyonla doğrulandı: vetoyu yok sayan bir değişiklik 2 testi kırıyor.
 
+### İkiz başladı — 2026-09-25 11:35:21 UTC
+
+`breakoutbot-test` 11:35:17'de `43a81a6`'ya yeniden başlatıldı (bayrak kapalı,
+davranış byte-aynı), 4 s sonra state + log kopyalandı, ikiz aynı commit ve
+`X_AI_VETO=1` ile başladı. **Çatal: bar #16682, bakiye $962.47**, açık pozisyon
+yok. İlk ortak bar (#16,683, 11:40) iki botta aynı satırı yazdı ve iki state
+dosyası `funnel_totals` dışında **birebir aynı** çıktı.
+
+İkizin venv'i ana botun `pip freeze`'inden kuruldu: ccxt 4.5.56, pandas 3.0.3,
+numpy 2.4.6 aynı; SDK bağımlılığı olarak yalnız `idna` 3.17→3.20 ve
+`typing_extensions` 4.15→4.16 farklı (fiyat/strateji hesabına girmiyor).
+
+**İlk gerçek gölge kaydı (Faz 0):** `NEARUSDT@11:10` → ALLOW, conf 0.60, gecikme
+54 s (timer +25 s, API 22.9 s), $0.093. Duman testinde veto önerilen
+`UNIUSDT@10:35` pozisyonu TRAIL ile **+$12.02** kapandı — uygulanmış olsaydı bir
+kazananı eleyecekti. Tek örnek bir şey söylemez; neden n'e ihtiyaç olduğunu
+gösterir.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,

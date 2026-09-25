@@ -12,13 +12,20 @@ Canlı sistem sunucuda `breakoutbot-test` servisi olarak koşuyor (4 coin:
 UNI/INJ/ADA/NEAR — POL 2026-09-22'de sahip kararıyla çıkarıldı, `config.py` TOKENS
 bloğu ve `BENCHMARKS.md` Faz 9'da gerekçesi ve karşı-kanıtı kayıtlı).
 
+2026-09-25'ten beri yanında **"With AI" ikizi** `breakoutbot-ai` koşuyor
+(`/root/BreakoutBot-ai`): aynı commit, aynı config; tek fark unit'teki
+`X_AI_VETO=1` (DEFTER Tur 15, H15.2). İkisi de `deploy_test.sh` ile, aynı SHA'ya
+dağıtılır (`BOT_TARGET=ai` ikiz için). Bot koduna dokunan bir değişiklik **iki bota
+birden** gider; yalnız birine giderse karşılaştırma AI'ı değil kod farkını ölçer.
+AI gölge işçisi ayrıca `breakoutbot-ai-shadow.timer` (`ai_shadow/README.md`).
+
 ## Parametreler env'de DEĞİL, config.py'de (2026-08-27'den beri)
 
 Doğrulanan çıkış seti artık `config.py` **varsayılanı** (`BENCHMARKS.md` Faz 8):
 `SL_FULL_ATR=2.25 · TP1=3.0 · TP2=6.0 · TRAIL=3.75 · TIMEOUT_BARS=96 ·
 TP1_CLOSE_FRAC=0.0 · MR_ENABLED=False`. Env'siz koşmak **doğru** sistemi test eder.
 
-Systemd unit'inde **X_\* override yok** (2026-09-22'de doğrulandı: E6'dan kalma
+`breakoutbot-test` unit'inde **X_\* override yok** (2026-09-22'de doğrulandı: E6'dan kalma
 `X_TP1_CLOSE_FRAC` / `X_TRAIL_ATR` satırları yorumlanmış, `DEPLOYED_SHA` deploy'u
 gösterir). Öyle kalmalı — bir X_* bayrağı ancak `experiments/DEFTER.md`'de onu hak
 eden bir kol varsa eklenir. `python3.12 backtest.py` açılışta env sapmasını yazdırır.
