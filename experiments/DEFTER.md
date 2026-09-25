@@ -2574,6 +2574,38 @@ canlı tempo ~4× üstünde; rejim değişirse düşer.
   değerlendirir. AI gecikmesi veya yokluğu hiçbir SL/TP/trail'i bekletmez.
 - Sonuç görüldükçe eşik, prompt veya model değiştirilmez; değişiklik = yeni kol.
 
+### Faz 0 öncesi netleştirmeler (25 Eyl, uygulama sırasında — ölçüm başlamadan)
+
+Onaylanan metin yukarıda olduğu gibi duruyor; şu noktalar kod yazılırken
+netleşti ve **karar kurallarına dokunmuyor**:
+
+- **Pencereler.** 288/168/180 *modele gösterilen* değil *çekilen* pencereler
+  oldu (4h 220'ye çıktı ki SMA200 hesaplanabilsin). Token bütçesi (~15K) için
+  modele coin 5m 144 · 1h 72 · 4h 90, BTC 5m 48 · 1h 72 · 4h 90 mum gösteriliyor;
+  kod özellikleri uzun pencerelerden hesaplanıyor.
+- **Rejim etiketi state'ten okunmuyor.** Botun 4h rejimi girişten sonra
+  yenilenmiş olabilir (gelecek bilgisi); yerine 4h SMA50/SMA200 konumu, kesimden
+  önceki mumlarla koddan hesaplanıyor.
+- **Kapsam (sahibin notu: "kapsamlı analiz").** Tek çağrıda: mum tabloları +
+  koddan özellikler (getiri, ATR, oynaklık, aralık konumu, hacim oranı, SMA
+  farkları, BTC korelasyonu) + botun girişteki seviyeleri (trail/TP1 ilerlemesi
+  hariç) + kesim anındaki pozisyon defteri (son 15 kapanmış pozisyon, açık
+  pozisyonlar). Ayrı bir ön-işleme modeli yok: karar zinciri tek model = tek kol.
+- **Model rolleri.** H15.1 kararı yalnız `claude-opus-5-5`. Daha ucuz modeller
+  (Sonnet 5 / Haiku 4.5) yalnız değerlendirmeye girmeyen işler için — ör. günlük
+  rapor; henüz yazılmadı.
+- **Yedek model yok.** Sunucu tarafı fallback kapalı: ret başka modelle
+  cevaplanırsa kol sessizce değişir. Ret = `NO_DATA` (`refusal`).
+- **Bütçe.** Console aylık limit $20, auto-reload kapalı (sahip ayarladı). İşçi
+  takvim ayı içinde kendi harcamasını sayar, $18'i aşacaksa çağrı yapmaz →
+  `NO_DATA` (`budget`) — Faz 1'in `NO_DATA` < %5 koşuluna sayılır.
+- **Sabitlenen sürüm.** `prompt_v1.md` sha256 `9caed5c5…5894542`,
+  `decision.schema.json` sha256 `d6a1acdc…d8bd8bfa`, effort `medium`,
+  `anthropic==1.8.0`. Her kayıt kendi hash'lerini taşır.
+- **Kod:** `ai_shadow/` (22 test; üç koruma — oluşmakta olan mumun atılması,
+  kesim sonrası bacakların defterden dışlanması, trail/TP1 alanlarının gizlenmesi
+  — bilerek bozulduğunda testler kırılıyor, kural 2).
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,

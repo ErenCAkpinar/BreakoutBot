@@ -1,0 +1,36 @@
+[Unit]
+Description=BreakoutBot AI shadow veto (DEFTER Tur 15), record-only
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/breakoutbot-ai
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/breakoutbot-ai/anthropic.env
+EnvironmentFile=/etc/breakoutbot-ai/shadow.conf
+ExecStart=/opt/breakoutbot-ai/.venv/bin/python -m ai_shadow.worker --state /root/BreakoutBot-test/state_paper.json --out-dir /var/lib/breakoutbot-ai-shadow --since ${SHADOW_SINCE} --model ${SHADOW_MODEL} --effort ${SHADOW_EFFORT} --budget-usd ${SHADOW_BUDGET_USD}
+TimeoutStartSec=280
+KillMode=control-group
+UMask=0077
+Nice=10
+CPUQuota=50%
+MemoryMax=512M
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+PrivateTmp=true
+PrivateDevices=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/var/lib/breakoutbot-ai-shadow
+# The dead --testnet bot's directory holds exchange keys; this service has no business there.
+InaccessiblePaths=-/root/.ssh -/root/BreakoutBot -/root/.codex -/run/systemd/private -/run/dbus/system_bus_socket
+StandardOutput=journal
+StandardError=journal

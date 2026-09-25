@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["recommendation", "confidence", "key_factors", "reasoning"],
+  "properties": {
+    "recommendation": {"type": "string", "enum": ["ALLOW", "VETO_RECOMMENDED"]},
+    "confidence": {"type": "number"},
+    "key_factors": {"type": "array", "items": {"type": "string"}},
+    "reasoning": {"type": "string"}
+  }
+}
