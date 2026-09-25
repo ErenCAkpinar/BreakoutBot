@@ -17,8 +17,14 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 : "${BREAKOUTBOT_SERVER:?BREAKOUTBOT_SERVER tanımlı değil — örn: export BREAKOUTBOT_SERVER=root@<vm-ip>}"
 SERVER="$BREAKOUTBOT_SERVER"
-DIR='~/BreakoutBot-test'
 FORCE="${1:-}"
+# BOT_TARGET=ai deploys the same tree to the "With AI" twin (DEFTER Tur 15, H15.2).
+# Both bots run the same commit; only the twin's unit sets X_AI_VETO=1.
+case "${BOT_TARGET:-test}" in
+  test) DIR='~/BreakoutBot-test'; UNIT='breakoutbot-test' ;;
+  ai)   DIR='~/BreakoutBot-ai';   UNIT='breakoutbot-ai' ;;
+  *)    echo "BOT_TARGET must be 'test' or 'ai'" >&2; exit 2 ;;
+esac
 
 # ── 1. Dosya listesini import ağacından türet ────────────────────────────────
 # Kök paper_bb.py; yerel modüller özyinelemeli izlenir. Liste elle tutulmaz.
@@ -48,9 +54,19 @@ while queue:
         elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
             names = [node.module]
         for n in names:
-            cand = n.split(".")[0] + ".py"
+            top = n.split(".")[0]
+            cand = top + ".py"
             if os.path.exists(cand) and cand not in seen and cand not in EXCLUDE:
                 queue.append(cand)
+            elif os.path.isfile(os.path.join(top, "__init__.py")):
+                # A local package (ai_shadow): ship its modules and the runtime
+                # assets they read (prompt, schema), and follow its own imports.
+                for name in sorted(os.listdir(top)):
+                    path = os.path.join(top, name)
+                    if name.endswith(".py") and path not in seen:
+                        queue.append(path)
+                    elif name in ("prompt_v1.md", "decision.schema.json"):
+                        seen.add(path)
 print("\n".join(sorted(seen)))
 PY
 )
@@ -81,7 +97,9 @@ echo ""
 echo "📁 Sunucuda klasör: $DIR"
 ssh "$SERVER" "mkdir -p $DIR"
 echo "📤 Kopyalanıyor…"
-scp "${FILES[@]}" "$SERVER:$DIR/"
+# tar, not scp: scp flattens ai_shadow/live.py into the bot's root directory.
+COPYFILE_DISABLE=1 tar --no-xattrs --no-mac-metadata -czf - "${FILES[@]}" |
+  ssh "$SERVER" "tar -xzf - -C $DIR --no-same-owner"
 
 # Ne koştuğunu tahmin etmek zorunda kalmamak için sürümü diske yaz.
 ssh "$SERVER" "printf '%s\n' '$SHA  $(date -u +%Y-%m-%dT%H:%M:%SZ)' > $DIR/DEPLOYED_SHA"
@@ -93,9 +111,10 @@ echo "⚠️  ENV SÖZLEŞMESİ — parametreler artık config.py VARSAYILANI (2
 echo "    Unit'te bir X_* exit override'ı KALMAMALI: doğrulanan seti ezer ve hiç"
 echo "    test edilmemiş bir karışım çalıştırır. Denetle:"
 echo ""
-echo "      ssh $SERVER 'systemctl show breakoutbot-test -p Environment'"
+echo "      ssh $SERVER 'systemctl show $UNIT -p Environment'"
 echo ""
-echo "    Boş dönmeli. Bir X_* bayrağı ancak experiments/DEFTER.md'de onu hak"
-echo "    eden bir kol varsa eklenir — elle ayar yok."
+echo "    breakoutbot-test için boş dönmeli; breakoutbot-ai için yalnız X_AI_VETO=1"
+echo "    (DEFTER Tur 15, H15.2). Bir X_* bayrağı ancak experiments/DEFTER.md'de onu"
+echo "    hak eden bir kol varsa eklenir — elle ayar yok."
 echo ""
-echo "    Yeniden başlat:  ssh $SERVER 'systemctl restart breakoutbot-test'"
+echo "    Yeniden başlat:  ssh $SERVER 'systemctl restart $UNIT'"

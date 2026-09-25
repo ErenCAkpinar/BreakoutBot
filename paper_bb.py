@@ -28,7 +28,8 @@ import os
 import sys
 import time
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, NamedTuple
+from functools import partial
+from typing import TYPE_CHECKING, Callable, NamedTuple
 
 import regime
 from config import (
@@ -36,6 +37,8 @@ from config import (
     DAILY_DD_LIMIT, EQUITY_THROTTLE_DD, PEAK_DD_LIMIT, DAILY_SL_LIMIT,
     SESSION_START_UTC, SESSION_END_UTC,
     TEST_SIZE_USD, MAX_OPEN, RISK_PER_TRADE_USD,
+    AI_VETO_ENABLED, AI_VETO_MODEL, AI_VETO_EFFORT, AI_VETO_BUDGET_USD,
+    AI_VETO_TIMEOUT_S, AI_VETO_BAR_DEADLINE_S, AI_VETO_LOG,
 )
 from indicators import build_snapshot, hurst_exponent, precompute_indicators
 from strategy import SymbolState, IDLE, SCALE_OPEN, TRAILING, TEST_OPEN
@@ -129,6 +132,16 @@ class PaperTrader:
 
         # Log file (line-buffered so tail -f works)
         self.log_f = open(LOG_FILE, "a", buffering=1)
+
+        # DEFTER Tur 15 / H15.2 — only the "With AI" twin sets X_AI_VETO. Imported
+        # lazily so the flag-off bot never loads the SDK or the reviewer at all.
+        self.ai_veto = None
+        if AI_VETO_ENABLED:
+            from ai_shadow.live import LiveVeto
+            self.ai_veto = LiveVeto(
+                AI_VETO_LOG, model=AI_VETO_MODEL, effort=AI_VETO_EFFORT,
+                budget_usd=AI_VETO_BUDGET_USD, timeout_s=AI_VETO_TIMEOUT_S,
+                bar_deadline_s=AI_VETO_BAR_DEADLINE_S, log=self._log)
 
         if resume and os.path.exists(STATE_FILE):
             self._load_state()
@@ -575,10 +588,14 @@ class PaperTrader:
             block_new_full = (s.state == TEST_OPEN and open_full >= MAX_OPEN)
             if block_new_full:
                 funnel["blocked_max_open"] += 1
+            veto: Callable[[dict], bool] | None = None
+            if self.ai_veto is not None:
+                veto = partial(self.ai_veto.review, bar_dt=bar_dt,
+                               trade_log=self.trade_log, balance=self.balance)
             events = s.process_bar(reading.snap, reading.high, reading.low,
                                    reading.rsi, reading.vol_ratio,
                                    block_new_full=block_new_full,
-                                   size_mult=size_mult)
+                                   size_mult=size_mult, veto=veto)
 
         for ev in events:
             self.balance += ev.pnl

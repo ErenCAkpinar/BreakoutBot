@@ -28,6 +28,7 @@ State transitions per symbol:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Callable
 
 from math_engine import MathEngine
 from config import (
@@ -108,13 +109,18 @@ class SymbolState:
     def process_bar(self, snapshot: dict, high: float, low: float,
                     rsi_val: float, vol_ratio: float,
                     block_new_full: bool = False,
-                    size_mult: float = 1.0) -> list[Trade]:
+                    size_mult: float = 1.0,
+                    veto: Callable[[dict], bool] | None = None) -> list[Trade]:
         """
         Process one 5m bar. Returns list of completed Trade objects.
         Call this for every bar, in order.
 
         block_new_full : when True and confirmation succeeds, suppress the SCALE_OPEN
                          (used by paper trader to enforce MAX_OPEN across all symbols).
+        veto           : optional; asked once, with the prospective FULL position, right
+                         before it would open. True suppresses it exactly like
+                         block_new_full does. None (the default) is today's behaviour —
+                         the backtest and the flag-off live bot never pass one.
         """
         price = snapshot["price"]["current"]
 
@@ -127,7 +133,7 @@ class SymbolState:
             return self._scan_for_setup(snapshot, price)
         if self.state == TEST_OPEN:
             return self._resolve_probe(price, high, low, rsi_val, vol_ratio,
-                                       block_new_full, size_mult)
+                                       block_new_full, size_mult, veto)
         if self.state == SCALE_OPEN:
             return self._manage_full_position(price, high, low)
         if self.state == TRAILING:
@@ -178,7 +184,8 @@ class SymbolState:
         return events
     def _resolve_probe(self, price: float, high: float, low: float,
                        rsi_val: float, vol_ratio: float,
-                       block_new_full: bool, size_mult: float) -> list[Trade]:
+                       block_new_full: bool, size_mult: float,
+                       veto: Callable[[dict], bool] | None = None) -> list[Trade]:
         """TEST_OPEN — a bar later the probe is stopped, fails, or scales up."""
         events: list[Trade] = []
         self.bars_held += 1
@@ -217,6 +224,7 @@ class SymbolState:
             # NEUTRAL/BEAR between the TEST bar and this confirm bar, size_mult
             # is 0 → opening FULL would create a $0-notional position (and a
             # rejected testnet order). Skip → fall to else → reset + cooldown.
+            vetoed = False
             if confirmed and not block_new_full and size_mult > 0:
                 # Open full position
                 atr_val  = self.test_atr
@@ -228,7 +236,18 @@ class SymbolState:
                 notional = (RISK_PER_TRADE_USD / sl_frac) if sl_frac > 0 else FULL_SIZE_USD * LEVERAGE
                 notional = max(MIN_NOTIONAL_USD, min(notional, MAX_NOTIONAL_USD))
                 notional *= size_mult   # FAZ 1: regime throttle (BULL 1.0 / NEUTRAL+BEAR 0.35)
+                if veto is not None:
+                    # DEFTER Tur 15 / H15.2: the only point an external reviewer may act.
+                    vetoed = bool(veto({
+                        "symbol": self.symbol, "direction": self.direction,
+                        "test_entry": self.test_entry, "test_atr": atr_val,
+                        "full_entry": price, "full_notional": notional,
+                        "full_sl": price - mult * sl_dist,
+                        "full_tp1": price + mult * tp1_dist,
+                        "full_tp2": price + mult * tp2_dist,
+                    }))
 
+            if confirmed and not block_new_full and size_mult > 0 and not vetoed:
                 self.state        = SCALE_OPEN
                 self.full_entry   = price
                 self.full_notional= notional
@@ -245,7 +264,8 @@ class SymbolState:
                     symbol=self.symbol, direction=self.direction, kind="FULL",
                     entry=price, exit=0.0, pnl=-fee, exit_type="OPEN"))
             else:
-                # confirmed but MAX_OPEN reached (block_new_full=True), or failed confirmation
+                # confirmed but MAX_OPEN reached (block_new_full=True), vetoed, or failed
+                # confirmation
                 self._reset(cooldown=COOLDOWN_BARS)
         return events
     def _manage_full_position(self, price: float, high: float,

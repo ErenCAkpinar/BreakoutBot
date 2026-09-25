@@ -218,6 +218,21 @@ ADVERSE_FILLS = _os.getenv("X_ADVERSE_FILLS", "1") != "0"
 # so this must earn its place on two windows like everything else.
 MIN_SL_FRAC = _envf("X_MIN_SL_FRAC", 0.0)
 
+# ── AI veto (DEFTER Tur 15, H15.2) ────────────────────────────────────────────
+# Off everywhere except the "With AI" twin bot, whose unit sets X_AI_VETO=1. When
+# on, the pinned reviewer (the same arm the shadow worker measures, H15.1) is
+# asked once per confirmed probe, right before the FULL position would open, and
+# a VETO_RECOMMENDED suppresses it exactly like MAX_OPEN does. Any failure —
+# timeout, budget, network, refusal — lets the entry through (fail-open), so the
+# twin can never trade MORE than the bot without it, only less.
+AI_VETO_ENABLED      = _envf("X_AI_VETO", 0.0) > 0
+AI_VETO_MODEL        = "claude-opus-5-5"
+AI_VETO_EFFORT       = "medium"
+AI_VETO_BUDGET_USD   = 8.0     # calendar-month cap for the twin's own calls
+AI_VETO_TIMEOUT_S    = 60.0    # per call; the bar loop waits at most this long
+AI_VETO_BAR_DEADLINE_S = 200.0 # no call may start later than this past the bar close
+AI_VETO_LOG          = "ai_decisions.jsonl"
+
 # ── Confirmation check (1 bar after test entry) ───────────────────────────────
 CONFIRM_PRICE_MOVE_PCT = _envf("X_CONFIRM_PRICE_MOVE_PCT", 0.0005)  # ≥0.05% move in signal direction
 CONFIRM_VOL_MULT       = _envf("X_CONFIRM_VOL_MULT", 1.0)   # volume ≥ N× avg — 1.0 is effectively no filter

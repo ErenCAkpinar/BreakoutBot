@@ -6,6 +6,7 @@ deadline and portfolio slot; its TP2 becomes unreachable after the one partial.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Callable
 from functools import partial
 from math import isfinite
 
@@ -29,7 +30,8 @@ class TP2RunnerState(SymbolState):
     def process_bar(self, snapshot: dict, high: float, low: float,
                     rsi_val: float, vol_ratio: float,
                     block_new_full: bool = False,
-                    size_mult: float = 1.0) -> list[Trade]:
+                    size_mult: float = 1.0,
+                    veto: Callable[[dict], bool] | None = None) -> list[Trade]:
         direction = 1 if self.direction == "LONG" else -1
         if self.state == TRAILING and self.close_fraction == 0:
             self.full_tp2 = direction * float("inf")
@@ -42,7 +44,7 @@ class TP2RunnerState(SymbolState):
         if not partial_hit:
             return super().process_bar(snapshot, high, low, rsi_val, vol_ratio,
                                        block_new_full=block_new_full,
-                                       size_mult=size_mult)
+                                       size_mult=size_mult, veto=veto)
 
         # The original, completed-bar trail has survived. TP2 is reached on this
         # bar, so realize only the chosen fraction, charging its one exit fee.

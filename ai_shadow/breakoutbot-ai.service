@@ -1,0 +1,17 @@
+[Unit]
+Description=BreakoutBot "With AI" twin (simulation; AI veto on, DEFTER Tur 15 H15.2)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/root/BreakoutBot-ai
+# The one difference from breakoutbot-test. Earned by DEFTER Tur 15, H15.2.
+Environment=X_AI_VETO=1
+EnvironmentFile=/etc/breakoutbot-ai/anthropic.env
+ExecStart=/root/BreakoutBot-ai/.venv/bin/python paper_bb.py --resume
+Restart=on-failure
+RestartSec=15
+RestartPreventExitStatus=1
+
+[Install]
+WantedBy=multi-user.target

@@ -2632,6 +2632,72 @@ bitişinden (10:55 UTC) önce. Faz 1 anahtarı (ayrı workspace, $20 limit, 90 g
 2 Ekim'den önce `/etc/breakoutbot-ai/anthropic.env`'e yazılmalı; aksi halde son
 saatler `auth_401` olarak kaydedilir (sayılır, gizlenmez).
 
+## Tur 15 · H15.2 — "With AI" ikizi: aynı bot, veto aktif · 25 Eyl 2026
+
+**Durum:** sahibin isteğiyle (siteye "With AI / Without AI" ayrımı); ikiz
+çalışmaya başlamadan yazıldı.
+
+### Ne
+
+`breakoutbot-ai`, `breakoutbot-test`'in ikizi: **aynı commit, aynı config, aynı
+veri, aynı VM**; tek fark unit'teki `X_AI_VETO=1`. H15.1'in onaylı kolunu —
+`claude-opus-5-5`, prompt v1 (aynı hash), effort `medium`, aynı girdi paketi ve
+look-ahead koruması — teyit edilmiş probe ile tam pozisyon arasına koyar.
+`VETO_RECOMMENDED` → tam pozisyon açılmaz; bu, MAX_OPEN bloğunun kullandığı yolun
+aynısıdır (probe `CONFIRM_OK` ile kapanır, cooldown başlar). Her hata, zaman
+aşımı, ret veya bütçe → **izin** (fail-open): ikiz, AI'sız bottan **fazla** işlem
+açamaz, yalnız eksik açabilir.
+
+**Çatal:** ikiz, çalıştırıldığı anda `breakoutbot-test`'in `state_paper.json` ve
+`paper_bb.log` kopyasıyla başlar — bakiye, zirve, throttle ve açık pozisyonlar
+aynı. Çatal öncesi geçmiş iki botta ortak; ikizin log'unda çatal satırı işaretli.
+
+### Neden
+
+H15.1'in portföy replay'i bir modeldir; ikiz, aynı politikanın **gerçek yolunu**
+üretir. İki kazanç: (a) sitede görünür bir karşılaştırma, (b) replay harness'ının
+doğrulaması — Faz 1'de `breakoutbot-test` log'una ikizin veto listesi
+uygulandığında replay ikizin yolunu (yaklaşık) üretmeli; üretmiyorsa harness'ta
+kusur vardır.
+
+### Ne değildir
+
+**Bağımsız kanıt değil.** Tek bir yol (n=1 patika); iki hesabın farkı vetolu
+işlemlerin sonuçlarına indirgenir, yani H15.1 ile aynı soruyu sorar, üstüne yol
+gürültüsü ekler. **Kendi karar kuralı yok:** ikizin önde ya da geride olması tek
+başına AL/RED değildir — Tur 15'in n=100/n=300 kuralları geçerli. Sitede de
+"deney" olarak sunulur.
+
+### Bilinen farklar
+
+- Pozisyon defteri çataldan sonra ayrışır → aynı sinyale gölge ile ikiz farklı
+  girdi görür; model de deterministik değil. Aynı `signal_id` için gölge/aktif
+  cevaplar kaydedilir, uyuşmazlık oranı raporlanır.
+- Prompt v1 "az önce açtığı" der; aktifte pozisyon henüz açılmamıştır. Kol
+  kimliği için metin **bilerek** değiştirilmedi.
+- Bar döngüsü cevabı bekler. Çağrı ancak bar kapanışından sonraki 200 s içinde
+  60 s'lik tam süre kalmışsa başlar (sonraki sembollerin veri çekimi bir sonraki
+  bara taşmasın diye); kalmamışsa `bar_time_budget` → izin.
+
+### Bütçe
+
+İkiz ayda $8 tavan (`config.AI_VETO_BUDGET_USD`); gölge işçinin tavanı $18 → **$10**
+(`shadow.conf`). Toplam ≤ $18 < Console'daki $20. Çağrı ~$0.09, tempo ~2 tam
+giriş/gün → her biri ayda ~$6.
+
+### Davranış denkliği (bayrak kapalı)
+
+`strategy.process_bar(veto=None)` varsayılanı ve paper_bb'deki bayrak, AI'sız bot
+için hiçbir şeyi değiştirmemeli — iki harness'la ölçüldü, ikisi de **byte-aynı**:
+
+| harness | önce | sonra |
+|---|---|---|
+| `replay_paper.py … 3000` (canlı motor) | `replay_before.json` | `cmp` → aynı |
+| 240g backtest, `BT_RESTARTS=1` | $1361.38 · 1150 bacak | `cmp` → aynı |
+
+Bayrak kapalıyken `paper_bb` ne `ai_shadow`'u ne SDK'yı import ediyor (test).
+Veto kancası mutasyonla doğrulandı: vetoyu yok sayan bir değişiklik 2 testi kırıyor.
+
 ## Sıradaki fikirler (henüz hipotez değil)
 
 - **Walk-forward.** E1–E8 arası sekiz çıkış kolu denendi ve en iyisi seçildi,
