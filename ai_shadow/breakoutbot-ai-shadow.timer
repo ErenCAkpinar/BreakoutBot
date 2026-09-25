@@ -1,0 +1,12 @@
+[Unit]
+Description=AI shadow review, 25 s after every 5-minute bar
+
+[Timer]
+OnCalendar=*-*-* *:00/5:25 UTC
+AccuracySec=1s
+# Missed passes need no replay: the next pass reads every unreviewed entry from the log.
+Persistent=false
+Unit=breakoutbot-ai-shadow.service
+
+[Install]
+WantedBy=timers.target

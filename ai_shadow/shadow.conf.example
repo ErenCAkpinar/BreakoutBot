@@ -1,0 +1,6 @@
+# /etc/breakoutbot-ai/shadow.conf — non-secret settings (the key lives in anthropic.env).
+# Changing MODEL or EFFORT starts a new arm (DEFTER Tur 15): record the change there first.
+SHADOW_SINCE=2026-09-25T12:00:00Z
+SHADOW_MODEL=claude-opus-5-5
+SHADOW_EFFORT=medium
+SHADOW_BUDGET_USD=18
