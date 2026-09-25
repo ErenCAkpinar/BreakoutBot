@@ -36,8 +36,9 @@ kullanılmaz — reddedilen bir isteği başka modelin cevaplaması kolu değiş
 | kayıtlar | `/var/lib/breakoutbot-ai-shadow/decisions.jsonl`, `runs/` |
 | unit'ler | `breakoutbot-ai-shadow.service` + `.timer` |
 
-Unit kısıtlı çalışır: dosya sistemi salt-okunur (yalnız kayıt dizini yazılabilir),
-`/root/.ssh` ve botun çalışma dizini dışındaki `/root` içeriği erişilemez.
+Unit kısıtlı çalışır: dosya sistemi salt-okunur (yalnız kayıt dizini yazılabilir);
+`/root` boş bir tmpfs'tir ve içine yalnız `/root/BreakoutBot-test` salt-okunur bağlanır —
+botun dizini dışında `/root` altındaki hiçbir şey görünmez.
 
 ## Okuma
 

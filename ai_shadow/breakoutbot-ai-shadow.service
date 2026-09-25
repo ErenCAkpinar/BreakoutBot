@@ -19,7 +19,9 @@ CPUQuota=50%
 MemoryMax=512M
 NoNewPrivileges=true
 ProtectSystem=strict
-ProtectHome=read-only
+# /root becomes an empty tmpfs; only the bot's directory is bound back, read-only.
+ProtectHome=tmpfs
+BindReadOnlyPaths=/root/BreakoutBot-test
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
@@ -30,7 +32,6 @@ LockPersonality=true
 SystemCallArchitectures=native
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 ReadWritePaths=/var/lib/breakoutbot-ai-shadow
-# Only the running bot's directory is needed; everything else under /root stays out of reach.
-InaccessiblePaths=-/root/.ssh -/root/BreakoutBot -/root/.codex -/run/systemd/private -/run/dbus/system_bus_socket
+InaccessiblePaths=-/run/systemd/private -/run/dbus/system_bus_socket
 StandardOutput=journal
 StandardError=journal
