@@ -2621,7 +2621,7 @@ Sunucuda `2d487ce`, `breakoutbot-ai-shadow.timer` açık (her barın 25. sn'si),
 | maliyet | **$0.090** (tahmin $0.18'di) |
 | API süresi | 21.5 s |
 | look-ahead | son mumlar 5m 10:30 · 1h 09:00 · 4h 04:00 — hepsi kesimden (10:35) önce kapanmış; oluşmakta olan 1h 10:00 ve 4h 08:00 atılmış ✅ |
-| sandbox | Binance + Anthropic erişilebilir; `/root/BreakoutBot` (eski botun anahtarları) görünmüyor ✅ |
+| sandbox | Binance + Anthropic erişilebilir; botun dizini dışındaki `/root` içeriği görünmüyor ✅ |
 
 Bu tek sonuç **hiçbir şey kanıtlamaz** (UNI pozisyonu açık, sonucu bilinmiyor);
 yalnız zincirin uçtan uca çalıştığını gösterir. Maliyet tahmini: ayda ~63 tam

@@ -37,7 +37,7 @@ kullanılmaz — reddedilen bir isteği başka modelin cevaplaması kolu değiş
 | unit'ler | `breakoutbot-ai-shadow.service` + `.timer` |
 
 Unit kısıtlı çalışır: dosya sistemi salt-okunur (yalnız kayıt dizini yazılabilir),
-`/root/.ssh` ve anahtar taşıyan eski `/root/BreakoutBot` dizini erişilemez.
+`/root/.ssh` ve botun çalışma dizini dışındaki `/root` içeriği erişilemez.
 
 ## Okuma
 
