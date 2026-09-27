@@ -2727,3 +2727,15 @@ gösterir.
 - **Session filtresi (04–23 UTC).** Env'e açık değil, hiç test edilmedi.
 - **Funding sleeve (Phase B).** Yönlü sistemde Sharpe ~0.8 tavanı var; delta-nötr
   taşıma stratejileri 2026'da çok daha iyi risk-ayarlı getiri üretiyor.
+
+## Not — 2026-09-27: değişen commit hash'leri
+
+27 Eylül'de commit mesajlarındaki "Co-Authored-By: Claude" ve "Claude-Session"
+satırları silindi ve ikiz dalı (`ai-twin`) main'e taşındı. Bu, commit
+hash'lerini değiştirdi; kod aynı kaldı. Bu defterde geçen eski hash'lerin
+karşılıkları:
+
+| Eski | Yeni | Commit |
+|---|---|---|
+| `2d487ce` | `bba5179` | feat(ai_shadow): the record-only AI veto worker for DEFTER Tur 15 |
+| `43a81a6` | `b3c01d7` | feat(ai_veto): a "With AI" twin — same bot, the pinned reviewer can veto |
