@@ -1,109 +1,112 @@
 # BreakoutBot
 
-> Rejim-farkındalıklı **breakout momentum** kripto botu.
-> 7/24 **simülasyon**: gerçek Binance Futures fiyat verisi, yerel sanal cüzdan,
-> borsaya **hiç emir gitmiyor** (API anahtarı dahi yüklü değil). Emekli sürümler
-> Binance Futures Testnet'e emir gönderiyordu; bu repoda "testnet" yalnızca onları anlatır.
-> Canlı kayıt: **[breakoutbot.dev](https://breakoutbot.dev)**
+**English** · [Türkçe](README.tr.md)
 
-Bu repo "kazanan botumu paylaşıyorum" demiyor. Hikâye daha dürüst:
-**sistemi kurdum, ölçtüm, strateji kaybedince risk katmanı botu durdurdu,
-postmortem yazdım, ölçüm hatalarını düzelttim ve her değişikliği önceden yazılmış
-kurallarla deniyorum.** Olay analizi: [REPORT.md](REPORT.md) · deneyler:
-[BENCHMARKS.md](BENCHMARKS.md), [experiments/DEFTER.md](experiments/DEFTER.md).
+> A regime-aware **breakout momentum** crypto bot.
+> A 24/7 **simulation**: real Binance Futures price data and a local virtual wallet;
+> **no orders ever reach an exchange** (no API key is even loaded). Retired versions
+> sent orders to the Binance Futures Testnet; in this repo, "testnet" only refers to them.
+> Live record: **[breakoutbot.dev](https://breakoutbot.dev)**
+
+This repo is not "here is my winning bot". The story is more honest:
+**I built the system and measured it; when the strategy lost, the risk layer stopped the bot;
+I wrote a postmortem, fixed the measurement errors, and I test every change against rules
+written down in advance.** Incident analysis: [REPORT.md](REPORT.md) · experiments:
+[BENCHMARKS.md](BENCHMARKS.md), [experiments/DEFTER.md](experiments/DEFTER.md)
+(these three documents are in Turkish; there, phases are "Faz" and rounds are "Tur").
 
 ---
 
-## Güncel durum (25 Eylül 2026)
+## Current state (25 September 2026)
 
 | | |
 |---|---|
-| **Mod** | Saf simülasyon: gerçek fiyat, sanal cüzdan, emir yok |
-| **Sistem** | Güncel sürüm (sitede "v2"), 29 Temmuz 2026'dan beri kayıtta |
-| **Strateji** | 4h BTC rejim kapısı (long yalnız BULL'da) + 5 dakikalık breakout; short ve mean-reversion kolları kapalı |
-| **Çıkış seti** | Faz 8, 27 Ağustos 2026'dan beri `config.py` varsayılanı: SL 2.25×ATR · TP1 3×ATR (kısmi kapanış yok) · TP2 6×ATR · trailing 3.75×ATR · 96 bar zaman aşımı |
-| **Evren** | 4 coin: ADA, INJ, NEAR, UNI (22 Eylül 2026'dan beri; POL'un çıkarılma gerekçesi [BENCHMARKS.md](BENCHMARKS.md) Faz 9'da) |
-| **Sonuç** | 25 Eylül itibarıyla 115 kapalı pozisyon, $1,000 → $946.68 (−%5.3), en kötü drawdown −%13.5. Güncel rakamlar: [breakoutbot.dev](https://breakoutbot.dev/without-ai.html) |
-| **Aktif deney** | AI veto (25 Eylül 2026'dan beri): Claude Opus 5.5 her tam girişi değerlendiriyor ([ai_shadow/](ai_shadow/)). Site, kuralları tek başına izleyen hesapla veto edilen girişleri atlayan kopyayı yan yana yayınlıyor. Karar kuralları veriden önce yazıldı: 100 kapalı pozisyonda ilk kontrol, 300'de karar, aynı oranda rastgele vetoya karşı ([DEFTER.md](experiments/DEFTER.md) Tur 15). |
+| **Mode** | Pure simulation: real prices, virtual wallet, no orders |
+| **System** | Current version ("v2" on the site), on record since 29 July 2026 |
+| **Strategy** | 4h BTC regime gate (longs only in BULL) + 5-minute breakout; the short and mean-reversion arms are switched off |
+| **Exit set** | Phase 8, the `config.py` default since 27 August 2026: SL 2.25×ATR · TP1 3×ATR (no partial close) · TP2 6×ATR · trailing 3.75×ATR · 96-bar timeout |
+| **Universe** | 4 coins: ADA, INJ, NEAR, UNI (since 22 September 2026; why POL was dropped is explained in [BENCHMARKS.md](BENCHMARKS.md), Phase 9) |
+| **Result** | As of 25 September: 115 closed positions, $1,000 → $946.68 (−5.3%), worst drawdown −13.5%. Current figures: [breakoutbot.dev](https://breakoutbot.dev/without-ai.html) |
+| **Active experiment** | AI veto (since 25 September 2026): Claude Opus 5.5 reviews every full entry ([ai_shadow/](ai_shadow/)). The site publishes the account that follows the rules alone next to the copy that skips vetoed entries. The decision rules were written before any data: a first check at 100 closed positions, a decision at 300, against a random veto at the same rate ([DEFTER.md](experiments/DEFTER.md), Tur 15). |
 
-Canlı sonuç şu an backtest beklentisinin altında (bkz. [Doğrulama](#doğrulama));
-aradaki fark açık bir araştırma sorusu.
+The live result is currently below the backtest expectation (see [Validation](#validation));
+the gap is an open research question.
 
 ---
 
-## Nasıl çalışıyor
+## How it works
 
 ```
-market_data.py (Binance 5m + 4h mumlar, yalnız kapanmış bar)
+market_data.py (Binance 5m + 4h candles, closed bars only)
         │
 indicators.py ──► math_engine.py          regime.py
 (RSI, BB, ATR,    (Wave 11 composite      (BTC 200-MA:
- ADX, Hurst)       skor 0–100)             BULL/NEUTRAL/BEAR)
+ ADX, Hurst)       score 0–100)            BULL/NEUTRAL/BEAR)
         │                 │                     │
         └────────┬────────┘─────────────────────┘
                  ▼
-          strategy.py  ◄── mean_reversion.py (NEUTRAL rejimde MR, şu an KAPALI)
-   (sinyal → karar,    ◄── short_sleeve.py  (test edildi, edge yok → KAPALI)
-    rejim kapıları)
+          strategy.py  ◄── mean_reversion.py (MR in the NEUTRAL regime, currently OFF)
+   (signal → decision, ◄── short_sleeve.py  (tested, no edge → OFF)
+    regime gates)
                  │
                  ▼
            paper_bb.py
-   (yürütme durum makinesi, sanal cüzdan,
-    risk limitleri, state kaydı, systemd altında 7/24)
-                 │  salt-okur
+   (execution state machine, virtual wallet,
+    risk limits, state persistence, 24/7 under systemd)
+                 │  read-only
      ┌───────────┼─────────────────────┐
      ▼           ▼                     ▼
   watch.py    ai_shadow/            monitoring/
-  (terminal   (AI veto kaydı,       (15 dakikalık AI
-   monitörü)   Tur 15)               gözlem raporu)
+  (terminal   (AI veto record,      (15-minute AI
+   monitor)    Tur 15)               observation report)
 ```
 
-### Giriş mimarisi: Test → Confirm → Scale
+### Entry architecture: Test → Confirm → Scale
 
-Full pozisyona doğrudan girilmez; breakout önce küçük parayla yoklanır:
+The bot never enters a full position directly; a breakout is first probed with a small amount:
 
-1. **TEST OPEN** — $20'lık probe pozisyonu (sinyal gerçek mi?)
-2. **CONFIRMED / CONF FAIL** — 1 bar sonra fiyat/hacim/RSI onayı; geçemezse iptal
-3. **FULL OPEN** — risk-bazlı boyutlandırılmış asıl pozisyon
-4. **Çıkış** — ATR tabanlı SL (2.25×) / TP2 (6×) / trailing (3.75×) / zaman aşımı (96 bar)
+1. **TEST OPEN** — a $20 probe position (is the signal real?)
+2. **CONFIRMED / CONF FAIL** — one bar later, a price/volume/RSI confirmation; if it fails, the probe is cancelled
+3. **FULL OPEN** — the real position, sized by risk
+4. **Exit** — ATR-based SL (2.25×) / TP2 (6×) / trailing (3.75×) / timeout (96 bars)
 
-> Çıkış geometrisi 2026-08-27'de genişletildi (bkz. [BENCHMARKS.md](BENCHMARKS.md)
-> Faz 8). Kısmi çıkış kapatıldı: TP1'de %50 kapatmak kazananı ~0.7R'de sınırlarken
-> kayıp tam 1R kalıyordu. Geniş stop, risk sabit dolar olduğu için **daha küçük**
-> pozisyon demek — aynı riske daha az ücret. 665 günlük pencerede hard-stop sayısı
-> 7'den 3'e indi.
+> The exit geometry was widened on 2026-08-27 (see [BENCHMARKS.md](BENCHMARKS.md),
+> Phase 8). The partial exit was switched off: closing 50% at TP1 capped a winner at
+> about 0.7R while a loss still cost a full 1R. Because risk is a fixed dollar amount,
+> a wider stop means a **smaller** position, so less goes to fees for the same risk. Over
+> the 665-day window the number of hard stops fell from 7 to 3.
 
-Güncel kayıtta (29 Temmuz – 25 Eylül) 471 probe açıldı, 102'si onaylanıp tam
-pozisyona dönüştü; probe katmanının toplam maliyeti −$13.48.
+In the current record (29 July – 25 September), 471 probes were opened and 102 of them
+were confirmed and became full positions; the probe layer cost −$13.48 in total.
 
-### Pozisyon boyutlandırma
+### Position sizing
 
-Sabit notional değil, **sabit dolar riski**: her full pozisyon, SL'e gelirse
-~`RISK_PER_TRADE_USD` ($10 ≈ bakiyenin %1'i) kaybedecek şekilde boyutlanır.
-Volatil coin küçük, sakin coin büyük pozisyon alır. Emekli testnet sürümünde
-ortalama kaybın $10.34 çıkması bu mekanizmanın sahada doğrulaması.
+Not a fixed notional but a **fixed dollar risk**: every full position is sized to lose about
+`RISK_PER_TRADE_USD` ($10 ≈ 1% of the balance) if its SL is hit. A volatile coin gets a
+small position and a calm one a large position. In the retired testnet version the average
+loss came out at $10.34, a check of this mechanism in the field.
 
-### Risk katmanları (kill-switch'ler)
+### Risk layers (kill switches)
 
-| Limit | Eşik | Aksiyon |
+| Limit | Threshold | Action |
 |---|---|---|
-| `DAILY_DD_LIMIT` | −%5 (gün içi) | Yeni giriş dondurulur |
-| `EQUITY_THROTTLE_DD` | −%7 (peak'ten) | Pozisyon boyutu yarıya iner |
-| `PEAK_DD_LIMIT` | −%15 (peak'ten) | **Hard stop** — bot kendini durdurur |
-| `DAILY_SL_LIMIT` | 2 SL / sembol / gün | O sembol o gün dondurulur |
-| `MAX_OPEN` | 2 | Aynı anda en fazla 2 full pozisyon |
+| `DAILY_DD_LIMIT` | −5% (intraday) | New entries are frozen |
+| `EQUITY_THROTTLE_DD` | −7% (from peak) | Position size is halved |
+| `PEAK_DD_LIMIT` | −15% (from peak) | **Hard stop**: the bot stops itself |
+| `DAILY_SL_LIMIT` | 2 SLs / symbol / day | That symbol is frozen for the day |
+| `MAX_OPEN` | 2 | At most 2 full positions at a time |
 
-(14 Haziran'da tetiklenen ilk build −%20 limitle koşuyordu; güncel kod −%15 —
-bkz. [config.py](config.py).)
+(The first build, which tripped on 14 June, ran with a −20% limit; the current code uses −15%,
+see [config.py](config.py).)
 
 ---
 
-## Canlı izleme (`watch.py`)
+## Live monitor (`watch.py`)
 
-Bot çalışırken ikinci bir terminalde açtığın, birkaç saniyede bir yenilenen bir
-monitör. `state_paper.json`'u **sadece okur** — çalışan bota dokunmaz. Drawdown'ın
-throttle/hard-stop eşiklerine ne kadar kaldığını, açık pozisyonları, rejim
-tablosunu ve son trade'leri tek ekranda gösterir.
+A monitor you open in a second terminal while the bot runs; it refreshes every few seconds.
+It **only reads** `state_paper.json` and never touches the running bot. One screen shows how
+far the drawdown is from the throttle and hard-stop thresholds, the open positions, the
+regime table and the latest trades. The monitor's labels are in Turkish.
 
 ```console
 $ python watch.py --demo          # örnek veriyle dene (bot gerekmez)
@@ -143,79 +146,78 @@ $ python watch.py --demo          # örnek veriyle dene (bot gerekmez)
   read-only · botu etkilemez · simülasyon (gerçek para değil)
 ```
 
-> Yukarıdaki tablo `state_paper.sample.json` **örnek verisidir** (UI'yi bot olmadan
-> göstermek için; Temmuz ayındaki 8 coinlik evreni ve eski çıkış yapısını yansıtır).
-> Gerçek sonuçlar için → [breakoutbot.dev](https://breakoutbot.dev).
+> The screen above is **sample data** from `state_paper.sample.json` (it shows the UI without
+> the bot and reflects the 8-coin universe and the old exit structure from July).
+> For real results → [breakoutbot.dev](https://breakoutbot.dev).
 
 ```bash
-python watch.py                 # canlı, 5 sn'de bir yenilenir (gerçek state)
-python watch.py --interval 2    # daha sık yenile
-python watch.py --demo          # örnek veriyle
-python watch.py --once          # tek kare (ekran görüntüsü / CI)
+python watch.py                 # live, refreshes every 5 s (real state)
+python watch.py --interval 2    # refresh more often
+python watch.py --demo          # with sample data
+python watch.py --once          # a single frame (screenshot / CI)
 ```
 
 ---
 
-## Doğrulama
+## Validation
 
-Her deney **aynı sabitlenmiş veride** koşar; metrik farkı = sadece kod farkı.
-Bir parametre değişikliği ancak 240 günlük **ve** 665 günlük pencerede birden
-baseline'ı geçerse alınır ([experiments/](experiments/),
-[BENCHMARKS.md](BENCHMARKS.md)). Metrikler pozisyon başına sayılır
-([metrics.py](metrics.py)); kısmi çıkışlar ayrı kazanç sayılmaz.
+Every experiment runs on **the same pinned data**, so a difference in the metrics is purely a
+difference in the code. A parameter change is adopted only if it beats the baseline in the
+240-day **and** the 665-day window ([experiments/](experiments/), [BENCHMARKS.md](BENCHMARKS.md)).
+Metrics are counted per position ([metrics.py](metrics.py)); partial exits do not count as
+separate wins.
 
-Güncel çıkış seti (Faz 8) backtest'te:
+The current exit set (Phase 8) in backtests:
 
-| Pencere | Sonuç | Max DD | Hard stop |
+| Window | Result | Max DD | Hard stops |
 |---|---|---|---|
-| 240 gün (Ağustos 2026'ya kadar) | $1,000 → $1,435 (PF 2.00) | −%6.14 | 0 |
-| 665 gün (Ekim 2024 – Ağustos 2026) | $1,000 → $1,085 (PF 1.18) | −%37.6 | 3 (her birinden sonra yeniden başlatıldığı varsayılarak) |
+| 240 days (to August 2026) | $1,000 → $1,435 (PF 2.00) | −6.14% | 0 |
+| 665 days (October 2024 – August 2026) | $1,000 → $1,085 (PF 1.18) | −37.6% | 3 (assuming a restart after each) |
 
-Canlı kayıt (−%5.3, 115 pozisyon) şu an 240 günlük beklentinin altında. Backtest
-ile canlı arasındaki fark ve seçim yanlılığı riski [DEFTER.md](experiments/DEFTER.md)'de
-izleniyor; bu tablo bir getiri beklentisi değildir.
+The live record (−5.3%, 115 positions) is currently below the 240-day expectation. The gap
+between backtest and live results, and the risk of selection bias, are tracked in
+[DEFTER.md](experiments/DEFTER.md); this table is not a return expectation.
 
 ---
 
-## Yerelde çalıştırma
+## Run locally
 
 ```bash
 pip install -r requirements.txt   # ccxt, pandas, numpy, requests
 
-python paper_bb.py                    # simülasyon (anahtar gerekmez)
-python paper_bb.py --resume           # kayıtlı state'ten devam
-python paper_bb.py --status           # mevcut state özeti
+python paper_bb.py                    # simulation (no keys needed)
+python paper_bb.py --resume           # continue from the saved state
+python paper_bb.py --status           # summary of the current state
 
-python watch.py                       # canlı izleme ekranı (read-only)
-python watch.py --demo                # örnek veriyle (bot gerekmez)
+python watch.py                       # live monitor (read-only)
+python watch.py --demo                # with sample data (no bot needed)
 
-python bench.py fazN                  # faz backtest'i (bkz. BENCHMARKS.md)
-./experiments/run_arm.sh <kol> <gün> ENV=VAL…   # deney kolu (bkz. experiments/DEFTER.md)
+python bench.py fazN                  # phase backtest (see BENCHMARKS.md)
+./experiments/run_arm.sh <arm> <days> ENV=VAL…   # experiment arm (see experiments/DEFTER.md)
 ```
 
-`--testnet` bayrağı ve [testnet_orders.py](testnet_orders.py) emekli sürümden
-kalıyor; çalışan sistem kullanmıyor.
+The `--testnet` flag and [testnet_orders.py](testnet_orders.py) are left over from the
+retired version; the running system does not use them.
 
-Canlı sistem bir VM'de `breakoutbot-test` systemd servisi olarak koşar. Testnet
-emirleri gönderen eski `breakoutbot` (MAIN) servisi 22 Ağustos 2026'da emekliye
-ayrıldı. Değişiklikler [deploy_test.sh](deploy_test.sh) ile dağıtılır (hedef sunucu
-`BREAKOUTBOT_SERVER` env değişkeninden okunur). AI veto kaydı ve gözlem raporu
-ayrı, salt-okur servislerdir (bkz. [ai_shadow/](ai_shadow/) ve
-[monitoring/](monitoring/) README'leri).
+The live system runs on a VM as the `breakoutbot-test` systemd service. The old `breakoutbot`
+(MAIN) service, which sent testnet orders, was retired on 22 August 2026. Changes are deployed
+with [deploy_test.sh](deploy_test.sh) (the target server is read from the `BREAKOUTBOT_SERVER`
+environment variable). The AI veto record and the observation report are separate, read-only
+services (see the [ai_shadow/](ai_shadow/) and [monitoring/](monitoring/) READMEs).
 
 ---
 
-## Tarihçe
+## History
 
-| Dönem | Ne oldu | Sonuç |
+| Period | What happened | Outcome |
 |---|---|---|
-| **31 May – 14 Haz 2026** · ilk sürüm, 23 coin, testnet emirleri | 45 full pozisyon | WR %33, profit factor 0.52 → **edge negatif**. −%20.3 peak drawdown'da **hard stop tetiklendi, bot kendini durdurdu.** |
-| **Olay** · 14–15 Haz | Hard stop sonrası systemd servisi ~245 kez restart döngüsüne girdi (exit kodu `RestartPreventExitStatus` ile eşleşmedi) | Kanama yok (bot her seferinde yeniden durdu); servis ayarı düzeltildi. Postmortem: [REPORT.md §5](REPORT.md) |
-| **15 Haz – 22 Ağu 2026** · rejim-farkındalıklı sürüm (sitede "v1"), testnet emirleri | State $1,000'a resetlendi, evren 8 coine indi. İlk 3.2 haftada **0 full pozisyon** (aşırı düzeltme). Sonra bir ölçüm hatası bulundu: TP1 ayrı bir kazanç olarak sayılıyordu (raporlanan WR %57.7, gerçek %43.6) | 22 Ağustos'ta $896.38'de (−%10.4) emekliye ayrıldı |
-| **29 Tem 2026 – devam** · güncel sürüm (sitede "v2"), simülasyon | Test servisinde canlı A/B olarak başladı (geniş trailing, kısmi çıkış yok) ve 10 Ağustos'ta kazandı. 22 Ağustos'ta evren 5 coine indi, 27 Ağustos'ta Faz 8 çıkış seti alındı, 22 Eylül'de evren 4 coine indi | Canlı kayıt: [breakoutbot.dev](https://breakoutbot.dev) |
+| **31 May – 14 Jun 2026** · first version, 23 coins, testnet orders | 45 full positions | WR 33%, profit factor 0.52 → **negative edge**. At a −20.3% peak drawdown **the hard stop fired and the bot stopped itself.** |
+| **Incident** · 14–15 Jun | After the hard stop, the systemd service went into a restart loop of about 245 restarts (the exit code did not match `RestartPreventExitStatus`) | No further losses (the bot stopped again each time); the service setting was fixed. Postmortem: [REPORT.md §5](REPORT.md) |
+| **15 Jun – 22 Aug 2026** · regime-aware version ("v1" on the site), testnet orders | The state was reset to $1,000 and the universe cut to 8 coins. **0 full positions** in the first 3.2 weeks (an overcorrection). Then a measurement bug was found: TP1 was counted as a separate win (reported WR 57.7%, real 43.6%) | Retired on 22 August at $896.38 (−10.4%) |
+| **29 Jul 2026 – ongoing** · current version ("v2" on the site), simulation | Started as a live A/B test on the test service (wider trailing stop, no partial exit) and won on 10 August. The universe went to 5 coins on 22 August, the Phase 8 exit set was adopted on 27 August, and the universe went to 4 coins on 22 September | Live record: [breakoutbot.dev](https://breakoutbot.dev) |
 
-Emekli testnet sürümünün log'undan bir yaşam döngüsü (eski çıkış yapısı; TP1'de
-yarım kapanış vardı):
+A position's lifecycle from the retired testnet version's log (old exit structure; half of
+the position was closed at TP1):
 
 ```
 TEST OPEN   JUPUSDT LONG @ 0.1877  | bal=$989.25
@@ -225,60 +227,60 @@ CLOSE FULL  JUPUSDT [TP1]   entry=0.1883 exit=0.1901   pnl=$+3.95
 CLOSE FULL  JUPUSDT [TRAIL] entry=0.1883 exit=0.18965  pnl=$+2.90
 ```
 
-O dönemde 308 probe'un toplam maliyeti net −$7.65 oldu ve 228 zayıf sinyali full
-pozisyona dönüşmeden eledi. Aynı dönemin Faz 4c backtest'inin raporladığı PF 3.29,
-TP1'in ayrı kazanç sayılmasıyla şişmişti; düzeltilmiş havuzlanmış PF 1.95
-([BENCHMARKS.md](BENCHMARKS.md) Faz 5).
+In that period, 308 probes cost a net −$7.65 in total and filtered out 228 weak signals before
+they became full positions. The PF of 3.29 reported by that period's Phase 4c backtest was
+inflated by counting TP1 as a separate win; the corrected pooled PF is 1.95
+([BENCHMARKS.md](BENCHMARKS.md), Phase 5).
 
 ---
 
-## Repo haritası
+## Repo map
 
-| Dosya | Ne |
+| File | What it is |
 |---|---|
-| [paper_bb.py](paper_bb.py) | Ana döngü: bar işleme, risk kapıları, state kaydı |
-| [market_data.py](market_data.py) | Binance public 5m/4h mum çekimi (yalnız kapanmış bar) |
-| [strategy.py](strategy.py) | Sinyal → karar; rejim kapıları, confirm mantığı |
-| [math_engine.py](math_engine.py) | Wave 11 composite sinyal skoru (0–100) |
-| [indicators.py](indicators.py) | RSI, Bollinger, ATR, ADX, Hurst vb. |
-| [regime.py](regime.py) | BTC 200-MA rejim sınıflandırması (BULL / NEUTRAL / BEAR) |
-| [metrics.py](metrics.py) | Pozisyon bazlı metrikler (expectancy, payoff, başabaş WR) — tek doğruluk kaynağı |
-| [mean_reversion.py](mean_reversion.py) | Range piyasa MR kolu (şu an kapalı) |
-| [short_sleeve.py](short_sleeve.py) | Short denemesi — backtest'te edge bulunamadı, kapalı ama belgeli |
-| [config.py](config.py) | Tüm parametreler, tek dosyada, gerekçeli yorumlarla |
-| [testnet_orders.py](testnet_orders.py) | **Emekli** testnet emir yürütücüsü — çalışan sistemde kullanılmıyor |
-| [backtest.py](backtest.py) / [bench.py](bench.py) | Backtest replay motoru + sabit-veri faz kıyas harness'ı |
-| [backtest_data.py](backtest_data.py) | Geçmiş OHLCV çekimi + pencere cache'i (deney tekrarlanabilirliği) |
-| [backtest_report.py](backtest_report.py) | Backtest çıktısı: ilerleme, raporlar, koşu dump'ları |
-| [experiments/](experiments/) | Deney kolları, `DEFTER.md` hipotez defteri, `ledger.py` |
-| [ai_shadow/](ai_shadow/) | AI veto kaydı (Claude Opus 5.5, Tur 15) — bota dokunmayan ayrı servis |
-| [monitoring/](monitoring/) | 15 dakikalık AI gözlem raporu servisi (salt-okur) |
-| [watch.py](watch.py) | Canlı izleme ekranı — state'i okur (read-only) |
-| [dashboard.py](dashboard.py) | Go/no-go kontrol panosu (tek seferlik checklist) |
-| [REPORT.md](REPORT.md) | Testnet raporu + postmortem (31 May – 7 Tem 2026) |
-| [BENCHMARKS.md](BENCHMARKS.md) | Faz faz backtest kıyası ve kararlar |
-| [ROADMAP.md](ROADMAP.md) | Çok-rejim evrim tasarım dokümanı |
+| [paper_bb.py](paper_bb.py) | Main loop: bar processing, risk gates, state persistence |
+| [market_data.py](market_data.py) | Binance public 5m/4h candle fetching (closed bars only) |
+| [strategy.py](strategy.py) | Signal → decision; regime gates, confirmation logic |
+| [math_engine.py](math_engine.py) | Wave 11 composite signal score (0–100) |
+| [indicators.py](indicators.py) | RSI, Bollinger, ATR, ADX, Hurst and more |
+| [regime.py](regime.py) | BTC 200-MA regime classification (BULL / NEUTRAL / BEAR) |
+| [metrics.py](metrics.py) | Per-position metrics (expectancy, payoff, break-even WR): the single source of truth |
+| [mean_reversion.py](mean_reversion.py) | Mean-reversion arm for ranging markets (currently off) |
+| [short_sleeve.py](short_sleeve.py) | Short experiment: no edge found in backtests, off but documented |
+| [config.py](config.py) | Every parameter in one file, with comments explaining each choice |
+| [testnet_orders.py](testnet_orders.py) | **Retired** testnet order executor, not used by the running system |
+| [backtest.py](backtest.py) / [bench.py](bench.py) | Backtest replay engine + fixed-data phase comparison harness |
+| [backtest_data.py](backtest_data.py) | Historical OHLCV fetching + window cache (for reproducible experiments) |
+| [backtest_report.py](backtest_report.py) | Backtest output: progress, reports, run dumps |
+| [experiments/](experiments/) | Experiment arms, the `DEFTER.md` hypothesis notebook, `ledger.py` |
+| [ai_shadow/](ai_shadow/) | AI veto record (Claude Opus 5.5, Tur 15): a separate service that does not touch the bot |
+| [monitoring/](monitoring/) | 15-minute AI observation report service (read-only) |
+| [watch.py](watch.py) | Live monitor; reads the state (read-only) |
+| [dashboard.py](dashboard.py) | Go/no-go control board (one-off checklist) |
+| [REPORT.md](REPORT.md) | Testnet report + postmortem (31 May – 7 Jul 2026) |
+| [BENCHMARKS.md](BENCHMARKS.md) | Phase-by-phase backtest comparison and decisions |
+| [ROADMAP.md](ROADMAP.md) | Design document for the multi-regime evolution |
 
 ---
 
-## Sırada ne var
+## What's next
 
-- [x] Hard stop sonrası restart döngüsü düzeltildi (Haziran 2026, [REPORT.md §5](REPORT.md))
-- [x] Sinyal hunisi telemetrisi ve pozisyon bazlı metrikler (Temmuz 2026, [BENCHMARKS.md](BENCHMARKS.md) Faz 5)
-- [x] Çıkış yapısı deneyleri → Faz 8 çıkış seti (Ağustos 2026)
-- [ ] AI veto deneyi: Faz 0 (25 Eylül – 2 Ekim 2026), ardından 100 ve 300 kapalı pozisyonda önceden yazılmış kontroller
-- [ ] Walk-forward doğrulama (seçilen çıkış kolundaki seçim yanlılığını ölçmek için)
-- [ ] Probe katmanının gerekli olup olmadığını ölçmek
+- [x] Fix the restart loop after a hard stop (June 2026, [REPORT.md §5](REPORT.md))
+- [x] Signal funnel telemetry and per-position metrics (July 2026, [BENCHMARKS.md](BENCHMARKS.md), Phase 5)
+- [x] Exit structure experiments → the Phase 8 exit set (August 2026)
+- [ ] AI veto experiment: Phase 0 (25 September – 2 October 2026), then the pre-registered checks at 100 and 300 closed positions
+- [ ] Walk-forward validation (to measure the selection bias in the chosen exit arm)
+- [ ] Measure whether the probe layer is needed
 
 ---
 
-## Feragat
+## Disclaimer
 
-Hiçbir rakam gerçek parayla üretilmemiştir. Çalışan bot **saf simülasyondur** —
-gerçek fiyat verisi, yerel sanal cüzdan, borsaya giden emir yok. Emekli sürümler
-Binance Futures **Testnet**'e gerçek emir gönderiyordu (yine sahte bakiye); bu
-ayrım önemli, çünkü emir gönderen bir sistemin slipaj ve icra maliyeti simülasyonda
-görünmez. Hangi rakamın hangisinden geldiği `BENCHMARKS.md`'de belirtilir.
+No figure here was produced with real money. The running bot is **a pure simulation**: real
+price data, a local virtual wallet, no orders sent to an exchange. Retired versions sent real
+orders to the Binance Futures **Testnet** (still with a fake balance). The distinction matters,
+because the slippage and execution costs of a system that sends orders do not show up in a
+simulation. `BENCHMARKS.md` states which figure comes from which source.
 
-Bu proje bir araştırma/mühendislik çalışmasıdır; **yatırım tavsiyesi değildir** ve
-gerçek parayla kullanım için tasarlanmamıştır.
+This project is a research and engineering exercise; it is **not investment advice** and is not
+designed for use with real money.
